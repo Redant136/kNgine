@@ -307,7 +307,6 @@ void clear(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
   glClearColor(r / 255.0, g / 255.0, b / 255.0, a / 255.0);
   glClear(GL_COLOR_BUFFER_BIT);
 }
-void clear() { clear(0, 0, 0, 0); }
 
 void drawRect(v2 points[4]) {
   float vertices[] = {
