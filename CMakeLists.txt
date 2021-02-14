@@ -1,6 +1,16 @@
 if(APPLE)
   include_directories ( /usr/local/include) 
   link_directories( /usr/local/lib)
+  SET(GCC_LINK_FLAGS "-framework Foundation -framework OpenGL -framework AppKit -lglfw -pthread")
+else()
+  SET(GCC_LINK_FLAGS "-pthread -lGL -lglfw -ldl -lopenal -lalut")
+endif()
+SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS}")
+
+
+if(APPLE)
+  include_directories ( /usr/local/include) 
+  link_directories( /usr/local/lib)
   set(OSSpecificFiles
     src/AudioEngineNSSound.mm
     src/RendererGLFW.cpp
