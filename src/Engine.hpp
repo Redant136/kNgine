@@ -10,8 +10,6 @@
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
 
-#include <iostream>
-
 namespace kNgine
 {
 #ifdef global_engine
@@ -143,6 +141,7 @@ namespace kNgine
   public:
     std::vector<EngineObject*>workingObjects=std::vector<EngineObject*>();
     std::string window_name="Game";
+    v2 window_size={1920.0f,1080.0f};
 
     void includeChildren()
     {
