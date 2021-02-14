@@ -370,6 +370,9 @@ void drawRect(v2 points[4]) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                GL_STATIC_DRAW);
   // draw------
+  glm::mat4 transform = glm::mat4(1.0f);
+  unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+  glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glUseProgram(shaderProgram);
@@ -433,6 +436,9 @@ void drawTriangle(v2 points[3]) {
                         (void*)(7 * sizeof(float)));
   glEnableVertexAttribArray(2);
   // draw------
+  glm::mat4 transform = glm::mat4(1.0f);
+  unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+  glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glUseProgram(shaderProgram);
@@ -480,6 +486,9 @@ void drawLine(v2 points[2]) {
   glEnableVertexAttribArray(2);
 
   // draw------
+  glm::mat4 transform = glm::mat4(1.0f);
+  unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+  glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
