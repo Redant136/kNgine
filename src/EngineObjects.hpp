@@ -90,7 +90,6 @@ namespace kNgine
   {
   protected:
     std::vector<ObjectComponent *> components;
-
   public:
     ComponentGameObject();
     ComponentGameObject(const ComponentGameObject &base);

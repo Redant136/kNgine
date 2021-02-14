@@ -115,7 +115,7 @@ namespace kNgine{
   }
   ObjectComponent::ObjectComponent(const ObjectComponent &base) {
     this->object = base.object;
-    this->label = "none";
+    this->label = base.label;
   };
   ObjectComponent::~ObjectComponent() {}
   void ObjectComponent::update(std::vector<msg> msgs) {}
@@ -126,8 +126,12 @@ namespace kNgine{
   ComponentGameObject::ComponentGameObject(const ComponentGameObject &base) {
     this->labels = base.labels;
     this->flags=base.flags;
-    this->flags=base.flags;
-    this->components = base.components;
+    this->components=std::vector<ObjectComponent*>();
+    for(int i=0;i<base.components.size();i++){
+      this->components.push_back(new ObjectComponent(*base.components[i]));
+      this->components[this->components.size()-1]->object=this;
+    }
+    // this->components = base.components;
     this->position = base.position;
   }
   ComponentGameObject::~ComponentGameObject() {
