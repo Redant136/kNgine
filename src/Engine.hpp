@@ -264,7 +264,7 @@ namespace kNgine
     {
       includeChildren();
       renderer::init(argc, argv);
-      renderer::createWindow(1920, 1080, window_name.c_str());
+      renderer::createWindow(window_size.x, window_size.y, window_name.c_str());
       sleepMillis(10);
       renderer::setupWindow(std::bind(&engine::frameUpdate,this));
       renderer::setDrawFunction(std::bind(&engine::frameUpdate, this));
