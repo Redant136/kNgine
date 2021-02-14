@@ -1,12 +1,3 @@
-if(APPLE)
-  include_directories ( /usr/local/include) 
-  link_directories( /usr/local/lib)
-  SET(GCC_LINK_FLAGS "-framework Foundation -framework OpenGL -framework AppKit -lglfw -pthread")
-else()
-  SET(GCC_LINK_FLAGS "-pthread -lGL -lglfw -ldl -lopenal -lalut")
-endif()
-SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS}")
-
 
 if(APPLE)
   include_directories ( /usr/local/include) 
@@ -40,6 +31,13 @@ target_link_libraries(kNgine PRIVATE box2d)
 
 add_subdirectory(extern/glad/)
 target_link_libraries(kNgine PRIVATE kNgine_glad)
+
+if(APPLE)
+  target_link_directories(kNgine PUBLIC "/usr/local/lib")
+  target_link_libraries(kNgine PRIVATE "-framework Foundation -framework OpenGL -framework AppKit -lglfw -pthread")
+else()
+  target_link_libraries(kNgine PRIVATE "-pthread -lGL -lglfw -ldl -lopenal -lalut")
+endif()
 
 target_include_directories(kNgine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
