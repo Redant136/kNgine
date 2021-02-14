@@ -25,7 +25,7 @@ void launch();
 void setDrawColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a=255);
 void clear(uint8_t r, uint8_t g, uint8_t b, uint8_t a=255);
 // clear the window, if no color specified, set to black with alpha = 255
-void clear(uint8_t rgb=0){clear(rgb,rgb,rgb,255);}
+inline void clear(uint8_t rgb=0){clear(rgb,rgb,rgb,255);}
 
 void drawRect(v2 points[4]);
 void drawRect(v2 startPos, double width, double height);
