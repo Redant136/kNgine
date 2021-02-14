@@ -44,7 +44,7 @@ namespace kNgine
       : SpriteMapAccessor(base)
   {
     this->spriteLocation = "CENTER";
-    this->spriteDimension = v2(0, 0);
+    this->spriteDimension = v2(1, 1);
     this->mapIndex = index;
     this->spriteList = spriteList;
   }
