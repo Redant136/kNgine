@@ -25,7 +25,7 @@ namespace kNgine{
   SoundPlayerComponent::~SoundPlayerComponent(){
   }
 
-  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, const char* fileName,audiofiletype type, SoundPlayerComponent *player) : SoundEmiterComponent(object, new NSSoundBuffer(fileName),player)
+  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, const char* fileName,audiofiletype type, SoundPlayerComponent *player) : SoundEmiterComponent(object, createBuffer(fileName,type),player)
   {
 
   }
@@ -42,7 +42,7 @@ namespace kNgine{
 
   }
   void AudioEngine::play(const char* fileName,audiofiletype type){
-    BaseAudioBuffer*buffer=createBuffer(fileName);
+    BaseAudioBuffer*buffer=createBuffer(fileName,type);
     play(buffer);
   }
   void AudioEngine::play(BaseAudioBuffer* buffer){
