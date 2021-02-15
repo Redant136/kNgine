@@ -62,7 +62,7 @@ namespace kNgine
     std::vector<objectFlags> flags;
     bool enabled=true;
     EngineObject(){ labels = std::vector<std::string>(); flags=std::vector<objectFlags>();}
-    EngineObject(const EngineObject&base){this->labels=base.labels;this->flags=base.flags;}
+    EngineObject(const EngineObject&base){this->labels=base.labels;this->flags=base.flags;this->enabled=base.enabled;}
     virtual ~EngineObject(){}
     virtual void update(std::vector<msg> msgs){}
     virtual void init(std::vector<EngineObject *> objects){}

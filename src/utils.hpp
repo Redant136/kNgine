@@ -3,13 +3,13 @@
 #define fast_calc_precision 11
 #include <cmath>
 #include <functional>
+#include <random>
 
 #ifdef _WIN32
 #include <Windows.h>
 #elif __unix__
 #include <unistd.h>
 #endif
-
 
 struct iv2;
 struct iv3;
@@ -542,6 +542,12 @@ inline v4::v4(const iv4 &base)
   this->z=base.z;
   this->w=base.w;
 }
+
+inline float randf()// randome float between 0-1
+{
+  return ((float)std::rand() / (RAND_MAX));
+}
+#define rand() randf()
 
 struct color
 {

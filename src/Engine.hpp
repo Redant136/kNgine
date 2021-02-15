@@ -4,6 +4,8 @@
 #include <string>
 #include <chrono>
 #include <functional>
+#include <random>
+#include <ctime>
 #include "utils.hpp"
 #include "EngineObjects.hpp"
 #include "Renderer.hpp"
@@ -262,6 +264,7 @@ namespace kNgine
 
     void start(int argc, const char **argv)
     {
+      srand(time(NULL));
       includeChildren();
       renderer::init(argc, argv);
       renderer::createWindow(window_size.x, window_size.y, window_name.c_str());
