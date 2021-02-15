@@ -13,6 +13,14 @@ namespace kNgine
     mapper posMapper;
     float fov;
     std::vector<std::string> blackList = std::vector<std::string>();
+    enum
+    {
+      MAX_WH,
+      MIN_WH,
+      WIDTH,
+      HEIGHT,
+      DIAGONAL
+    } fovType = MAX_WH;
     bool showDebugHitBox = false;
     Camera();
     Camera(float fov, int windowWidth, int windowHeight);

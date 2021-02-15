@@ -1,3 +1,4 @@
+set(BOX2DPHYSICS ON)
 
 if(APPLE)
   include_directories ( /usr/local/include) 
@@ -16,8 +17,6 @@ endif()
 set(KNGINE_SOURCE_FILES
   ${OSSpecificFiles}
   src/EngineObjects.cpp 
-  src/Physics_2D.cpp
-  src/PhysicsB2.cpp
   src/Camera_2D.cpp
   src/TextBox.cpp
   src/SpriteUtils.cpp
@@ -26,8 +25,19 @@ add_library(kNgine
   ${KNGINE_SOURCE_FILES}
 )
 
-add_subdirectory(extern/box2d)
-target_link_libraries(kNgine PRIVATE box2d)
+if(BOX2DPHYSICS)
+  set(KNGINE_SOURCE_FILES
+    ${KNGINE_SOURCE_FILES}
+    src/PhysicsB2.cpp
+  )
+  add_subdirectory(extern/box2d)
+  target_link_libraries(kNgine PRIVATE box2d)
+else()
+  set(KNGINE_SOURCE_FILES
+    ${KNGINE_SOURCE_FILES}
+    src/Physics_2D.cpp
+  )
+endif()
 
 add_subdirectory(extern/glad/)
 target_link_libraries(kNgine PRIVATE kNgine_glad)

@@ -61,11 +61,12 @@ namespace kNgine
     std::vector<std::string> labels;
     std::vector<objectFlags> flags;
     bool enabled=true;
-    EngineObject();
-    virtual ~EngineObject();
-    virtual void update(std::vector<msg> msgs);
-    virtual void init(std::vector<EngineObject *> objects);
-    virtual void end(std::vector<EngineObject *> objects);
+    EngineObject(){ labels = std::vector<std::string>(); flags=std::vector<objectFlags>();}
+    EngineObject(const EngineObject&base){this->labels=base.labels;this->flags=base.flags;}
+    virtual ~EngineObject(){}
+    virtual void update(std::vector<msg> msgs){}
+    virtual void init(std::vector<EngineObject *> objects){}
+    virtual void end(std::vector<EngineObject *> objects){}
   };
   // object to be positionned in game
   class GameObject : public EngineObject
@@ -74,6 +75,8 @@ namespace kNgine
     v3 position;
     v3 rotation; // v3(yz,xz,xy)
     GameObject();
+    GameObject(const GameObject&base);
+    virtual ~GameObject(){}
   };
   // modular objects for implementations, define modules labels using [name]
   class ObjectComponent
@@ -143,6 +146,7 @@ namespace kNgine
   class UIRenderer:public EngineObject{
   public:
     UIRenderer();
+    UIRenderer(const UIRenderer&base):EngineObject(base){}
     virtual void render();
   };
   // do not implement, is automatically generated when starting engine for the
@@ -161,7 +165,17 @@ namespace kNgine
   public:
     std::vector<GameObject *> children;
     ParentObject();
+    ParentObject(const ParentObject&base);
   };
+
+  struct EngineEvent
+  {
+    std::string name;
+    std::vector<EngineObject *> *objects;
+    std::function<void(std::vector<EngineObject *> objects)> event;
+  };
+  void addEvent(EngineEvent event);
+  void callEvent(std::string name);
 
   template <class T = EngineObject>
   std::vector<T *> findObject(std::vector<EngineObject *> objects,
@@ -321,16 +335,6 @@ namespace kNgine
   };
 
   Sprite importSprite(const char *filename);
-
-  struct EngineEvent
-  {
-    std::string name;
-    std::vector<EngineObject*>* objects;
-    std::function<void(std::vector<EngineObject *>objects)> event;
-  };
-
-  void addEvent(EngineEvent event);
-  void callEvent(std::string name);
 
   template <class T = GameObject>
   std::vector<T *> orderObjectsByZ(std::vector<GameObject *> objects)

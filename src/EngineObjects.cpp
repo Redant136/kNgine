@@ -101,13 +101,12 @@ namespace kNgine{
     }
   }
 
-  EngineObject::EngineObject() { labels = std::vector<std::string>(); flags=std::vector<objectFlags>();}
-  EngineObject::~EngineObject() {}
-  void EngineObject::update(std::vector<msg> msgs) {}
-  void EngineObject::init(std::vector<EngineObject *> objects) {}
-  void EngineObject::end(std::vector<EngineObject *> objects) {}
-
   GameObject::GameObject() { flags.push_back(objectFlags::GAME_OBJECT); }
+  GameObject::GameObject(const GameObject&base):EngineObject(base)
+  {
+    this->position=base.position;
+    this->rotation=base.rotation;
+  }
 
   ObjectComponent::ObjectComponent(GameObject *base) {
     this->object = base;
@@ -123,16 +122,14 @@ namespace kNgine{
     components = std::vector<ObjectComponent *>();
     flags.push_back(objectFlags::COMPONENT);
   }
-  ComponentGameObject::ComponentGameObject(const ComponentGameObject &base) {
-    this->labels = base.labels;
-    this->flags=base.flags;
+  ComponentGameObject::ComponentGameObject(const ComponentGameObject &base) :GameObject(base){
     this->components=std::vector<ObjectComponent*>();
     for(int i=0;i<base.components.size();i++){
-      this->components.push_back(new ObjectComponent(*base.components[i]));
+      ObjectComponent*comp=new ObjectComponent(this);
+      *comp=*base.components[i];
+      this->components.push_back(comp);
       this->components[this->components.size()-1]->object=this;
     }
-    // this->components = base.components;
-    this->position = base.position;
   }
   ComponentGameObject::~ComponentGameObject() {
     for (int i = 0; i < components.size(); i++) {
@@ -216,6 +213,10 @@ namespace kNgine{
     children = std::vector<GameObject *>();
     flags.push_back(objectFlags::PARENT);
     labels.push_back("_PARENT_");
+  }
+  ParentObject::ParentObject(const ParentObject &base) : ComponentGameObject(base)
+  {
+    this->children=base.children;
   }
 
   Sprite importSprite(const char *filename) {

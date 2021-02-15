@@ -12,7 +12,7 @@
 
 namespace kNgine
 {
-#ifdef global_engine
+#ifdef global_engine//deprecated
   std::vector<EngineObject *> objects = std::vector<EngineObject *>();
   std::string window_name = "Game";
   std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();

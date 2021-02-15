@@ -10,17 +10,23 @@
 #include "Physics.hpp"
 #include "SpriteUtils.hpp"
 
-namespace kNgine{
-  Camera::Camera():Camera(1,1920,1080) {
+namespace kNgine
+{
+  Camera::Camera() : Camera(1, 1920, 1080)
+  {
   }
-  Camera::Camera(float fov, int windowWidth, int windowHeight) {
+  Camera::Camera(float fov, int windowWidth, int windowHeight)
+  {
     this->position = v3(0, 0, 1);
-    if (windowWidth < windowHeight) {
+    if (windowWidth < windowHeight)
+    {
       float widthFOV = ((float)windowWidth) / windowHeight * fov;
       this->posMapper =
           mapper(v2(-widthFOV / 2, -fov / 2), v2(widthFOV / 2, fov / 2),
                  v2(0, windowHeight), v2(windowHeight, 0));
-    } else {
+    }
+    else
+    {
       float heightFOV = ((float)windowHeight) / windowWidth * fov;
       this->posMapper =
           mapper(v2(-fov / 2, -heightFOV / 2), v2(fov / 2, heightFOV / 2),
@@ -31,27 +37,100 @@ namespace kNgine{
   }
   Camera::~Camera() {}
 
-  void Camera::updateWindowSize(int windowWidth, int windowHeight) {
+  void Camera::updateWindowSize(int windowWidth, int windowHeight)
+  {
     this->posMapper.targetMax = v2(windowWidth, 0);
     this->posMapper.targetMin = v2(0, windowHeight);
-    if (windowWidth < windowHeight)
+    if (fovType == MAX_WH)
+    {
+      if (windowWidth < windowHeight)
+      {
+        float widthFOV = ((float)windowWidth) / windowHeight * fov;
+        this->posMapper.min.x = -widthFOV / 2;
+        this->posMapper.max.x = widthFOV / 2;
+        this->posMapper.min.y = -fov / 2;
+        this->posMapper.max.y = fov / 2;
+      }
+      else
+      {
+        float heightFOV = ((float)windowHeight) / windowWidth * fov;
+        this->posMapper.min.y = -heightFOV / 2;
+        this->posMapper.max.y = heightFOV / 2;
+        this->posMapper.min.x = -fov / 2;
+        this->posMapper.max.x = fov / 2;
+      }
+    }
+    else if (fovType == MIN_WH)
+    {
+      if (windowWidth > windowHeight)
+      {
+        float widthFOV = ((float)windowWidth) / windowHeight * fov;
+        this->posMapper.min.x = -widthFOV / 2;
+        this->posMapper.max.x = widthFOV / 2;
+        this->posMapper.min.y = -fov / 2;
+        this->posMapper.max.y = fov / 2;
+      }
+      else
+      {
+        float heightFOV = ((float)windowHeight) / windowWidth * fov;
+        this->posMapper.min.y = -heightFOV / 2;
+        this->posMapper.max.y = heightFOV / 2;
+        this->posMapper.min.x = -fov / 2;
+        this->posMapper.max.x = fov / 2;
+      }
+    }
+    else if (fovType == WIDTH)
     {
       float widthFOV = ((float)windowWidth) / windowHeight * fov;
       this->posMapper.min.x = -widthFOV / 2;
       this->posMapper.max.x = widthFOV / 2;
+      this->posMapper.min.y = -fov / 2;
+      this->posMapper.max.y = fov / 2;
     }
-    else
+    else if (fovType == HEIGHT)
     {
       float heightFOV = ((float)windowHeight) / windowWidth * fov;
       this->posMapper.min.y = -heightFOV / 2;
       this->posMapper.max.y = heightFOV / 2;
+      this->posMapper.min.x = -fov / 2;
+      this->posMapper.max.x = fov / 2;
+    }
+    else if (fovType == DIAGONAL)
+    {
+      // float widthFOV = ((float)windowWidth) / windowHeight * fov;
+      // this->posMapper.min.x = -widthFOV / 2;
+      // this->posMapper.max.x = widthFOV / 2;
+      // float heightFOV = ((float)windowHeight) / windowWidth * fov;
+      // this->posMapper.min.y = -heightFOV / 2;
+      // this->posMapper.max.y = heightFOV / 2;
+    }
+    else
+    {
+      if (windowWidth < windowHeight)
+      {
+        float widthFOV = ((float)windowWidth) / windowHeight * fov;
+        this->posMapper.min.x = -widthFOV / 2;
+        this->posMapper.max.x = widthFOV / 2;
+        this->posMapper.min.y = -fov / 2;
+        this->posMapper.max.y = fov / 2;
+      }
+      else
+      {
+        float heightFOV = ((float)windowHeight) / windowWidth * fov;
+        this->posMapper.min.y = -heightFOV / 2;
+        this->posMapper.max.y = heightFOV / 2;
+        this->posMapper.min.x = -fov / 2;
+        this->posMapper.max.x = fov / 2;
+      }
     }
   }
 
-  void showLines(ComponentGameObject *obj, mapper posMapper,v3 position) {
+  void showLines(ComponentGameObject *obj, mapper posMapper, v3 position)
+  {
     physics::PhysicsBodyComponent *body =
         obj->findComponent<physics::PhysicsBodyComponent>("[physics_body]");
-    if (body) {
+    if (body)
+    {
       // for (float a = 0; a < 360; a += 1) {
       //   if (0)  // draw max dist
       //   {
@@ -79,11 +158,14 @@ namespace kNgine{
     }
   }
 
-  void Camera::render(std::vector<ComponentGameObject *> objects) {
+  void Camera::render(std::vector<ComponentGameObject *> objects)
+  {
     objects = orderObjectsByZ<ComponentGameObject>(
         std::vector<GameObject *>(objects.begin(), objects.end()));
-    for (int i = 0; i < objects.size() && objects[i]->position.z<position.z; i++) {
-      if (!isBlacklist(objects[i]->labels)) {
+    for (int i = 0; i < objects.size() && objects[i]->position.z < position.z; i++)
+    {
+      if (!isBlacklist(objects[i]->labels))
+      {
         SpriteAccessor *compn =
             objects[i]->findComponent<SpriteAccessor>("[sprite]");
         v2 spriteDimensions = posMapper.map(objects[i]->position.toV2() +
@@ -99,38 +181,46 @@ namespace kNgine{
             posMapper.map(objects[i]->position.toV2() - position.toV2()) +
                 spriteOffset,
             spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
-            compn->getSprite()->height, compn->getSprite()->numChannels,objects[i]->rotation);
-        if (showDebugHitBox) showLines(objects[i], posMapper,position);
+            compn->getSprite()->height, compn->getSprite()->numChannels, objects[i]->rotation);
+        if (showDebugHitBox)
+          showLines(objects[i], posMapper, position);
       }
     }
   }
-  void Camera::renderObject(ComponentGameObject* object){
-    if (!isBlacklist(object->labels)) {
+  void Camera::renderObject(ComponentGameObject *object)
+  {
+    if (!isBlacklist(object->labels))
+    {
       SpriteAccessor *compn =
           object->findComponent<SpriteAccessor>("[sprite]");
       v2 spriteDimensions = posMapper.map(object->position.toV2() +
                                           compn->getSpriteDimensions()) -
                             posMapper.map(object->position.toV2());
-      spriteDimensions.y*=-1;
+      spriteDimensions.y *= -1;
       unsigned char *colorMap = compn->getSprite()->colorMap.data();
       v2 spriteOffset = compn->getSpriteOffset();
       spriteOffset.x *= spriteDimensions.x;
       spriteOffset.y *= spriteDimensions.y;
-      if(compn->hasToSave()){
+      if (compn->hasToSave())
+      {
         renderer::drawColorMap(
             colorMap,
             posMapper.map(object->position.toV2() - position.toV2()) +
                 spriteOffset,
             spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
-            compn->getSprite()->height, compn->getSprite()->numChannels,object->rotation);
-      }else{
+            compn->getSprite()->height, compn->getSprite()->numChannels, object->rotation);
+      }
+      else
+      {
         SpriteMapAccessor *ref = (SpriteMapAccessor *)compn;
         renderer::drawTexture(
             ref->spriteList->texIndex[ref->getMapIndex()],
             posMapper.map(object->position.toV2() - position.toV2()) +
-                spriteOffset,spriteDimensions.x,spriteDimensions.y,object->rotation);
+                spriteOffset,
+            spriteDimensions.x, spriteDimensions.y, object->rotation);
       }
-      if(showDebugHitBox) showLines(object, posMapper,position);
+      if (showDebugHitBox)
+        showLines(object, posMapper, position);
     }
   }
-}
+} // namespace kNgine
