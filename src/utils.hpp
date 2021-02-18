@@ -547,7 +547,6 @@ inline float randf()// randome float between 0-1
 {
   return ((float)std::rand() / (RAND_MAX));
 }
-#define rand() randf()
 
 struct color
 {
