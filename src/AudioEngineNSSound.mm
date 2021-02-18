@@ -11,7 +11,6 @@ namespace kNgine{
     NSSound*sound;
     NSSoundBuffer(const char* fileName){
       NSURL *inputFileURL = [NSURL fileURLWithPath:[NSString stringWithUTF8String:fileName]];
-      printf("%s\n",[inputFileURL.absoluteString UTF8String]);
       sound=[[NSSound alloc]initWithContentsOfURL:inputFileURL byReference:NO];
     }
     ~NSSoundBuffer(){
@@ -47,7 +46,6 @@ namespace kNgine{
   }
   void AudioEngine::play(BaseAudioBuffer* buffer){
     queueBuffer("",buffer,false);
-    printf("%s\n","queued");
     this->queue[this->queue.size()-1]->job.start();
   }
   void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop)
