@@ -32,9 +32,10 @@ namespace kNgine
     CHILD,
     //----
     SPRITE,
+    Sprite_List,
+    BACKGROUND,
     CAMERA,
     UI,
-    Sprite_List,
     //----
     Physics,
     PhysicsEngine,
@@ -152,10 +153,10 @@ namespace kNgine
     v2 getSpriteDimensions();
     v2 getSpriteOffset();
   };
-  class UIRenderer:public EngineObject{
+  class LayerRenderer:public EngineObject{
   public:
-    UIRenderer();
-    UIRenderer(const UIRenderer&base):EngineObject(base){}
+    LayerRenderer();
+    LayerRenderer(const LayerRenderer&base):EngineObject(base){}
     virtual void render();
   };
   // do not implement, is automatically generated when starting engine for the

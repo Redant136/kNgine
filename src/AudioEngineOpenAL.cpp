@@ -4,7 +4,6 @@
 #include "utils.hpp"
 #include "AudioEngine.hpp"
 #include "../extern/stb/stb_vorbis.c"
-extern void stb_vorbis_dumpmem(void);
 
 #ifndef __APPLE__
 #include <AL/al.h>
@@ -111,7 +110,7 @@ namespace kNgine
     }
   }
   SoundListenerComponent::~SoundListenerComponent(){
-    if(!(openALDevice)){
+    if(openALDevice){
       alutExit();
       alcMakeContextCurrent(nullptr);
       if (!check_alc_errors(__FILE__, __LINE__, openALDevice))

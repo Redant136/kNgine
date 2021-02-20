@@ -187,11 +187,11 @@ namespace kNgine{
     }
   }
 
-  UIRenderer::UIRenderer(){
+  LayerRenderer::LayerRenderer(){
     flags.push_back(objectFlags::UI);
     labels.push_back("UI");
   }
-  void UIRenderer::render(){
+  void LayerRenderer::render(){
   }
 
   ChildrenObject::ChildrenObject(GameObject *object, v3 &parentPosition)

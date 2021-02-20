@@ -214,6 +214,12 @@ namespace kNgine
       }
       renderer::clear(0, 0, 0, 0);
       workingObjects.clear();
+      std::vector<LayerRenderer *> background = findObject<LayerRenderer>(workingObjects, objectFlags::BACKGROUND);
+      for (int i = 0; i < background.size(); i++)
+      {
+        if (background[i]->isEnabled())background[i]->render();
+      }
+
       for (EngineObject *obj : objects)
       {
         if(obj->isEnabled()){
@@ -244,9 +250,9 @@ namespace kNgine
             cameras[i]->renderObject(sprites[j]);
           }
         }
-        std::vector<UIRenderer*>UI=findObject<UIRenderer>(workingObjects,objectFlags::UI);
+        std::vector<LayerRenderer *> UI = findObject<LayerRenderer>(workingObjects, objectFlags::UI);
         for(int i=0;i<UI.size();i++){
-          UI[i]->render();
+          if(UI[i]->isEnabled())UI[i]->render();
         }
         // 60fps ~= 0.016
         // 1e-05 =  0.00001

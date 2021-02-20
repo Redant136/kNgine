@@ -78,13 +78,7 @@ namespace kNgine
     SoundListenerComponent *player=NULL;
   public:
     AudioEngine();
-    virtual ~AudioEngine(){
-      for(int i=0;i<queue.size();i++){
-        queue[i]->loop=false;
-        queue[i]->stop=true;
-        queue[i]->job.join();
-      }
-    }
+    virtual ~AudioEngine();
     void play(const char *fileName, audiofiletype type);
     void play(BaseAudioBuffer* buffer);
     void queueBuffer(const char*name,BaseAudioBuffer*buffer,bool loop=false);

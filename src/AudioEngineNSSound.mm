@@ -47,6 +47,13 @@ namespace kNgine{
     this->flags.push_back(objectFlags::AUDIO);
     this->labels.push_back("AudioEngine");
   }
+  AudioEngine::~AudioEngine(){
+    for(int i=0;i<queue.size();i++){
+      queue[i]->loop=false;
+      queue[i]->stop=true;
+      queue[i]->job.join();
+    }
+  }
   void AudioEngine::play(const char* fileName,audiofiletype type){
     BaseAudioBuffer*buffer=createBuffer(fileName,type);
     play(buffer);

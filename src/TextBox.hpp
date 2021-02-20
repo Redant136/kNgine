@@ -7,7 +7,7 @@
 
 namespace kNgine
 {
-  class TextBoxRenderer : public UIRenderer
+  class TextBoxRenderer : public LayerRenderer
   {//not complete, only use as template code
   public:
     TextBoxRenderer();
