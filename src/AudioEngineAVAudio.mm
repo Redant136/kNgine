@@ -32,7 +32,7 @@ namespace kNgine{
     }
   };
 
-  // SoundPlayerComponent::SoundPlayerComponent(GameObject *object) : ObjectComponent(object){
+  // SoundListenerComponent::SoundListenerComponent(GameObject *object) : ObjectComponent(object){
   //   if(!engine){
   //     engine=[[AVAudioEngine alloc]init];
   //     NSUserDefaults* set=[NSUserDefaults standardUserDefaults];
@@ -65,13 +65,13 @@ namespace kNgine{
   //     [engine connect:mixerNode to:[engine mainMixerNode] format:[[engine outputNode] outputFormatForBus:0]];
   //   }
   // }
-  // SoundPlayerComponent::~SoundPlayerComponent(){
+  // SoundListenerComponent::~SoundListenerComponent(){
   //   [engine release];
   //   [mixerNode release];
   // }
 
-  // SoundEmiterComponent::SoundEmiterComponent(GameObject *object, const char* fileName, SoundPlayerComponent *player) : SoundEmiterComponent(object, new AVAudioBuffer(fileName),player){}
-  // SoundEmiterComponent::SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer, SoundPlayerComponent *player) : ObjectComponent(object){}
+  // SoundEmiterComponent::SoundEmiterComponent(GameObject *object, const char* fileName, SoundListenerComponent *player) : SoundEmiterComponent(object, new AVAudioBuffer(fileName),player){}
+  // SoundEmiterComponent::SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player) : ObjectComponent(object){}
   // void SoundEmiterComponent::play(){}
 
   AudioEngine::AudioEngine(){

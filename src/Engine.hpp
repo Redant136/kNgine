@@ -216,7 +216,7 @@ namespace kNgine
       workingObjects.clear();
       for (EngineObject *obj : objects)
       {
-        if(obj->enabled){
+        if(obj->isEnabled()){
           obj->update(msgs);
           workingObjects.push_back(obj);
         }

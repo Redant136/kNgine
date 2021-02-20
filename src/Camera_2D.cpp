@@ -193,31 +193,42 @@ namespace kNgine
     {
       SpriteAccessor *compn =
           object->findComponent<SpriteAccessor>("[sprite]");
-      v2 spriteDimensions = posMapper.map(object->position.toV2() +
-                                          compn->getSpriteDimensions()) -
-                            posMapper.map(object->position.toV2());
-      spriteDimensions.y *= -1;
-      unsigned char *colorMap = compn->getSprite()->colorMap.data();
-      v2 spriteOffset = compn->getSpriteOffset();
-      spriteOffset.x *= spriteDimensions.x;
-      spriteOffset.y *= spriteDimensions.y;
-      if (compn->hasToSave())
-      {
-        renderer::drawColorMap(
-            colorMap,
-            posMapper.map(object->position.toV2() - position.toV2()) +
-                spriteOffset,
-            spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
-            compn->getSprite()->height, compn->getSprite()->numChannels, object->rotation);
+      int numSprite=1;
+      if(!(compn)){
+        compn = object->findComponent<SpriteList>("[animation_system]")->getSpriteList()[0];
+        numSprite = object->findComponent<SpriteList>("[animation_system]")->getSpriteListLength();
       }
-      else
-      {
-        SpriteMapAccessor *ref = (SpriteMapAccessor *)compn;
-        renderer::drawTexture(
-            ref->spriteList->texIndex[ref->getMapIndex()],
-            posMapper.map(object->position.toV2() - position.toV2()) +
-                spriteOffset,
-            spriteDimensions.x, spriteDimensions.y, object->rotation);
+
+      for(int i=0;i<numSprite;i++){
+        v2 spriteDimensions = posMapper.map(object->position.toV2() +
+                                            compn->getSpriteDimensions()) -
+                              posMapper.map(object->position.toV2());
+        spriteDimensions.y *= -1;
+        unsigned char *colorMap = compn->getSprite()->colorMap.data();
+        v2 spriteOffset = compn->getSpriteOffset();
+        spriteOffset.x *= spriteDimensions.x;
+        spriteOffset.y *= spriteDimensions.y;
+        if (compn->hasToSave())
+        {
+          renderer::drawColorMap(
+              colorMap,
+              posMapper.map(object->position.toV2() - position.toV2()) +
+                  spriteOffset,
+              spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
+              compn->getSprite()->height, compn->getSprite()->numChannels, object->rotation);
+        }
+        else
+        {
+          SpriteMapAccessor *ref = (SpriteMapAccessor *)compn;
+          renderer::drawTexture(
+              ref->spriteList->texIndex[ref->getMapIndex()],
+              posMapper.map(object->position.toV2() - position.toV2()) +
+                  spriteOffset,
+              spriteDimensions.x, spriteDimensions.y, object->rotation);
+        }
+        if(i < numSprite-1){
+          compn=(&compn)[1];
+        }
       }
       if (showDebugHitBox)
         showLines(object, posMapper, position);

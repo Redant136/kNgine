@@ -3,14 +3,13 @@
 #include "EngineObjects.hpp"
 #include "utils.hpp"
 #include "AudioEngine.hpp"
+#include "../extern/stb/stb_vorbis.c"
+extern void stb_vorbis_dumpmem(void);
 
 #ifndef __APPLE__
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alut.h>
-#include "../extern/stb/stb_vorbis.c"
-
-extern void stb_vorbis_dumpmem(void);
 #else //just for debug purpose, should never be loaded
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
@@ -86,8 +85,12 @@ namespace kNgine
     }
   };
 
-  SoundPlayerComponent::SoundPlayerComponent(GameObject *object) : ObjectComponent(object)
+  SoundListenerComponent::SoundListenerComponent(GameObject *object) : ObjectComponent(object)
   {
+    this->label = "[AudioPlayer]";
+    object->flags.push_back(objectFlags::AUDIO);
+    object->flags.push_back(objectFlags::AUDIOPLAYER);
+    object->labels.push_back(label);
     if(!openALDevice){
       alutInit(nullptr, nullptr);
       openALDevice = alcOpenDevice(nullptr);
@@ -107,38 +110,42 @@ namespace kNgine
       }
     }
   }
-  SoundPlayerComponent::~SoundPlayerComponent(){
-    alutExit();
-    alcMakeContextCurrent(nullptr);
-    if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
-    {
-    }
-    alcDestroyContext(openALContext);
-    if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
-    {
-    }
-    alcCloseDevice(openALDevice);
-    if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
-    {
+  SoundListenerComponent::~SoundListenerComponent(){
+    if(!(openALDevice)){
+      alutExit();
+      alcMakeContextCurrent(nullptr);
+      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+      {
+      }
+      alcDestroyContext(openALContext);
+      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+      {
+      }
+      alcCloseDevice(openALDevice);
+      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+      {
+      }
     }
   }
 
-  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, const char *fileName, audiofiletype type, SoundPlayerComponent *player) : SoundEmiterComponent(object, createBuffer(fileName,type), player)
+  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, const char *fileName, audiofiletype type, SoundListenerComponent *player) : SoundEmiterComponent(object, createBuffer(fileName,type), player)
   {
   }
-  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer, SoundPlayerComponent *player) : ObjectComponent(object)
+  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player) : ObjectComponent(object)
   {
+    this->label = "[AudioEmiter]";
+    object->flags.push_back(objectFlags::AUDIO);
+    object->labels.push_back(label);
     this->buffer = buffer;
     this->player = player;
     job.stop();
     job = threaded_job([this](){
       ALuint source;
-      // store volume in player obj
       alGenSources(1, &source);
       alSourcef(source, AL_PITCH, 1);
-      alSourcef(source, AL_GAIN, 1.0f);
-      //change to set with player pos and current pos
-      alSource3f(source, AL_POSITION, 0, 0, 0);
+      // store volume in player obj
+      alSourcef(source, AL_GAIN, this->volume);
+      alSource3f(source, AL_POSITION, 0 - this->player->object->position.x, 0 - this->player->object->position.y, 0 - this->player->object->position.z);
       //nope nope nope
       alSource3f(source, AL_VELOCITY, 0, 0, 0);
       alSourcei(source, AL_LOOPING, AL_FALSE);
@@ -165,8 +172,9 @@ namespace kNgine
 
   AudioEngine::AudioEngine()
   {
+    this->flags.push_back(objectFlags::AUDIO);
+    this->labels.push_back("AudioEngine");
     if(!openALDevice){
-      // alutInit(NULL, NULL);
       alutInit(0, NULL);
       openALDevice = alcOpenDevice(nullptr);
       if (!openALDevice)
@@ -185,6 +193,30 @@ namespace kNgine
       {
         std::cerr << "ERROR: Could not make audio context current" << std::endl;
         return;
+      }
+    }
+  }
+  AudioEngine::~AudioEngine(){
+    for (int i = 0; i < queue.size(); i++)
+    {
+      queue[i]->loop = false;
+      queue[i]->stop = true;
+      queue[i]->job.join();
+    }
+    if (!(openALDevice))
+    {
+      alutExit();
+      alcMakeContextCurrent(nullptr);
+      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+      {
+      }
+      alcDestroyContext(openALContext);
+      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+      {
+      }
+      alcCloseDevice(openALDevice);
+      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+      {
       }
     }
   }

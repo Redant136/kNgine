@@ -542,6 +542,9 @@ inline v4::v4(const iv4 &base)
   this->z=base.z;
   this->w=base.w;
 }
+#define v2ToArray(v) {v.x,v.y}
+#define v3ToArray(v) {v.x,v.y,v.z}
+#define v4ToArray(v) {v.x,v.y,v.z,v.w} 
 
 inline float randf()// randome float between 0-1
 {

@@ -1,5 +1,8 @@
 set(BOX2DPHYSICS ON)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 if(APPLE)
   include_directories ( /usr/local/include) 
   link_directories( /usr/local/lib)
@@ -15,14 +18,13 @@ else()
 endif()
 
 set(KNGINE_SOURCE_FILES
-  ${OSSpecificFiles}
-  src/EngineObjects.cpp 
-  src/Camera_2D.cpp
-  src/TextBox.cpp
-  src/SpriteUtils.cpp
-)
-add_library(kNgine
-  ${KNGINE_SOURCE_FILES}
+src/EngineObjects.cpp 
+src/Camera_2D.cpp
+src/TextBox.cpp
+src/SpriteUtils.cpp
+src/PhysicsB2.cpp
+src/Tilemap.cpp 
+${OSSpecificFiles}
 )
 
 if(BOX2DPHYSICS)
@@ -30,13 +32,19 @@ if(BOX2DPHYSICS)
     ${KNGINE_SOURCE_FILES}
     src/PhysicsB2.cpp
   )
-  add_subdirectory(extern/box2d)
-  target_link_libraries(kNgine PRIVATE box2d)
 else()
   set(KNGINE_SOURCE_FILES
     ${KNGINE_SOURCE_FILES}
     src/Physics_2D.cpp
   )
+endif()
+add_library(kNgine
+  ${KNGINE_SOURCE_FILES}
+)
+
+if(BOX2DPHYSICS)
+  add_subdirectory(extern/box2d)
+  target_link_libraries(kNgine PRIVATE box2d)
 endif()
 
 add_subdirectory(extern/glad/)
@@ -44,7 +52,7 @@ target_link_libraries(kNgine PRIVATE kNgine_glad)
 
 if(APPLE)
   target_link_directories(kNgine PUBLIC "/usr/local/lib")
-  target_link_libraries(kNgine PRIVATE "-framework Foundation -framework OpenGL -framework AppKit -lglfw -pthread")
+  target_link_libraries(kNgine PRIVATE "-framework Foundation -framework OpenGL -framework AppKit -framework CoreAudio -lglfw -pthread")
 else()
   target_link_libraries(kNgine PRIVATE "-pthread -lGL -lglfw -ldl -lopenal -lalut")
 endif()

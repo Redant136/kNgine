@@ -15,6 +15,7 @@
 #include "src/Camera.hpp"
 #include "src/SpriteUtils.hpp"
 #include "src/AudioEngine.hpp"
+#include "src/Tilemap.hpp"
 
 #include "src/TextBox.hpp"
 

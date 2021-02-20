@@ -17,6 +17,8 @@ namespace kNgine
     virtual ~SpriteMap();
     void init(std::vector<EngineObject *> objects);
     void end(std::vector<EngineObject *> objects);
+    void enable(){if(!enabled){load();enabled=true;}}
+    void disable(){if(enabled){unload();enabled=false;}}
     void load();
     void unload();
   };
@@ -108,6 +110,41 @@ namespace kNgine
     Sprite *getSprite(){return active->getSprite();}
     v2 getSpriteDimensions(){return v2(active->getSpriteDimensions().x*spriteDimension.x,active->getSpriteDimensions().y*spriteDimension.y);}
     v2 getSpriteOffset(){return active->getSpriteOffset();}
+  };
+
+  class SpriteList : public SpriteAccessor{
+  protected:
+    std::vector<SpriteAccessor *> accessors;
+  public:
+    v2 spriteDimension;
+    SpriteList(GameObject *base, SpriteMap *spriteList) : SpriteList(base,std::vector<SpriteAccessor*>(),spriteList)
+    {
+    }
+    SpriteList(GameObject *base, std::vector<SpriteAccessor *> accessors, SpriteMap *spriteList) : SpriteAccessor(base)
+    {
+      this->label="[sprite_list]";
+      this->accessors=accessors;
+      spriteDimension = v2(1, 1);
+    }
+    virtual ~SpriteList()
+    {
+      for (SpriteAccessor *spr : accessors)
+      {
+        delete spr;
+      }
+    }
+    void addAccessor(SpriteAccessor* accessor){accessors.push_back(accessor);}
+    virtual void update(std::vector<msg> msgs) {
+      for(SpriteAccessor*spr:accessors){
+        spr->update(msgs);
+      }
+    }
+    SpriteAccessor**getSpriteList(){return accessors.data();}
+    int getSpriteListLength(){return accessors.size();}
+    bool hasToSave(){return false;}
+    Sprite *getSprite(){return accessors[0]->getSprite();}
+    v2 getSpriteDimensions() { return accessors[0]->getSpriteOffset();};
+    v2 getSpriteOffset(){return accessors[0]->getSpriteOffset();};
   };
 
   std::vector<Sprite> importSpriteSheet(const char *filename, int spriteWidth, int spriteHeight);

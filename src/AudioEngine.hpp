@@ -17,25 +17,29 @@ namespace kNgine
     virtual ~BaseAudioBuffer(){}
   };
 
+  //[AudioPlayer]
   // to be attached to main character or camera
-  class SoundPlayerComponent : public ObjectComponent // there can only be one sound player
+  class SoundListenerComponent : public ObjectComponent // there can only be one sound player
   {
   public:
-    SoundPlayerComponent(GameObject *object);
-    virtual ~SoundPlayerComponent();
+    float globalVolume=1.0f;
+    SoundListenerComponent(GameObject *object);
+    virtual ~SoundListenerComponent();
   };
 
+  //[AudioEmiter]
   // attach to anything making sound, just short sound effects
   class SoundEmiterComponent : public ObjectComponent
   {
   private:
-    SoundPlayerComponent *player;
+    SoundListenerComponent *player;
     bool playing=false;
+    float volume=1.0f;
     threaded_job job=threaded_job([](){});
   public:
     BaseAudioBuffer *buffer;
-    SoundEmiterComponent(GameObject *object, const char *fileName, audiofiletype type, SoundPlayerComponent *player);
-    SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer,SoundPlayerComponent*player);
+    SoundEmiterComponent(GameObject *object, const char *fileName, audiofiletype type, SoundListenerComponent *player);
+    SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer,SoundListenerComponent*player);
     bool isPlaying(){return playing;}
     void play();
   };
@@ -71,6 +75,7 @@ namespace kNgine
       }
     };
     std::vector<AudioQueue*>queue;
+    SoundListenerComponent *player=NULL;
   public:
     AudioEngine();
     virtual ~AudioEngine(){
@@ -88,6 +93,11 @@ namespace kNgine
     void setLoop(bool loop,unsigned int index = 0) { queue[index]->loop = loop; }
     void setVolume(float volume,unsigned int index = 0) { queue[index]->volume = volume; }
     void terminate(unsigned int index=0){queue[index]->stop=true;}
+    void init(std::vector<EngineObject*>objects){
+      for(EngineObject*obj:objects){
+
+      }
+    }
   };
 
   BaseAudioBuffer *createBuffer(const char* fileName,audiofiletype type);

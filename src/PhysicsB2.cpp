@@ -36,7 +36,7 @@ namespace kNgine
       this->shape=base.shape;
       this->body=base.body;
     }
-                                                                                                        b2PhysicsBodyComponent::~b2PhysicsBodyComponent()
+    b2PhysicsBodyComponent::~b2PhysicsBodyComponent()
     {
     }
     void b2PhysicsBodyComponent::updatePos()
@@ -104,7 +104,6 @@ namespace kNgine
         addBody(bods[i]->findComponent<b2PhysicsBodyComponent>("[b2_physics_body]"));
       }
     }
-
     void b2PhysicsEngine::update(std::vector<msg> msgs)
     {
       float timeElapsed;
@@ -118,7 +117,7 @@ namespace kNgine
       }
 
       for(int i=0;i<bodies.size();i++){
-        bodies[i]->body->SetEnabled(bodies[i]->object->enabled);
+        bodies[i]->body->SetEnabled(bodies[i]->object->isEnabled());
       }
       box2dWorld.Step(timeElapsed, 6, 2);
       for (b2PhysicsBodyComponent *bod : this->bodies)

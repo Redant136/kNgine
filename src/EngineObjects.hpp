@@ -28,14 +28,19 @@ namespace kNgine
     ALL,
     GAME_OBJECT,
     COMPONENT,
-    SPRITE,
     PARENT,
     CHILD,
+    //----
+    SPRITE,
     CAMERA,
     UI,
     Sprite_List,
+    //----
     Physics,
-    PhysicsEngine
+    PhysicsEngine,
+    //----
+    AUDIO,
+    AUDIOPLAYER
   };
 
   // an object containing important info to draw image for the engine
@@ -57,13 +62,17 @@ namespace kNgine
   // objects for engine
   class EngineObject
   {
+  protected:
+    bool enabled=true;
   public:
     std::vector<std::string> labels;
     std::vector<objectFlags> flags;
-    bool enabled=true;
     EngineObject(){ labels = std::vector<std::string>(); flags=std::vector<objectFlags>();}
     EngineObject(const EngineObject&base){this->labels=base.labels;this->flags=base.flags;this->enabled=base.enabled;}
     virtual ~EngineObject(){}
+    bool isEnabled(){return enabled;}
+    virtual void enable(){enabled=true;}
+    virtual void disable(){enabled=false;}
     virtual void update(std::vector<msg> msgs){}
     virtual void init(std::vector<EngineObject *> objects){}
     virtual void end(std::vector<EngineObject *> objects){}

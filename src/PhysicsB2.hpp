@@ -5,8 +5,6 @@
 #include "EngineObjects.hpp"
 #include "../extern/box2d/include/box2d/box2d.h"
 
-#include <iostream>
-
 namespace kNgine{
   //this cannot be used with custom physics engine
   namespace physics
@@ -21,7 +19,7 @@ namespace kNgine{
       b2PhysicsBodyComponent(ComponentGameObject *base, std::vector<b2FixtureDef> shape);
       b2PhysicsBodyComponent(ComponentGameObject *base, b2FixtureDef shape);
       b2PhysicsBodyComponent(const b2PhysicsBodyComponent& base);
-      ~b2PhysicsBodyComponent();
+      virtual ~b2PhysicsBodyComponent();
       void updatePos();
       void setAffectedByGravity(bool isAffectedByGravity);
       v2 getVelocity();
@@ -31,13 +29,17 @@ namespace kNgine{
 
     class b2Rect : public b2PhysicsBodyComponent{
     public:
+      b2PolygonShape *shapePoly;
       b2Rect(ComponentGameObject *base, float width=1.0f, float height=1.0f, float density = 1.0f, float friction = 1.0f) : b2PhysicsBodyComponent(base, b2FixtureDef())
       {
-        b2PolygonShape *shape = new b2PolygonShape();
-        shape->SetAsBox(width / 2, height / 2);
-        this->shape[0].shape = shape;
+        shapePoly = new b2PolygonShape();
+        shapePoly->SetAsBox(width / 2, height / 2);
+        this->shape[0].shape = shapePoly;
         this->shape[0].density = density;
         this->shape[0].friction = friction;
+      }
+      ~b2Rect(){
+        delete shapePoly;
       }
     };
 
