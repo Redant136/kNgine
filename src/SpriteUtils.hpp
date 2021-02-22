@@ -4,7 +4,6 @@
 #include "utils.hpp"
 #include "EngineObjects.hpp"
 
-#include <iostream>
 namespace kNgine
 {
   class SpriteMap : public EngineObject
@@ -34,7 +33,6 @@ namespace kNgine
   public:
     unsigned int mapIndex;
     v2 spriteDimension;
-    std::string spriteLocation;
     SpriteReferenceComponent(ComponentGameObject *base, SpriteMap *spriteList, int index);
     SpriteReferenceComponent(ComponentGameObject *base, SpriteMap *spriteList, Sprite sprite);
     SpriteReferenceComponent(const SpriteComponent &base, SpriteMap *spriteList);
@@ -44,7 +42,6 @@ namespace kNgine
     unsigned int getMapIndex();
     Sprite *getSprite();
     v2 getSpriteDimensions();
-    v2 getSpriteOffset();//where the sprite will be started to be drawn from
   };
   class SpriteAnimation : public SpriteMapAccessor
   {
@@ -54,7 +51,6 @@ namespace kNgine
     float timeUntilNextFrame=0;
   public:
     std::vector<v2>spriteDimensions;
-    std::string spriteLocation;
     float frameLength;
     SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<unsigned int> indexes,
                     float frameLength, v2 spriteDimension = v2(1.0f, 1.0f));
@@ -71,7 +67,6 @@ namespace kNgine
     unsigned int getMapIndex();
     Sprite *getSprite();
     v2 getSpriteDimensions();
-    v2 getSpriteOffset();
   };
   //[animation_system]
   class SpriteAnimationSystem:public SpriteMapAccessor{//make sure that spriteanimation uses the same map
@@ -109,9 +104,10 @@ namespace kNgine
     unsigned int getMapIndex(){return active->getMapIndex();}
     Sprite *getSprite(){return active->getSprite();}
     v2 getSpriteDimensions(){return v2(active->getSpriteDimensions().x*spriteDimension.x,active->getSpriteDimensions().y*spriteDimension.y);}
-    v2 getSpriteOffset(){return active->getSpriteOffset();}
+    v2 getSpriteLocation(){return active->getSpriteLocation();}
   };
 
+  //[sprite_list]
   class SpriteList : public SpriteAccessor{
   protected:
     std::vector<SpriteAccessor *> accessors;
@@ -143,8 +139,8 @@ namespace kNgine
     int getSpriteListLength(){return accessors.size();}
     bool hasToSave(){return false;}
     Sprite *getSprite(){return accessors[0]->getSprite();}
-    v2 getSpriteDimensions() { return accessors[0]->getSpriteOffset();};
-    v2 getSpriteOffset(){return accessors[0]->getSpriteOffset();};
+    v2 getSpriteDimensions() { return accessors[0]->getSpriteLocation();}
+    v2 getSpriteLocation(){return accessors[0]->getSpriteLocation();}
   };
 
   std::vector<Sprite> importSpriteSheet(const char *filename, int spriteWidth, int spriteHeight);

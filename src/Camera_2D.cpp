@@ -10,6 +10,8 @@
 #include "Physics.hpp"
 #include "SpriteUtils.hpp"
 
+#include <iostream>
+
 namespace kNgine
 {
   Camera::Camera() : Camera(1, 1920, 1080)
@@ -173,7 +175,7 @@ namespace kNgine
                               posMapper.map(objects[i]->position.toV2());
         unsigned char *colorMap = compn->getSprite()->colorMap.data();
 
-        v2 spriteOffset = compn->getSpriteOffset();
+        v2 spriteOffset = compn->getSpriteLocation();
         spriteOffset.x *= spriteDimensions.x;
         spriteOffset.y *= spriteDimensions.y;
         renderer::drawColorMap(
@@ -194,25 +196,30 @@ namespace kNgine
       SpriteAccessor *compn =
           object->findComponent<SpriteAccessor>("[sprite]");
       int numSprite=1;
+      bool isSpriteList=false;
       if(!(compn)){
-        compn = object->findComponent<SpriteList>("[animation_system]")->getSpriteList()[0];
-        numSprite = object->findComponent<SpriteList>("[animation_system]")->getSpriteListLength();
+        numSprite = object->findComponent<SpriteList>("[sprite_list]")->getSpriteListLength();
+        isSpriteList=true;
       }
 
       for(int i=0;i<numSprite;i++){
+        if (isSpriteList)
+        {
+          compn = object->findComponent<SpriteList>("[sprite_list]")->getSpriteList()[i];
+        }
         v2 spriteDimensions = posMapper.map(object->position.toV2() +
                                             compn->getSpriteDimensions()) -
                               posMapper.map(object->position.toV2());
         spriteDimensions.y *= -1;
         unsigned char *colorMap = compn->getSprite()->colorMap.data();
-        v2 spriteOffset = compn->getSpriteOffset();
+        v2 spriteOffset = compn->getSpriteLocation();
         spriteOffset.x *= spriteDimensions.x;
         spriteOffset.y *= spriteDimensions.y;
         if (compn->hasToSave())
         {
           renderer::drawColorMap(
               colorMap,
-              posMapper.map(object->position.toV2() - position.toV2()) +
+              posMapper.map(object->position.toV2() + compn->offset - position.toV2()) +
                   spriteOffset,
               spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
               compn->getSprite()->height, compn->getSprite()->numChannels, object->rotation);
@@ -222,12 +229,9 @@ namespace kNgine
           SpriteMapAccessor *ref = (SpriteMapAccessor *)compn;
           renderer::drawTexture(
               ref->spriteList->texIndex[ref->getMapIndex()],
-              posMapper.map(object->position.toV2() - position.toV2()) +
+              posMapper.map(object->position.toV2() + compn->offset - position.toV2()) +
                   spriteOffset,
               spriteDimensions.x, spriteDimensions.y, object->rotation);
-        }
-        if(i < numSprite-1){
-          compn=(&compn)[1];
         }
       }
       if (showDebugHitBox)

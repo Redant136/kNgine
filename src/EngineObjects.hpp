@@ -129,11 +129,41 @@ namespace kNgine
   class SpriteAccessor : public ObjectComponent
   {
   public:
+    enum
+    {
+      CENTER,
+      TOP_LEFT,
+      TOP_RIGHT,
+      BOT_LEFT,
+      BOT_RIGHT,
+      TOP,
+      BOT,
+      RIGHT,
+      LEFT
+    } spriteLocation;
+    v2 offset={0.0f,0.0f};// offset in game units
     SpriteAccessor(GameObject *base);
     virtual bool hasToSave() = 0;
     virtual Sprite *getSprite() = 0; //pointer for not having to call copy
     virtual v2 getSpriteDimensions() = 0;
-    virtual v2 getSpriteOffset() = 0;
+    virtual v2 getSpriteLocation()
+    {
+      switch (spriteLocation)
+      {
+      case CENTER:
+        return v2(-0.5, -0.5);
+      case TOP_LEFT:
+        return v2(0, 0);
+      case TOP_RIGHT:
+        return v2(-1, 0);
+      case BOT_LEFT:
+        return v2(0, -1);
+      case BOT_RIGHT:
+        return v2(-1, -1);
+      default:
+        return v2(0, 0);
+      }
+    }
   };
   // component representing that the class has a sprite
   class SpriteComponent : public SpriteAccessor
@@ -142,7 +172,6 @@ namespace kNgine
     Sprite sprite;
     // in game units
     v2 spriteDimension;
-    std::string spriteLocation;
     SpriteComponent(ComponentGameObject *base);
     SpriteComponent(ComponentGameObject *base, Sprite sprite);
     SpriteComponent(const SpriteComponent &base);
@@ -151,8 +180,8 @@ namespace kNgine
     bool hasToSave() { return true; }
     Sprite *getSprite();
     v2 getSpriteDimensions();
-    v2 getSpriteOffset();
   };
+
   class LayerRenderer:public EngineObject{
   public:
     LayerRenderer();

@@ -21,7 +21,7 @@ namespace kNgine{
       b2PhysicsBodyComponent(const b2PhysicsBodyComponent& base);
       virtual ~b2PhysicsBodyComponent();
       void updatePos();
-      void setAffectedByGravity(bool isAffectedByGravity);
+      void setStatic(bool isAffectedByGravity);
       v2 getVelocity();
       void setVelocity(v2 newVel);
       void addVelocity(v2 toAdd);

@@ -44,7 +44,7 @@ namespace kNgine
       object->position = v2(body->GetPosition().x, body->GetPosition().y);
       object->rotation.z=body->GetAngle();
     }
-    void b2PhysicsBodyComponent::setAffectedByGravity(bool isAffectedByGravity)
+    void b2PhysicsBodyComponent::setStatic(bool isAffectedByGravity)
     {
       if(isAffectedByGravity){
         this->bodyDef.type = b2_dynamicBody;

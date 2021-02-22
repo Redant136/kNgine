@@ -5,6 +5,8 @@
 #include "EngineObjects.hpp"
 #include "SpriteUtils.hpp"
 
+#include <iostream>
+
 namespace kNgine{
   /* either object that simply serves as container for multiple pieces of ground and 
     just shortens code writen to create multiple similar objects
@@ -13,7 +15,7 @@ namespace kNgine{
   */
 
   // must be added before phys engine
-  class Tileset:public ComponentGameObject{
+  class Tilemap:public ComponentGameObject{
   private:
     struct Tile{
       v2 pos;
@@ -50,11 +52,11 @@ namespace kNgine{
     v2 spriteDimensions={1.0f,1.0f};
     float friction=1.0f;
     SpriteMap*spriteList;
-    Tileset(SpriteMap *spriteList)
+    Tilemap(SpriteMap *spriteList)
     {
       this->spriteList=spriteList;
     }
-    virtual ~Tileset();
+    virtual ~Tilemap();
     void addTileDef(TileDef tileDef){tileDefs.push_back(tileDef);}
     void addTileDef(Sprite spr);
     void addTileDef(std::vector<Sprite>sprites){for(int i=0;i<sprites.size();i++){addTileDef(sprites[i]);}}

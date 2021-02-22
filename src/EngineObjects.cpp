@@ -150,14 +150,14 @@ namespace kNgine{
 
   SpriteComponent::SpriteComponent(ComponentGameObject *base)
       : SpriteAccessor(base) {
-    this->spriteLocation = "CENTER";
+    this->spriteLocation = CENTER;
     this->spriteDimension = v2(0, 0);
     this->sprite = Sprite();
   }
   SpriteComponent::SpriteComponent(ComponentGameObject *base, Sprite sprite)
       : SpriteAccessor(base) {
     this->sprite = sprite;
-    this->spriteLocation = "CENTER";
+    this->spriteLocation = CENTER;
     this->spriteDimension = v2(1, 1);
   }
   SpriteComponent::SpriteComponent(const SpriteComponent &base)
@@ -171,21 +171,6 @@ namespace kNgine{
   void SpriteComponent::update(std::vector<msg> msgs) {}
   Sprite *SpriteComponent::getSprite() { return &sprite; }
   v2 SpriteComponent::getSpriteDimensions() { return spriteDimension; }
-  v2 SpriteComponent::getSpriteOffset() {
-    if (spriteLocation == "TOP_LEFT") {
-      return v2(0, 0);
-    } else if (spriteLocation == "TOP_RIGHT") {
-      return v2(-1, 0);
-    } else if (spriteLocation == "BOT_LEFT") {
-      return v2(0, -1);
-    } else if (spriteLocation == "BOT_RIGHT") {
-      return v2(-1, -1);
-    } else if (spriteLocation == "CENTER") {
-      return v2(-0.5, -0.5);
-    } else {
-      return v2(0, 0);
-    }
-  }
 
   LayerRenderer::LayerRenderer(){
     flags.push_back(objectFlags::UI);

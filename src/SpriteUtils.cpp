@@ -43,7 +43,7 @@ namespace kNgine
                                                      int index)
       : SpriteMapAccessor(base)
   {
-    this->spriteLocation = "CENTER";
+    this->spriteLocation = CENTER;
     this->spriteDimension = v2(1, 1);
     this->mapIndex = index;
     this->spriteList = spriteList;
@@ -55,7 +55,7 @@ namespace kNgine
     this->spriteList = spriteList;
     this->mapIndex = spriteList->list.size();
     this->spriteList->list.push_back(sprite);
-    this->spriteLocation = "CENTER";
+    this->spriteLocation = CENTER;
     this->spriteDimension = v2(1, 1);
   }
   SpriteReferenceComponent::SpriteReferenceComponent(const SpriteComponent &base, SpriteMap *spriteList) : SpriteMapAccessor(base.object)
@@ -83,26 +83,11 @@ namespace kNgine
     return &(spriteList->list[mapIndex]);
   }
   v2 SpriteReferenceComponent::getSpriteDimensions() { return spriteDimension; }
-  v2 SpriteReferenceComponent::getSpriteOffset() {
-    if (spriteLocation == "TOP_LEFT") {
-      return v2(0, 0);
-    } else if (spriteLocation == "TOP_RIGHT") {
-      return v2(-1, 0);
-    } else if (spriteLocation == "BOT_LEFT") {
-      return v2(0, -1);
-    } else if (spriteLocation == "BOT_RIGHT") {
-      return v2(-1, -1);
-    } else if (spriteLocation == "CENTER") {
-      return v2(-0.5, -0.5);
-    } else {
-      return v2(0, 0);
-    }
-  }
 
   SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<unsigned int> indexes,
                                    float frameLength, v2 spriteDimension) : SpriteMapAccessor(base)
   {
-    this->spriteLocation = "CENTER";
+    this->spriteLocation = CENTER;
     this->spriteList = spriteList;
     this->frame=0;
     this->frameLength=frameLength;
@@ -115,7 +100,7 @@ namespace kNgine
   SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<Sprite> sprites,
                                    float frameLength, v2 spriteDimension) : SpriteMapAccessor(base)
   {
-    this->spriteLocation = "CENTER";
+    this->spriteLocation = CENTER;
     this->spriteList = spriteList;
     this->frame = 0;
     this->frameLength = frameLength;
@@ -130,7 +115,7 @@ namespace kNgine
   SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<unsigned int> indexes,
                                   float frameLength, std::vector<v2> spriteDimensions) : SpriteMapAccessor(base)
   {
-    this->spriteLocation = "CENTER";
+    this->spriteLocation = CENTER;
     this->spriteList = spriteList;
     this->frame = 0;
     this->frameLength = frameLength;
@@ -140,7 +125,7 @@ namespace kNgine
   SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<Sprite> sprites,
                                    float frameLength, std::vector<v2> spriteDimensions) : SpriteMapAccessor(base)
   {
-    this->spriteLocation = "CENTER";
+    this->spriteLocation = CENTER;
     this->spriteList = spriteList;
     this->frame = 0;
     this->frameLength = frameLength;
@@ -186,22 +171,6 @@ namespace kNgine
   }
   v2 SpriteAnimation::getSpriteDimensions(){
     return spriteDimensions[frame];
-  }
-  v2 SpriteAnimation::getSpriteOffset(){
-    if (spriteLocation == "TOP_LEFT") {
-      return v2(0, 0);
-    } else if (spriteLocation == "TOP_RIGHT") {
-      return v2(-1, 0);
-    } else if (spriteLocation == "BOT_LEFT") {
-      return v2(0, -1);
-    } else if (spriteLocation == "BOT_RIGHT") {
-      return v2(-1, -1);
-    } else if (spriteLocation == "CENTER") {
-      return v2(-0.5, -0.5);
-    } else {
-      return v2(0, 0);
-    }
-
   }
 
   std::vector<Sprite> importSpriteSheet(const char *filename, int spriteWidth,
