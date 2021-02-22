@@ -141,6 +141,14 @@ namespace kNgine{
       mod->update(msgs);
     }
   }
+  void ComponentGameObject::removeComponent(ObjectComponent*component){
+    for(int i=0;i<components.size();i++){
+      if(components[i]==component){
+        components.erase(components.begin()+i);
+        break;
+      }
+    }
+  }
 
   SpriteAccessor::SpriteAccessor(GameObject *base) : ObjectComponent(base) {
     this->label = "[sprite]";

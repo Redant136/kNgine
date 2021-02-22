@@ -124,6 +124,8 @@ namespace kNgine
       }
       return NULL;
     }
+    void removeComponent(ObjectComponent *component);
+    void removeComponent(std::string flag) { removeComponent(findComponent(flag));}
   };
   //[sprite]
   class SpriteAccessor : public ObjectComponent
