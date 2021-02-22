@@ -6,6 +6,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../extern/stb/stb_image.h"
 
+#include <iostream>
+
 namespace kNgine{
   std::vector<EngineEvent> events;
 
@@ -144,6 +146,7 @@ namespace kNgine{
   void ComponentGameObject::removeComponent(ObjectComponent*component){
     for(int i=0;i<components.size();i++){
       if(components[i]==component){
+        delete components[i];
         components.erase(components.begin()+i);
         break;
       }
