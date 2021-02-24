@@ -4,7 +4,7 @@
 #include <cstdint>
 #include "utils.hpp"
 #include "Renderer.hpp"
-#ifdef __linux__
+#ifdef __unix__
 #include "../extern/glad/include/glad/glad.h"
 #define GLFW_INCLUDE_GLCOREARB
 #include <GLFW/glfw3.h>

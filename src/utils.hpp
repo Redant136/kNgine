@@ -7,7 +7,7 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-#elif __unix__
+#elif defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #endif
 
@@ -687,7 +687,7 @@ inline void sleepMillis(unsigned int millis)
 {
 #ifdef _WIN32
   Sleep(millis);
-#elif __unix__
+#elif defined(__unix__) || defined(__APPLE__)
   usleep(millis * 1000);
 #endif
 }
@@ -695,7 +695,7 @@ inline void sleepMillis(unsigned int millis)
 void threadDetach(std::function<void(void)> func);
 std::function<void(void)> threadLaunch(std::function<void(void)> func);
 #ifdef _WIN32
-#elif __unix__ | __APPLE__
+#elif defined(__unix__) || defined(__APPLE__)
 #include <thread>
 inline void threadDetach(std::function<void(void)> func)
 {
@@ -770,80 +770,80 @@ public:
   }
 };
 
-namespace kNgine
+struct mapper
 {
-  struct mapper
+  v4 min, max, targetMin, targetMax;
+  mapper()
   {
-    v4 min, max, targetMin, targetMax;
-    mapper()
-    {
-      this->min = v4();
-      this->max = v4();
-      this->targetMin = v4();
-      this->targetMax = v4();
-    }
-    mapper(float min, float max, float targetMin, float targetMax)
-    {
-      this->min = v4(min);
-      this->max = v4(max);
-      this->targetMin = v4(targetMin);
-      this->targetMax = v4(targetMax);
-    }
-    mapper(v2 min, v2 max, v2 targetMin, v2 targetMax)
-    {
-      this->min = v4(min);
-      this->max = v4(max);
-      this->targetMin = v4(targetMin);
-      this->targetMax = v4(targetMax);
-    }
-    mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
-    {
-      this->min = v4(min);
-      this->max = v4(max);
-      this->targetMin = v4(targetMin);
-      this->targetMax = v4(targetMax);
-    }
-    mapper(v4 min, v4 max, v4 targetMin, v4 targetMax)
-    {
-      this->min = v4(min);
-      this->max = v4(max);
-      this->targetMin = v4(targetMin);
-      this->targetMax = v4(targetMax);
-    }
-    float map(float n)
-    {
-      float scale = (v4(n) - min).x / (max - min).x;
-      return scale * (targetMax - targetMin).x + targetMin.x;
-    }
-    v2 map(v2 n)
-    {
-      float xScale = (v4(n) - min).x / (max - min).x;
-      float yScale = (v4(n) - min).y / (max - min).y;
-      return v2(xScale * (targetMax - targetMin).x + targetMin.x,
-                yScale * (targetMax - targetMin).y + targetMin.y);
-    }
-    v3 map(v3 n)
-    {
-      float xScale = (v4(n) - min).x / (max - min).x;
-      float yScale = (v4(n) - min).y / (max - min).y;
-      float zScale = (v4(n) - min).z / (max - min).z;
-      return v3(xScale * (targetMax - targetMin).x + targetMin.x,
-                yScale * (targetMax - targetMin).y + targetMin.y,
-                zScale * (targetMax - targetMin).z + targetMin.z);
-    }
-    v4 map(v4 n)
-    {
-      float xScale = (v4(n) - min).x / (max - min).x;
-      float yScale = (v4(n) - min).y / (max - min).y;
-      float zScale = (v4(n) - min).z / (max - min).z;
-      float wScale = (v4(n) - min).w / (max - min).w;
-      return v4(xScale * (targetMax - targetMin).x + targetMin.x,
-                yScale * (targetMax - targetMin).y + targetMin.y,
-                zScale * (targetMax - targetMin).z + targetMin.z,
-                wScale * (targetMax - targetMin).w + targetMin.w);
-    }
-  };
+    this->min = v4();
+    this->max = v4();
+    this->targetMin = v4();
+    this->targetMax = v4();
+  }
+  mapper(float min, float max, float targetMin, float targetMax)
+  {
+    this->min = v4(min);
+    this->max = v4(max);
+    this->targetMin = v4(targetMin);
+    this->targetMax = v4(targetMax);
+  }
+  mapper(v2 min, v2 max, v2 targetMin, v2 targetMax)
+  {
+    this->min = v4(min);
+    this->max = v4(max);
+    this->targetMin = v4(targetMin);
+    this->targetMax = v4(targetMax);
+  }
+  mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
+  {
+    this->min = v4(min);
+    this->max = v4(max);
+    this->targetMin = v4(targetMin);
+    this->targetMax = v4(targetMax);
+  }
+  mapper(v4 min, v4 max, v4 targetMin, v4 targetMax)
+  {
+    this->min = v4(min);
+    this->max = v4(max);
+    this->targetMin = v4(targetMin);
+    this->targetMax = v4(targetMax);
+  }
+  float map(float n)
+  {
+    float scale = (v4(n) - min).x / (max - min).x;
+    return scale * (targetMax - targetMin).x + targetMin.x;
+  }
+  v2 map(v2 n)
+  {
+    float xScale = (v4(n) - min).x / (max - min).x;
+    float yScale = (v4(n) - min).y / (max - min).y;
+    return v2(xScale * (targetMax - targetMin).x + targetMin.x,
+              yScale * (targetMax - targetMin).y + targetMin.y);
+  }
+  v3 map(v3 n)
+  {
+    float xScale = (v4(n) - min).x / (max - min).x;
+    float yScale = (v4(n) - min).y / (max - min).y;
+    float zScale = (v4(n) - min).z / (max - min).z;
+    return v3(xScale * (targetMax - targetMin).x + targetMin.x,
+              yScale * (targetMax - targetMin).y + targetMin.y,
+              zScale * (targetMax - targetMin).z + targetMin.z);
+  }
+  v4 map(v4 n)
+  {
+    float xScale = (v4(n) - min).x / (max - min).x;
+    float yScale = (v4(n) - min).y / (max - min).y;
+    float zScale = (v4(n) - min).z / (max - min).z;
+    float wScale = (v4(n) - min).w / (max - min).w;
+    return v4(xScale * (targetMax - targetMin).x + targetMin.x,
+              yScale * (targetMax - targetMin).y + targetMin.y,
+              zScale * (targetMax - targetMin).z + targetMin.z,
+              wScale * (targetMax - targetMin).w + targetMin.w);
+  }
+};
 
+namespace kMath
+{
   inline bool lineCross(v2 s1, v2 end1, v2 s2, v2 end2)
   {
     float uA =

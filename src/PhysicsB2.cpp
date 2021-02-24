@@ -2,7 +2,7 @@
 #include "utils.hpp"
 #include "EngineObjects.hpp"
 #include "PhysicsB2.hpp"
-#include "../extern/box2d/include/box2d/box2d.h"
+#include <box2d/box2d.h>
 
 namespace kNgine
 {
