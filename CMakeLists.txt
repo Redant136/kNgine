@@ -97,13 +97,14 @@ elseif(WIN32)
   target_link_libraries(kNgine PRIVATE "-lGL -ldl")
 elseif(UNIX)
   add_subdirectory(extern/openal-soft)
-  target_link_libraries(kNgine PRIVATE openal)
+  target_include_directories(kNgine PRIVATE extern/openal-soft/include/)
+  target_link_libraries(kNgine PRIVATE OpenAl)
 
-  add_subdirectory(extern/freealut)
-  target_link_libraries(kNgine PRIVATE alut)
+  # add_subdirectory(extern/freealut)
+  # target_link_libraries(kNgine PRIVATE alut)
 
   target_link_libraries(kNgine PRIVATE "-pthread -lGL -ldl")
 endif()
 
-target_include_directories(kNgine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(kNgine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
