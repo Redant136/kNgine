@@ -1,11 +1,15 @@
 #pragma once
 
 #define fast_calc_precision 11
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <functional>
 #include <random>
 
 #ifdef _WIN32
+#define NOMINMAX
 #include <Windows.h>
 #elif defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
@@ -282,8 +286,8 @@ struct iv2
   }
   iv2(const v2 &base)
   {
-    this->x = std::floor(base.x);
-    this->y = std::floor(base.y);
+    this->x = (int)std::floor(base.x);
+    this->y = (int)std::floor(base.y);
   }
   bool operator==(const iv2 &a) { return x == a.x && y == a.y; }
   bool operator!=(const iv2 &a) { return x != a.x || y != a.y; }
@@ -352,9 +356,9 @@ struct iv3
     this->z = 0;
   }
   iv3(const v3&base){
-    this->x=std::floor(base.x);
-    this->y=std::floor(base.y);
-    this->z = std::floor(base.z);
+    this->x = (int)std::floor(base.x);
+    this->y = (int)std::floor(base.y);
+    this->z = (int)std::floor(base.z);
   }
   bool operator==(const iv3 &a) { return x == a.x && y == a.y && z == a.z; }
   bool operator!=(const iv3 &a) { return x != a.x || y != a.y || z != a.z; }
@@ -448,9 +452,10 @@ struct iv4
   }
   iv4(const v4&base)
   {
-    this->x = std::floor(base.x);
-    this->y = std::floor(base.y);
-    this->z = std::floor(base.z);
+    this->x = (int)std::floor(base.x);
+    this->y = (int)std::floor(base.y);
+    this->z = (int)std::floor(base.z);
+    this->w = (int)std::floor(base.w);
   }
   bool operator==(const iv4 &a)
   {
@@ -526,21 +531,21 @@ struct iv4
 };
 inline v2::v2(const iv2 &base)
 {
-  this->x = base.x;
-  this->y = base.y;
+  this->x = (float)base.x;
+  this->y = (float)base.y;
 }
 inline v3::v3(const iv3 &base)
 {
-  this->x = base.x;
-  this->y = base.y;
-  this->z=base.z;
+  this->x = (float)base.x;
+  this->y = (float)base.y;
+  this->z = (float)base.z;
 }
 inline v4::v4(const iv4 &base)
 {
-  this->x = base.x;
-  this->y = base.y;
-  this->z=base.z;
-  this->w=base.w;
+  this->x = (float)base.x;
+  this->y = (float)base.y;
+  this->z = (float)base.z;
+  this->w = (float)base.w;
 }
 #define v2ToArray(v) {v.x,v.y}
 #define v3ToArray(v) {v.x,v.y,v.z}
@@ -877,14 +882,14 @@ namespace kMath
   }
   inline float regularizeDegree(float angle)
   {
-    float degree = std::fmod(angle, 360);
+    float degree = (float)std::fmod(angle, 360);
     if (degree < 0)
       degree += 360;
     return degree;
   }
   inline float regularizeRad(float angle)
   {
-    float rad = std::fmod(angle, 2 * M_PI);
+    float rad = (float)std::fmod(angle, 2 * M_PI);
     if (rad < 0)
       rad += 2 * M_PI;
     return rad;

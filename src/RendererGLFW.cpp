@@ -4,23 +4,14 @@
 #include <cstdint>
 #include "utils.hpp"
 #include "Renderer.hpp"
-#ifdef __unix__
-#include "../extern/glad/include/glad/glad.h"
-#define GLFW_INCLUDE_GLCOREARB
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#elif __WIN32
-#elif __APPLE__
 #include <glad/glad.h>
-// #define __gl3_h_
-// #define GLFW_INCLUDE_GLCOREARB
+#ifdef __unix__
+#define GLFW_INCLUDE_GLCOREARB
+#endif
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#endif
 
 const int GLFW_KEYS[] = {GLFW_KEY_SPACE,
                          GLFW_KEY_APOSTROPHE /* ' */,

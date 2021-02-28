@@ -11,6 +11,9 @@ if(APPLE)
     src/RendererGLFW.cpp
   )
 else()
+  if(WIN32)
+    add_compile_definitions(_USE_MATH_DEFINES)
+  endif()
   set(OSSpecificFiles
     src/AudioEngineOpenAL.cpp
     src/RendererGLFW.cpp
@@ -27,6 +30,7 @@ ${OSSpecificFiles}
 )
 
 set(KNGINE_HEADER_FILES
+src/utils.hpp
 src/EngineObjects.hpp
 src/Camera.hpp
 src/TextBox.hpp
@@ -34,6 +38,7 @@ src/SpriteUtils.hpp
 src/Tilemap.hpp 
 src/AudioEngine.hpp
 src/Renderer.hpp
+kNgine.h
 )
 
 if(BOX2DPHYSICS)
@@ -82,7 +87,15 @@ target_link_libraries(kNgine PRIVATE glm)
 if(APPLE)
   target_link_directories(kNgine PUBLIC "/usr/local/lib")
   target_link_libraries(kNgine PRIVATE "-framework Foundation -framework AppKit -framework CoreAudio -pthread")
-else()
+elseif(WIN32)
+  add_subdirectory(extern/openal-soft)
+  target_link_libraries(kNgine PRIVATE OpenAL)
+
+  add_subdirectory(extern/freealut)
+  target_link_libraries(kNgine PRIVATE alut)
+
+  target_link_libraries(kNgine PRIVATE "-lGL -ldl")
+elseif(UNIX)
   add_subdirectory(extern/openal-soft)
   target_link_libraries(kNgine PRIVATE openal)
 
