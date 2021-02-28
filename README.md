@@ -4,12 +4,8 @@ https://github.com/Redant136/kNgine.git
 
 # Installation
 
-- run git submodule init from main folder, git submodule update
-- cd kNgine, git submodule init, git submodule update
-- install glfw or glfw3-devel
-- install openAL and ALUT
+- run git submodule init from kNgine folder, then git submodule update
 - add using cmake add_subdirectory(kNgine), target_link_libraries([PROJECT NAME] PRIVATE kNgine)
-
 
 # Usage
 
@@ -47,6 +43,6 @@ https://github.com/Redant136/kNgine.git
 - Tileset: object to hold a tileset/tilemap
 - Tileset::TileDef : a definition of a tile. add a tile using the position in the array of it's definition
 ## Events
-- an event contains a name, a pointer to the engine objects(use engine.workingObjects), a function as (``std::vector<EngineObject*>``){}
+- an event contains a name, a pointer to the engine objects(use engine.workingObjects), a function as ``(std::vector<EngineObject*>){}``
 - addEvent(Event)
 - callEvent(name)

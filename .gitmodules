@@ -4,3 +4,15 @@
 [submodule "extern/box2d"]
 	path = extern/box2d
 	url = https://github.com/erincatto/box2d.git
+[submodule "extern/glfw"]
+	path = extern/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "extern/glm"]
+	path = extern/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "extern/openal-soft"]
+	path = extern/openal-soft
+	url = https://github.com/kcat/openal-soft.git
+[submodule "extern/freealut"]
+	path = extern/freealut
+	url = https://github.com/vancegroup/freealut.git
