@@ -94,7 +94,7 @@ elseif(UNIX)
   add_subdirectory(extern/wave)
   target_link_libraries(kNgine PRIVATE wave)
 
-  target_link_libraries(kNgine PRIVATE "-pthread -lopenal -ldl")
+  target_link_libraries(kNgine PRIVATE "-pthread -lGL -ldl -lopenal")
 endif()
 
 target_include_directories(kNgine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")
