@@ -5,6 +5,7 @@ https://github.com/Redant136/kNgine.git
 # Installation
 
 - run git submodule init from kNgine folder, then git submodule update
+- install openAl, if using linux install glfw
 - add using cmake ``add_subdirectory(kNgine)``, ``target_link_libraries([PROJECT NAME] PRIVATE kNgine)``
 
 # Usage

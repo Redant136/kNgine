@@ -13,6 +13,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <iostream>
+
 const int GLFW_KEYS[] = {GLFW_KEY_SPACE,
                          GLFW_KEY_APOSTROPHE /* ' */,
                          GLFW_KEY_COMMA /* , */,

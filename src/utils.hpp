@@ -735,6 +735,7 @@ public:
           this->job();
           jobEnd = true;
         }
+        sleepMillis(1); // WHY DO I NEED THIS?!?!?
       }
     });
   }

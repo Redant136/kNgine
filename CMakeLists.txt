@@ -1,7 +1,7 @@
-set(BOX2DPHYSICS ON)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+set(BOX2DPHYSICS ON)
 
 if(APPLE)
   include_directories ( /usr/local/include) 
@@ -88,22 +88,13 @@ if(APPLE)
   target_link_directories(kNgine PUBLIC "/usr/local/lib")
   target_link_libraries(kNgine PRIVATE "-framework Foundation -framework AppKit -framework CoreAudio -pthread")
 elseif(WIN32)
-  add_subdirectory(extern/openal-soft)
-  target_link_libraries(kNgine PRIVATE OpenAL)
-
-  add_subdirectory(extern/freealut)
-  target_link_libraries(kNgine PRIVATE alut)
-
-  target_link_libraries(kNgine PRIVATE "-lGL -ldl")
+  target_link_libraries(kNgine PRIVATE "-lGL -ldl -lopenal")
 elseif(UNIX)
-  add_subdirectory(extern/openal-soft)
-  target_include_directories(kNgine PRIVATE extern/openal-soft/include/)
-  target_link_libraries(kNgine PRIVATE OpenAl)
+  set(wave_enable_tests OFF)
+  add_subdirectory(extern/wave)
+  target_link_libraries(kNgine PRIVATE wave)
 
-  # add_subdirectory(extern/freealut)
-  # target_link_libraries(kNgine PRIVATE alut)
-
-  target_link_libraries(kNgine PRIVATE "-pthread -lGL -ldl")
+  target_link_libraries(kNgine PRIVATE "-pthread -lopenal -ldl")
 endif()
 
 target_include_directories(kNgine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")

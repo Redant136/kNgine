@@ -8,11 +8,10 @@
 #ifndef __APPLE__
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <AL/alut.h>
+#include <wave/file.h>
 #else //just for debug purpose, should never be loaded
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
-#include <AL/alut.h>
 #endif
 
 #include <iostream>
@@ -62,7 +61,47 @@ namespace kNgine
     OpenALBuffer(const char* fileName,audiofiletype type)
     {
       if(type==audiofiletype::wav){
-        buffer = alutCreateBufferFromFile(fileName);
+        // buffer = alutCreateBufferFromFile(fileName);
+        alGenBuffers(1,&buffer);
+        wave::File file;
+        wave::Error err = file.Open(fileName, wave::kIn);
+        if (err)
+        {
+          std::cout << "Something went wrong in in open" << std::endl;
+        }
+        std::vector<float> content;
+        err = file.Read(&content);
+        if (err)
+        {
+          std::cout << "Something went wrong in read" << std::endl;
+        }
+        int chan=file.channel_number();
+        int samplerate=file.sample_rate();
+        int samples=content.size();
+        // AudioFile<double> audioFile;
+        // audioFile.load(fileName);
+        // int samplerate = audioFile.getSampleRate();
+        // int samples = audioFile.getNumSamplesPerChannel();
+        // int chan = audioFile.getNumChannels();
+        ALenum format;
+        if (chan == 1 && samplerate == 8)
+          format = AL_FORMAT_MONO8;
+        else if (chan == 1 && samplerate == 16)
+          format = AL_FORMAT_MONO16;
+        else if (chan == 2 && samplerate == 8)
+          format = AL_FORMAT_STEREO8;
+        else if (chan == 2 && samplerate == 16)
+          format = AL_FORMAT_STEREO16;
+        else
+        {
+          std::cerr
+              << "ERROR: unrecognised wave format: "
+              << chan << " channels, "
+              << samplerate << " bps" << std::endl;
+          std::cout<<samples<<std::endl;
+        }
+        // std::vector<u_int16_t>pcm_data=audioFile.get;
+        alBufferData(buffer, format, content.data(), samples * sizeof(float), samplerate);
         if (!check_alc_errors(__FILE__, __LINE__, openALDevice) || buffer == AL_NONE)
         {
           std::cerr << "ERROR: Could not load file" << std::endl;
@@ -72,7 +111,7 @@ namespace kNgine
         short *output;
         int samples = stb_vorbis_decode_filename(fileName, &chan, &samplerate, &output);
         alGenBuffers(1, &buffer);
-        alBufferData(buffer,AL_FORMAT_MONO16,output,samples*sizeof(short),samplerate);
+        alBufferData(buffer, AL_FORMAT_MONO16, output, samples * sizeof(short), samplerate);
         if (!check_alc_errors(__FILE__, __LINE__, openALDevice) || buffer == AL_NONE)
         {
           std::cerr << "ERROR: Could not load file" << std::endl;
@@ -91,7 +130,6 @@ namespace kNgine
     object->flags.push_back(objectFlags::AUDIOPLAYER);
     object->labels.push_back(label);
     if(!openALDevice){
-      alutInit(nullptr, nullptr);
       openALDevice = alcOpenDevice(nullptr);
       if (!openALDevice)
       {
@@ -111,7 +149,6 @@ namespace kNgine
   }
   SoundListenerComponent::~SoundListenerComponent(){
     if(openALDevice){
-      alutExit();
       alcMakeContextCurrent(nullptr);
       if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
       {
@@ -174,7 +211,6 @@ namespace kNgine
     this->flags.push_back(objectFlags::AUDIO);
     this->labels.push_back("AudioEngine");
     if(!openALDevice){
-      alutInit(0, NULL);
       openALDevice = alcOpenDevice(nullptr);
       if (!openALDevice)
       {
@@ -204,7 +240,6 @@ namespace kNgine
     }
     if (!(openALDevice))
     {
-      alutExit();
       alcMakeContextCurrent(nullptr);
       if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
       {

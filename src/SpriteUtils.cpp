@@ -4,6 +4,7 @@
 #include "Renderer.hpp"
 #include "SpriteUtils.hpp"
 #include "../extern/stb/stb_image.h"
+#include <iostream>
 
 namespace kNgine
 {
