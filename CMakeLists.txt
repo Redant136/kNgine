@@ -38,7 +38,6 @@ src/SpriteUtils.hpp
 src/Tilemap.hpp 
 src/AudioEngine.hpp
 src/Renderer.hpp
-kNgine.h
 )
 
 if(BOX2DPHYSICS)
@@ -86,16 +85,28 @@ target_link_libraries(kNgine PRIVATE glm)
 
 if(APPLE)
   target_link_directories(kNgine PUBLIC "/usr/local/lib")
-  target_link_libraries(kNgine PRIVATE "-framework Foundation -framework AppKit -framework CoreAudio -pthread")
+  target_link_libraries(kNgine PRIVATE "-framework Foundation -framework AppKit -framework CoreAudio")
 elseif(WIN32)
-  target_link_libraries(kNgine PRIVATE "-lGL -ldl -lopenal")
+  set(wave_enable_tests OFF)
+  add_subdirectory(extern/wave)
+  target_link_libraries(kNgine PRIVATE wave)
+
+  add_subdirectory(extern/openal-soft)
+  target_link_libraries(kNgine PRIVATE OpenAL)
+   
+  target_link_libraries(kNgine PRIVATE "-lGL -ldl")
 elseif(UNIX)
   set(wave_enable_tests OFF)
   add_subdirectory(extern/wave)
   target_link_libraries(kNgine PRIVATE wave)
 
-  target_link_libraries(kNgine PRIVATE "-pthread -lGL -ldl -lopenal")
+  add_subdirectory(extern/openal-soft)
+  target_link_libraries(kNgine PRIVATE OpenAL)
+
+  target_link_libraries(kNgine PRIVATE "-lGL -ldl -lopenal")
 endif()
 
-target_include_directories(kNgine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")
+target_include_directories(kNgine PUBLIC include/)
+target_include_directories(kNgine PUBLIC src/)
+
 

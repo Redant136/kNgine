@@ -13,3 +13,6 @@
 [submodule "extern/wave"]
 	path = extern/wave
 	url = https://github.com/audionamix/wave.git
+[submodule "extern/openal-soft"]
+	path = extern/openal-soft
+	url = https://github.com/kcat/openal-soft.git

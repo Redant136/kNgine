@@ -7,6 +7,7 @@
 #include <cmath>
 #include <functional>
 #include <random>
+#include <thread>
 
 #ifdef _WIN32
 #define NOMINMAX
@@ -699,9 +700,6 @@ inline void sleepMillis(unsigned int millis)
 
 void threadDetach(std::function<void(void)> func);
 std::function<void(void)> threadLaunch(std::function<void(void)> func);
-#ifdef _WIN32
-#elif defined(__unix__) || defined(__APPLE__)
-#include <thread>
 inline void threadDetach(std::function<void(void)> func)
 {
   std::thread t = std::thread(func);
@@ -713,7 +711,6 @@ inline std::function<void(void)> threadLaunch(std::function<void(void)> func)
   std::thread *t = new std::thread(func);
   return [t]() {t->join();delete t; };
 }
-#endif
 class threaded_job final
 { // use "fflush(stdout)" if printing
 private:
