@@ -203,7 +203,6 @@ struct v3
     this->y = a.y;
     return *this;
   }
-  v2 toV2() { return v2(x, y); }
 };
 struct v4
 {
@@ -333,8 +332,6 @@ struct v4
     this->z = a.z;
     return *this;
   }
-  v2 toV2() { return v2(x, y); }
-  v3 toV3() { return v3(x, y, z); }
 };
 struct iv2
 {
@@ -805,6 +802,9 @@ static iv4 IV4Init(i32 x, i32 y, i32 z, i32 w)
 #define iv4(x, y, z, w) IV4Init(x, y, z, w)
 
 #endif
+#define toV2(v) v2(v.x,v.y)
+#define toV3(v) v2(v.x,v.y,v.y)
+#define toV4(v) v2(v.x, v.y,v.y,v.w)
 
 static f32 V2Dot(v2 a, v2 b)
 {

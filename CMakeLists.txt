@@ -21,7 +21,6 @@ else()
 endif()
 
 set(KNGINE_SOURCE_FILES
-src/kThread.c
 src/EngineObjects.cpp 
 src/Camera_2D.cpp
 src/TextBox.cpp

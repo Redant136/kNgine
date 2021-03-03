@@ -3,13 +3,12 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#define vectorObjects
+// #define vectorObjects
 #include "utils.h"
 #include "EngineObjects.hpp"
 #include "Renderer.hpp"
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
-
 
 namespace kNgine
 {
@@ -40,8 +39,8 @@ namespace kNgine
 
   void Camera::updateWindowSize(int windowWidth, int windowHeight)
   {
-    this->posMapper.targetMax = v2(windowWidth, 0);
-    this->posMapper.targetMin = v2(0, windowHeight);
+    this->posMapper.targetMax = v4(windowWidth, 0,0,0);
+    this->posMapper.targetMin = v4(0, windowHeight,0,0);
     if (fovType == MAX_WH)
     {
       if (windowWidth < windowHeight)
@@ -136,9 +135,9 @@ namespace kNgine
       {
         SpriteAccessor *compn =
             objects[i]->findComponent<SpriteAccessor>("[sprite]");
-        v2 spriteDimensions = posMapper.map(objects[i]->position.toV2() +
-                                            compn->getSpriteDimensions()) -
-                              posMapper.map(objects[i]->position.toV2());
+        v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(objects[i]->position),
+                                            toV2(compn->getSpriteDimensions()))),
+                              posMapper.map(toV2(objects[i]->position)));
         unsigned char *colorMap = compn->getSprite()->colorMap.data();
 
         v2 spriteOffset = compn->getSpriteLocation();
@@ -146,8 +145,8 @@ namespace kNgine
         spriteOffset.y *= spriteDimensions.y;
         renderer::drawColorMap(
             colorMap,
-            posMapper.map(objects[i]->position.toV2() - position.toV2()) +
-                spriteOffset,
+            V2AddV2(posMapper.map(V2MinusV2(toV2(objects[i]->position), toV2(position))),
+                spriteOffset),
             spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
             compn->getSprite()->height, compn->getSprite()->numChannels, objects[i]->rotation);
         if (showDebugHitBox){
@@ -174,9 +173,9 @@ namespace kNgine
         {
           compn = object->findComponent<SpriteList>("[sprite_list]")->getSpriteList()[i];
         }
-        v2 spriteDimensions = posMapper.map(object->position.toV2() +
-                                            compn->getSpriteDimensions()) -
-                              posMapper.map(object->position.toV2());
+        v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(object->position),
+                                            compn->getSpriteDimensions())),
+                              posMapper.map(toV2(object->position)));
         spriteDimensions.y *= -1;
         unsigned char *colorMap = compn->getSprite()->colorMap.data();
         v2 spriteOffset = compn->getSpriteLocation();
@@ -186,8 +185,8 @@ namespace kNgine
         {
           renderer::drawColorMap(
               colorMap,
-              posMapper.map(object->position.toV2() + compn->offset - position.toV2()) +
-                  spriteOffset,
+              V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
+                  spriteOffset),
               spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
               compn->getSprite()->height, compn->getSprite()->numChannels, object->rotation);
         }
@@ -196,8 +195,8 @@ namespace kNgine
           SpriteMapAccessor *ref = (SpriteMapAccessor *)compn;
           renderer::drawTexture(
               ref->spriteList->texIndex[ref->getMapIndex()],
-              posMapper.map(object->position.toV2() + compn->offset - position.toV2()) +
-                  spriteOffset,
+              V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
+                  spriteOffset),
               spriteDimensions.x, spriteDimensions.y, object->rotation);
         }
       }
