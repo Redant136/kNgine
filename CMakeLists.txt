@@ -1,6 +1,7 @@
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+option(BOX2DPHYSICS "if box2d is used" ON)
 
 if(APPLE)
   include_directories ( /usr/local/include) 
