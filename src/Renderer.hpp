@@ -5,7 +5,7 @@
 
 #include <cstdint>
 #include <functional>
-#include "utils.hpp"
+#include "utils.h"
 
 namespace renderer {
 

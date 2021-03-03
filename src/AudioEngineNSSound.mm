@@ -1,7 +1,8 @@
 #import <Foundation/Foundation.h>
 #include <AppKit/NSSound.h>
 #include "EngineObjects.hpp"
-#include "utils.hpp"
+#include "utils.h"
+#include "kThread.h"
 #include "AudioEngine.hpp"
 
 namespace kNgine{

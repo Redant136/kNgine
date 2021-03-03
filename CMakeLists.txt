@@ -1,7 +1,6 @@
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(BOX2DPHYSICS ON)
 
 if(APPLE)
   include_directories ( /usr/local/include) 
@@ -21,6 +20,7 @@ else()
 endif()
 
 set(KNGINE_SOURCE_FILES
+src/kThread.c
 src/EngineObjects.cpp 
 src/Camera_2D.cpp
 src/TextBox.cpp
@@ -30,7 +30,8 @@ ${OSSpecificFiles}
 )
 
 set(KNGINE_HEADER_FILES
-src/utils.hpp
+src/utils.h
+src/kThread.h
 src/EngineObjects.hpp
 src/Camera.hpp
 src/TextBox.hpp

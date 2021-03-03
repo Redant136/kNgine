@@ -2,7 +2,7 @@
 #include <functional>
 #include <vector>
 #include <cstdint>
-#include "utils.hpp"
+#include "utils.h"
 #include "Renderer.hpp"
 #include <glad/glad.h>
 #ifdef __unix__
@@ -12,8 +12,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include <iostream>
 
 const int GLFW_KEYS[] = {GLFW_KEY_SPACE,
                          GLFW_KEY_APOSTROPHE /* ' */,
@@ -377,7 +375,7 @@ void drawRect(v2 points[4]) {
   glDeleteBuffers(1, &EBO);
 }
 void drawRect(v2 startPos, double width, double height) {
-  v2 points[4]{v2(startPos), v2(startPos.x, startPos.y + height),
+  v2 points[4]{startPos, v2(startPos.x, startPos.y + height),
                v2(startPos.x + width, startPos.y),
                v2(startPos.x + width, startPos.y + height)};
   renderer::drawRect(points);
@@ -505,8 +503,7 @@ void drawPoint(v2 point)  // very slow
 void drawCircle(v2 startPoint, double radius) {
   for (int a = 0; a < 360; a++) {
     double angle = a * M_PI / 180;
-    v2 line[2] = {startPoint, startPoint + v2(std::cos(angle) * radius,
-                                              std::sin(angle) * radius)};
+    v2 line[2] = {startPoint, V2AddV2(startPoint, v2(std::cos(angle) * radius, std::sin(angle) * radius))};
     renderer::drawLine(line);
   }
 }

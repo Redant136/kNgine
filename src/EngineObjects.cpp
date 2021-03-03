@@ -1,7 +1,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include "utils.hpp"
+#include "utils.h"
 #include "EngineObjects.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "../extern/stb/stb_image.h"
@@ -21,7 +21,7 @@ namespace kNgine{
     colorMap[2] = 0;
     colorMap[3] = 0;
   }
-  Sprite::Sprite(int width, int height, color colorFill) {
+  Sprite::Sprite(int width, int height, rgbcolor colorFill) {
     this->width = width;
     this->height = height;
     this->numChannels = 4;
@@ -69,18 +69,18 @@ namespace kNgine{
   void Sprite::resize(int newWidth, int newHeight) {
     // if image is same size with accuracy of 1 pixel, do nothing
     if (abs(width - newWidth) <= 2 && abs(height - newHeight) <= 2) return;
-    std::vector<color> newColorMap = std::vector<color>();
+    std::vector<rgbcolor> newColorMap = std::vector<rgbcolor>();
     for (int i = 0; i < width * height * numChannels; i += numChannels) {
       if (numChannels == 3)
-        newColorMap.push_back(color(this->colorMap[i], this->colorMap[i + 1],
+        newColorMap.push_back(rgbcolor(this->colorMap[i], this->colorMap[i + 1],
                                     this->colorMap[i + 2], 255));
       else
-        newColorMap.push_back(color(this->colorMap[i], this->colorMap[i + 1],
+        newColorMap.push_back(rgbcolor(this->colorMap[i], this->colorMap[i + 1],
                                     this->colorMap[i + 2],
                                     this->colorMap[i + 3]));
     }
 
-    std::vector<color> temp = std::vector<color>(newWidth * newHeight);
+    std::vector<rgbcolor> temp = std::vector<rgbcolor>(newWidth * newHeight);
     float x_ratio = width / (float)newWidth;
     float y_ratio = height / (float)newHeight;
     float px, py;
@@ -193,14 +193,14 @@ namespace kNgine{
   ChildrenObject::ChildrenObject(GameObject *object, v3 &parentPosition)
       : parentPosition(parentPosition) {
     this->object = object;
-    this->position = object->position-parentPosition;
+    this->position = V3MinusV3(object->position,parentPosition);
     this->previousParentPosition = parentPosition;
     this->flags.push_back(objectFlags::CHILD);
     labels.push_back("_CHILDREN_");
   }
   void ChildrenObject::update(std::vector<msg> msgs) {
-    object->position += parentPosition - previousParentPosition;
-    this->position = object->position - parentPosition;
+    object->position = V3AddV3(V3MinusV3(parentPosition, previousParentPosition),object->position);
+    this->position = V3MinusV3(object->position, parentPosition);
     this->previousParentPosition = parentPosition;
     object->update(msgs);
   }

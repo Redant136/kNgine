@@ -1,7 +1,7 @@
 #include <vector>
 #include <string>
 #include "EngineObjects.hpp"
-#include "utils.hpp"
+#include "utils.h"
 #include "AudioEngine.hpp"
 #include "../extern/stb/stb_vorbis.c"
 
@@ -12,6 +12,7 @@
 #else //just for debug purpose, should never be loaded
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
+#include <wave/file.h>
 #endif
 
 #include <iostream>
@@ -181,7 +182,7 @@ namespace kNgine
       alSourcef(source, AL_PITCH, 1);
       // store volume in player obj
       alSourcef(source, AL_GAIN, this->volume);
-      alSource3f(source, AL_POSITION, 0 - this->player->object->position.x, 0 - this->player->object->position.y, 0 - this->player->object->position.z);
+      alSource3f(source, AL_POSITION, this->object->position.x - this->player->object->position.x, this->object->position.y - this->player->object->position.y, this->object->position.z - this->player->object->position.z);
       //nope nope nope
       alSource3f(source, AL_VELOCITY, 0, 0, 0);
       alSourcei(source, AL_LOOPING, AL_FALSE);

@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include "utils.hpp"
+#include "utils.h"
 
 namespace kNgine
 {
@@ -51,7 +51,7 @@ namespace kNgine
     int width, height, numChannels;
     std::vector<unsigned char> colorMap;
     Sprite();
-    Sprite(int width, int height, color colorFill);
+    Sprite(int width, int height, rgbcolor colorFill);
     Sprite(int width, int height, unsigned char *colorMap);
     Sprite(int width, int height, int numChannels, unsigned char *colorMap);
     Sprite(int width, int height, int numChannels,

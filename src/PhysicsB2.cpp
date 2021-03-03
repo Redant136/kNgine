@@ -1,5 +1,5 @@
 #include <vector>
-#include "utils.hpp"
+#include "utils.h"
 #include "EngineObjects.hpp"
 #include "PhysicsB2.hpp"
 #include <box2d/box2d.h>
@@ -41,7 +41,7 @@ namespace kNgine
     }
     void b2PhysicsBodyComponent::updatePos()
     {
-      object->position = v2(body->GetPosition().x, body->GetPosition().y);
+      object->position = v3(body->GetPosition().x, body->GetPosition().y,0);
       object->rotation.z=body->GetAngle();
     }
     void b2PhysicsBodyComponent::setStatic(bool isAffectedByGravity)
@@ -69,13 +69,13 @@ namespace kNgine
 
     b2PhysicsEngine::b2PhysicsEngine() : box2dWorld(b2Vec2(gravity.x, gravity.y))
     {
-      this->gravity = v2();
+      this->gravity = v2(0,0);
       this->flags.push_back(objectFlags::PhysicsEngine);
       this->labels.push_back("b2Engine");
     }
     b2PhysicsEngine::b2PhysicsEngine(v2 grav) : box2dWorld(b2Vec2(grav.x, grav.y))
     {
-      this->gravity = v2();
+      this->gravity = v2(0,0);
       this->flags.push_back(objectFlags::PhysicsEngine);
       this->labels.push_back("b2Engine");
     }

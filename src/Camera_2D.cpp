@@ -3,14 +3,13 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include "utils.hpp"
+#define vectorObjects
+#include "utils.h"
 #include "EngineObjects.hpp"
 #include "Renderer.hpp"
 #include "Camera.hpp"
-#include "Physics.hpp"
 #include "SpriteUtils.hpp"
 
-#include <iostream>
 
 namespace kNgine
 {
@@ -127,39 +126,6 @@ namespace kNgine
     }
   }
 
-  void showLines(ComponentGameObject *obj, mapper posMapper, v3 position)
-  {
-    physics::PhysicsBodyComponent *body =
-        obj->findComponent<physics::PhysicsBodyComponent>("[physics_body]");
-    if (body)
-    {
-      // for (float a = 0; a < 360; a += 1) {
-      //   if (0)  // draw max dist
-      //   {
-      //     renderer::setDrawColor(255, 125, 0, 255);
-      //     v2 maxPoint = posMapper.map(
-      //         obj->position.toV2() - position.toV2() +
-      //         v2(fast_cos(degreeToRad(a)) * body->body->maxDistance,
-      //            fast_sin(degreeToRad(a)) * body->body->maxDistance));
-      //     renderer::drawPoint(maxPoint);
-      //   }
-      //   renderer::setDrawColor(255, 0, 0, 255);
-      //   v2 hitbox = posMapper.map(
-      //       obj->position.toV2() - position.toV2() +
-      //       v2(fast_cos(degreeToRad(a)) *
-      //              body->body->distanceAtAngle(a + obj->rotation.z),
-      //          fast_sin(degreeToRad(a)) *
-      //              body->body->distanceAtAngle(a + obj->rotation.z)));
-      //   renderer::drawPoint(hitbox);
-      // }
-      v2 velLine[2] = {
-          posMapper.map(obj->position.toV2() - position.toV2()),
-          posMapper.map(obj->position.toV2() - position.toV2() + body->velocity)};
-      renderer::setDrawColor(0, 0, 255, 255);
-      renderer::drawLine(velLine);
-    }
-  }
-
   void Camera::render(std::vector<ComponentGameObject *> objects)
   {
     objects = orderObjectsByZ<ComponentGameObject>(
@@ -184,8 +150,9 @@ namespace kNgine
                 spriteOffset,
             spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
             compn->getSprite()->height, compn->getSprite()->numChannels, objects[i]->rotation);
-        if (showDebugHitBox)
-          showLines(objects[i], posMapper, position);
+        if (showDebugHitBox){
+          // showLines(objects[i], posMapper, position);
+        }
       }
     }
   }
@@ -234,8 +201,11 @@ namespace kNgine
               spriteDimensions.x, spriteDimensions.y, object->rotation);
         }
       }
-      if (showDebugHitBox)
-        showLines(object, posMapper, position);
+      if (showDebugHitBox){
+        // showLines(object, posMapper, position);
+      }
     }
   }
 } // namespace kNgine
+
+#undef vectorObjects
