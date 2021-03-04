@@ -76,14 +76,14 @@ namespace kNgine
         {
           std::cout << "Something went wrong in read" << std::endl;
         }
-        int chan=file.channel_number();
-        int samplerate=file.sample_rate();
-        int samples=content.size();
+        i32  chan=file.channel_number();
+        i32  samplerate=file.sample_rate();
+        i32  samples=content.size();
         // AudioFile<double> audioFile;
         // audioFile.load(fileName);
-        // int samplerate = audioFile.getSampleRate();
-        // int samples = audioFile.getNumSamplesPerChannel();
-        // int chan = audioFile.getNumChannels();
+        // i32  samplerate = audioFile.getSampleRate();
+        // i32  samples = audioFile.getNumSamplesPerChannel();
+        // i32  chan = audioFile.getNumChannels();
         ALenum format;
         if (chan == 1 && samplerate == 8)
           format = AL_FORMAT_MONO8;
@@ -108,9 +108,9 @@ namespace kNgine
           std::cerr << "ERROR: Could not load file" << std::endl;
         }
       }else if(type=audiofiletype::ogg){
-        int chan, samplerate;
+        i32  chan, samplerate;
         short *output;
-        int samples = stb_vorbis_decode_filename(fileName, &chan, &samplerate, &output);
+        i32  samples = stb_vorbis_decode_filename(fileName, &chan, &samplerate, &output);
         alGenBuffers(1, &buffer);
         alBufferData(buffer, AL_FORMAT_MONO16, output, samples * sizeof(short), samplerate);
         if (!check_alc_errors(__FILE__, __LINE__, openALDevice) || buffer == AL_NONE)
@@ -233,7 +233,7 @@ namespace kNgine
     }
   }
   AudioEngine::~AudioEngine(){
-    for (int i = 0; i < queue.size(); i++)
+    for (i32  i = 0; i < queue.size(); i++)
     {
       queue[i]->loop = false;
       queue[i]->stop = true;

@@ -22,16 +22,16 @@ namespace kNgine
     }
   }
   void SpriteMap::load(){
-    texIndex = std::vector<unsigned int>();
-    for (int i = 0; i < list.size(); i++) {
-      unsigned int texture, VBO;
+    texIndex = std::vector<u32 >();
+    for (i32  i = 0; i < list.size(); i++) {
+      u32  texture, VBO;
       renderer::bindTexture(&texture, list[i].colorMap.data(), v2(0, 0), 1, 1,
                             list[i].width, list[i].height, list[i].numChannels);
       texIndex.push_back(texture);
     }
   }
   void SpriteMap::unload(){
-    for (int i = 0; i < list.size(); i++) {
+    for (i32  i = 0; i < list.size(); i++) {
       renderer::unbindTexture(texIndex[i]);
     }
   }
@@ -41,7 +41,7 @@ namespace kNgine
   }
 
   SpriteReferenceComponent::SpriteReferenceComponent(ComponentGameObject *base, SpriteMap *spriteList,
-                                                     int index)
+                                                     i32  index)
       : SpriteMapAccessor(base)
   {
     this->spriteLocation = CENTER;
@@ -79,14 +79,14 @@ namespace kNgine
   }
   SpriteReferenceComponent::~SpriteReferenceComponent() {}
   void SpriteReferenceComponent::update(std::vector<msg>msgs) {}
-  unsigned int SpriteReferenceComponent::getMapIndex() {return mapIndex;}
+  u32  SpriteReferenceComponent::getMapIndex() {return mapIndex;}
   Sprite *SpriteReferenceComponent::getSprite() {
     return &(spriteList->list[mapIndex]);
   }
   v2 SpriteReferenceComponent::getSpriteDimensions() { return spriteDimension; }
 
-  SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<unsigned int> indexes,
-                                   float frameLength, v2 spriteDimension) : SpriteMapAccessor(base)
+  SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<u32 > indexes,
+                                   f32 frameLength, v2 spriteDimension) : SpriteMapAccessor(base)
   {
     this->spriteLocation = CENTER;
     this->spriteList = spriteList;
@@ -94,27 +94,27 @@ namespace kNgine
     this->frameLength=frameLength;
     this->spritesIndexes=indexes;
     this->spriteDimensions=std::vector<v2>(indexes.size());
-    for(int i=0;i<indexes.size();i++){
+    for(i32  i=0;i<indexes.size();i++){
       this->spriteDimensions[i]=spriteDimension;
     }
   }
   SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<Sprite> sprites,
-                                   float frameLength, v2 spriteDimension) : SpriteMapAccessor(base)
+                                   f32 frameLength, v2 spriteDimension) : SpriteMapAccessor(base)
   {
     this->spriteLocation = CENTER;
     this->spriteList = spriteList;
     this->frame = 0;
     this->frameLength = frameLength;
-    this->spritesIndexes=std::vector<unsigned int>(sprites.size());
+    this->spritesIndexes=std::vector<u32 >(sprites.size());
     this->spriteDimensions=std::vector<v2>(sprites.size());
-    for(int i=0;i<sprites.size();i++){
+    for(i32  i=0;i<sprites.size();i++){
       this->spritesIndexes[i]=spriteList->list.size();
       this->spriteDimensions[i]=spriteDimension;
       this->spriteList->list.push_back(sprites[i]);
     }
   }
-  SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<unsigned int> indexes,
-                                  float frameLength, std::vector<v2> spriteDimensions) : SpriteMapAccessor(base)
+  SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<u32 > indexes,
+                                  f32 frameLength, std::vector<v2> spriteDimensions) : SpriteMapAccessor(base)
   {
     this->spriteLocation = CENTER;
     this->spriteList = spriteList;
@@ -124,14 +124,14 @@ namespace kNgine
     this->spriteDimensions=spriteDimensions;
   }
   SpriteAnimation::SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<Sprite> sprites,
-                                   float frameLength, std::vector<v2> spriteDimensions) : SpriteMapAccessor(base)
+                                   f32 frameLength, std::vector<v2> spriteDimensions) : SpriteMapAccessor(base)
   {
     this->spriteLocation = CENTER;
     this->spriteList = spriteList;
     this->frame = 0;
     this->frameLength = frameLength;
     this->spriteDimensions = spriteDimensions;
-    for (int i = 0; i < sprites.size(); i++)
+    for (i32  i = 0; i < sprites.size(); i++)
     {
       this->spritesIndexes[i] = this->spriteList->list.size();
       this->spriteList->list.push_back(sprites[i]);
@@ -150,8 +150,8 @@ namespace kNgine
 
   }
   void SpriteAnimation::update(std::vector<msg> msgs){
-    float timeElapsed=0;
-    for(int i=0;i<msgs.size();i++){
+    f32 timeElapsed=0;
+    for(i32  i=0;i<msgs.size();i++){
       if(msgs[i].msgType==msg::TIME_ELAPSED){
         timeElapsed=msgs[i].msgBody.time;
         break;
@@ -166,7 +166,7 @@ namespace kNgine
       }
     }
   }
-  unsigned int SpriteAnimation::getMapIndex() { return spritesIndexes[frame]; }
+  u32  SpriteAnimation::getMapIndex() { return spritesIndexes[frame]; }
   Sprite* SpriteAnimation::getSprite(){
     return &(spriteList->list[spritesIndexes[frame]]);
   }
@@ -174,20 +174,20 @@ namespace kNgine
     return spriteDimensions[frame];
   }
 
-  std::vector<Sprite> importSpriteSheet(const char *filename, int spriteWidth,
-                                        int spriteHeight) {
-    int width, height, numChannels;
+  std::vector<Sprite> importSpriteSheet(const char *filename, i32  spriteWidth,
+                                        i32  spriteHeight) {
+    i32  width, height, numChannels;
     unsigned char *data = stbi_load(filename, &width, &height, &numChannels, 0);
 
-    int numSpritesHor=width/spriteWidth;
-    int numSpritesVert=height/spriteHeight;
+    i32  numSpritesHor=width/spriteWidth;
+    i32  numSpritesVert=height/spriteHeight;
     std::vector<Sprite>sprites=std::vector<Sprite>();
-    for(int i=0;i<numSpritesVert;i++){
-      for(int j=0;j<numSpritesHor;j++){
+    for(i32  i=0;i<numSpritesVert;i++){
+      for(i32  j=0;j<numSpritesHor;j++){
         std::vector<unsigned char>sprite=std::vector<unsigned char>();
-        for (int y = 0; y < spriteHeight; y++) {
-          for (int x = 0; x < spriteWidth; x++) {
-            for(int c=0;c<numChannels;c++){
+        for (i32  y = 0; y < spriteHeight; y++) {
+          for (i32  x = 0; x < spriteWidth; x++) {
+            for(i32  c=0;c<numChannels;c++){
               sprite.push_back(
                   data[((x + j * spriteWidth) + (y + i * spriteHeight) * width) * numChannels + c]);
             }

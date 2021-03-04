@@ -30,7 +30,7 @@ namespace kNgine{
     class b2Rect : public b2PhysicsBodyComponent{
     public:
       b2PolygonShape *shapePoly;
-      b2Rect(ComponentGameObject *base, float width=1.0f, float height=1.0f, float density = 1.0f, float friction = 1.0f) : b2PhysicsBodyComponent(base, b2FixtureDef())
+      b2Rect(ComponentGameObject *base, f32 width=1.0f, f32 height=1.0f, f32 density = 1.0f, f32 friction = 1.0f) : b2PhysicsBodyComponent(base, b2FixtureDef())
       {
         shapePoly = new b2PolygonShape();
         shapePoly->SetAsBox(width / 2, height / 2);

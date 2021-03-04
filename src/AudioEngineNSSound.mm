@@ -49,7 +49,7 @@ namespace kNgine{
     this->labels.push_back("AudioEngine");
   }
   AudioEngine::~AudioEngine(){
-    for(int i=0;i<queue.size();i++){
+    for(i32  i=0;i<queue.size();i++){
       queue[i]->loop=false;
       queue[i]->stop=true;
       queue[i]->job.join();

@@ -18,9 +18,9 @@ namespace kNgine
     } msgType;
     union
     {
-      float time;
+      f32 time;
       Key key;
-      float cursorPos[2];
+      v2 cursorPos;
     } msgBody;
   };
   enum objectFlags
@@ -48,17 +48,17 @@ namespace kNgine
   struct Sprite
   {
     // in pixels
-    int width, height, numChannels;
+    i32  width, height, numChannels;
     std::vector<unsigned char> colorMap;
     Sprite();
-    Sprite(int width, int height, rgbcolor colorFill);
-    Sprite(int width, int height, unsigned char *colorMap);
-    Sprite(int width, int height, int numChannels, unsigned char *colorMap);
-    Sprite(int width, int height, int numChannels,
+    Sprite(i32  width, i32  height, rgbcolor colorFill);
+    Sprite(i32  width, i32  height, unsigned char *colorMap);
+    Sprite(i32  width, i32  height, i32  numChannels, unsigned char *colorMap);
+    Sprite(i32  width, i32  height, i32  numChannels,
            std::vector<unsigned char> colorMap);
     Sprite(const Sprite &base);
     ~Sprite();
-    void resize(int newWidth, int newHeight);
+    void resize(i32  newWidth, i32  newHeight);
   };
   // objects for engine
   class EngineObject
@@ -82,8 +82,8 @@ namespace kNgine
   class GameObject : public EngineObject
   {
   public:
-    v3 position;
-    v3 rotation; // v3(yz,xz,xy)
+    v3 position=v3(0,0,0);
+    v3 rotation=v3(0,0,0); // v3(yz,xz,xy)
     GameObject();
     GameObject(const GameObject&base);
     virtual ~GameObject(){}
@@ -383,9 +383,9 @@ namespace kNgine
     if(objects.size()==0){
       return std::vector<T*>();
     }
-    for (int i = 0; i < objects.size() - 1; i++)
+    for (i32  i = 0; i < objects.size() - 1; i++)
     {
-      for (int j = 0; j < objects.size() - 1 - i; j++)
+      for (i32  j = 0; j < objects.size() - 1 - i; j++)
       {
         if (objects[j]->position.z > objects[j + 1]->position.z)
         {
@@ -396,7 +396,7 @@ namespace kNgine
       }
     }
     std::vector<T *> res = std::vector<T *>(objects.size());
-    for (int i = 0; i < objects.size(); i++)
+    for (i32  i = 0; i < objects.size(); i++)
     {
       res[i] = (T *)objects[i];
     }

@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <cmath>
-// #define vectorObjects
 #include "utils.h"
 #include "EngineObjects.hpp"
 #include "Renderer.hpp"
@@ -15,19 +14,19 @@ namespace kNgine
   Camera::Camera() : Camera(1, 1920, 1080)
   {
   }
-  Camera::Camera(float fov, int windowWidth, int windowHeight)
+  Camera::Camera(f32 fov, i32  windowWidth, i32  windowHeight)
   {
     this->position = v3(0, 0, 1);
     if (windowWidth < windowHeight)
     {
-      float widthFOV = ((float)windowWidth) / windowHeight * fov;
+      f32 widthFOV = ((float)windowWidth) / windowHeight * fov;
       this->posMapper =
           mapper(v2(-widthFOV / 2, -fov / 2), v2(widthFOV / 2, fov / 2),
                  v2(0, windowHeight), v2(windowHeight, 0));
     }
     else
     {
-      float heightFOV = ((float)windowHeight) / windowWidth * fov;
+      f32 heightFOV = ((float)windowHeight) / windowWidth * fov;
       this->posMapper =
           mapper(v2(-fov / 2, -heightFOV / 2), v2(fov / 2, heightFOV / 2),
                  v2(0, windowHeight), v2(windowWidth, 0));
@@ -37,7 +36,7 @@ namespace kNgine
   }
   Camera::~Camera() {}
 
-  void Camera::updateWindowSize(int windowWidth, int windowHeight)
+  void Camera::updateWindowSize(i32  windowWidth, i32  windowHeight)
   {
     this->posMapper.targetMax = v4(windowWidth, 0,0,0);
     this->posMapper.targetMin = v4(0, windowHeight,0,0);
@@ -45,7 +44,7 @@ namespace kNgine
     {
       if (windowWidth < windowHeight)
       {
-        float widthFOV = ((float)windowWidth) / windowHeight * fov;
+        f32 widthFOV = ((float)windowWidth) / windowHeight * fov;
         this->posMapper.min.x = -widthFOV / 2;
         this->posMapper.max.x = widthFOV / 2;
         this->posMapper.min.y = -fov / 2;
@@ -53,7 +52,7 @@ namespace kNgine
       }
       else
       {
-        float heightFOV = ((float)windowHeight) / windowWidth * fov;
+        f32 heightFOV = ((float)windowHeight) / windowWidth * fov;
         this->posMapper.min.y = -heightFOV / 2;
         this->posMapper.max.y = heightFOV / 2;
         this->posMapper.min.x = -fov / 2;
@@ -64,7 +63,7 @@ namespace kNgine
     {
       if (windowWidth > windowHeight)
       {
-        float widthFOV = ((float)windowWidth) / windowHeight * fov;
+        f32 widthFOV = ((float)windowWidth) / windowHeight * fov;
         this->posMapper.min.x = -widthFOV / 2;
         this->posMapper.max.x = widthFOV / 2;
         this->posMapper.min.y = -fov / 2;
@@ -72,7 +71,7 @@ namespace kNgine
       }
       else
       {
-        float heightFOV = ((float)windowHeight) / windowWidth * fov;
+        f32 heightFOV = ((float)windowHeight) / windowWidth * fov;
         this->posMapper.min.y = -heightFOV / 2;
         this->posMapper.max.y = heightFOV / 2;
         this->posMapper.min.x = -fov / 2;
@@ -81,7 +80,7 @@ namespace kNgine
     }
     else if (fovType == WIDTH)
     {
-      float widthFOV = ((float)windowWidth) / windowHeight * fov;
+      f32 widthFOV = ((float)windowWidth) / windowHeight * fov;
       this->posMapper.min.x = -widthFOV / 2;
       this->posMapper.max.x = widthFOV / 2;
       this->posMapper.min.y = -fov / 2;
@@ -89,7 +88,7 @@ namespace kNgine
     }
     else if (fovType == HEIGHT)
     {
-      float heightFOV = ((float)windowHeight) / windowWidth * fov;
+      f32 heightFOV = ((float)windowHeight) / windowWidth * fov;
       this->posMapper.min.y = -heightFOV / 2;
       this->posMapper.max.y = heightFOV / 2;
       this->posMapper.min.x = -fov / 2;
@@ -97,10 +96,10 @@ namespace kNgine
     }
     else if (fovType == DIAGONAL)
     {
-      // float widthFOV = ((float)windowWidth) / windowHeight * fov;
+      // f32 widthFOV = ((float)windowWidth) / windowHeight * fov;
       // this->posMapper.min.x = -widthFOV / 2;
       // this->posMapper.max.x = widthFOV / 2;
-      // float heightFOV = ((float)windowHeight) / windowWidth * fov;
+      // f32 heightFOV = ((float)windowHeight) / windowWidth * fov;
       // this->posMapper.min.y = -heightFOV / 2;
       // this->posMapper.max.y = heightFOV / 2;
     }
@@ -108,7 +107,7 @@ namespace kNgine
     {
       if (windowWidth < windowHeight)
       {
-        float widthFOV = ((float)windowWidth) / windowHeight * fov;
+        f32 widthFOV = ((float)windowWidth) / windowHeight * fov;
         this->posMapper.min.x = -widthFOV / 2;
         this->posMapper.max.x = widthFOV / 2;
         this->posMapper.min.y = -fov / 2;
@@ -116,7 +115,7 @@ namespace kNgine
       }
       else
       {
-        float heightFOV = ((float)windowHeight) / windowWidth * fov;
+        f32 heightFOV = ((float)windowHeight) / windowWidth * fov;
         this->posMapper.min.y = -heightFOV / 2;
         this->posMapper.max.y = heightFOV / 2;
         this->posMapper.min.x = -fov / 2;
@@ -129,7 +128,7 @@ namespace kNgine
   {
     objects = orderObjectsByZ<ComponentGameObject>(
         std::vector<GameObject *>(objects.begin(), objects.end()));
-    for (int i = 0; i < objects.size() && objects[i]->position.z < position.z; i++)
+    for (i32  i = 0; i < objects.size() && objects[i]->position.z < position.z; i++)
     {
       if (!isBlacklist(objects[i]->labels))
       {
@@ -161,14 +160,14 @@ namespace kNgine
     {
       SpriteAccessor *compn =
           object->findComponent<SpriteAccessor>("[sprite]");
-      int numSprite=1;
+      i32  numSprite=1;
       bool isSpriteList=false;
       if(!(compn)){
         numSprite = object->findComponent<SpriteList>("[sprite_list]")->getSpriteListLength();
         isSpriteList=true;
       }
 
-      for(int i=0;i<numSprite;i++){
+      for(i32  i=0;i<numSprite;i++){
         if (isSpriteList)
         {
           compn = object->findComponent<SpriteList>("[sprite_list]")->getSpriteList()[i];
@@ -206,5 +205,3 @@ namespace kNgine
     }
   }
 } // namespace kNgine
-
-#undef vectorObjects

@@ -335,13 +335,13 @@ struct v4
 };
 struct iv2
 {
-  int x, y;
+  i32  x, y;
   iv2()
   {
     this->x = 0;
     this->y = 0;
   }
-  iv2(int x, int y)
+  iv2(i32  x, i32  y)
   {
     this->x = x;
     this->y = y;
@@ -351,15 +351,15 @@ struct iv2
     this->x = base.x;
     this->y = base.y;
   }
-  iv2(int d)
+  iv2(i32  d)
   {
     this->x = d;
     this->y = 0;
   }
   iv2(const v2 &base)
   {
-    this->x = (int)floor(base.x);
-    this->y = (int)floor(base.y);
+    this->x = (i32 )floor(base.x);
+    this->y = (i32 )floor(base.y);
   }
   bool operator==(const iv2 &a) { return x == a.x && y == a.y; }
   bool operator!=(const iv2 &a) { return x != a.x || y != a.y; }
@@ -375,26 +375,26 @@ struct iv2
     x -= a.x;
     y -= a.y;
   }
-  iv2 operator+(const int a) { return iv2(x + a, y + a); }
-  iv2 operator-(const int a) { return iv2(x - a, y - a); }
-  iv2 operator*(const int a) { return iv2(x * a, y * a); }
-  iv2 operator/(const int a) { return iv2(x / a, y / a); }
-  void operator+=(const int a)
+  iv2 operator+(const i32  a) { return iv2(x + a, y + a); }
+  iv2 operator-(const i32  a) { return iv2(x - a, y - a); }
+  iv2 operator*(const i32  a) { return iv2(x * a, y * a); }
+  iv2 operator/(const i32  a) { return iv2(x / a, y / a); }
+  void operator+=(const i32  a)
   {
     x += a;
     y += a;
   }
-  void operator-=(const int a)
+  void operator-=(const i32  a)
   {
     x -= a;
     y -= a;
   }
-  void operator*=(const int a)
+  void operator*=(const i32  a)
   {
     x *= a;
     y *= a;
   }
-  void operator/=(const int a)
+  void operator/=(const i32  a)
   {
     x /= a;
     y /= a;
@@ -402,14 +402,14 @@ struct iv2
 };
 struct iv3
 {
-  int x, y, z;
+  i32  x, y, z;
   iv3()
   {
     this->x = 0;
     this->y = 0;
     this->z = 0;
   }
-  iv3(int x, int y, int z)
+  iv3(i32  x, i32  y, i32  z)
   {
     this->x = x;
     this->y = y;
@@ -421,7 +421,7 @@ struct iv3
     this->y = vector2.y;
     this->z = 0;
   }
-  iv3(int d)
+  iv3(i32  d)
   {
     this->x = d;
     this->y = 0;
@@ -429,9 +429,9 @@ struct iv3
   }
   iv3(const v3 &base)
   {
-    this->x = (int)floor(base.x);
-    this->y = (int)floor(base.y);
-    this->z = (int)floor(base.z);
+    this->x = (i32 )floor(base.x);
+    this->y = (i32 )floor(base.y);
+    this->z = (i32 )floor(base.z);
   }
   bool operator==(const iv3 &a) { return x == a.x && y == a.y && z == a.z; }
   bool operator!=(const iv3 &a) { return x != a.x || y != a.y || z != a.z; }
@@ -449,29 +449,29 @@ struct iv3
     y -= a.y;
     z -= a.z;
   }
-  iv3 operator+(const int a) { return iv3(x + a, y + a, z + a); }
-  iv3 operator-(const int a) { return iv3(x - a, y - a, z - a); }
-  iv3 operator*(const int a) { return iv3(x * a, y * a, z * a); }
-  iv3 operator/(const int a) { return iv3(x / a, y / a, z / a); }
-  void operator+=(const int a)
+  iv3 operator+(const i32  a) { return iv3(x + a, y + a, z + a); }
+  iv3 operator-(const i32  a) { return iv3(x - a, y - a, z - a); }
+  iv3 operator*(const i32  a) { return iv3(x * a, y * a, z * a); }
+  iv3 operator/(const i32  a) { return iv3(x / a, y / a, z / a); }
+  void operator+=(const i32  a)
   {
     x += a;
     y += a;
     z += a;
   }
-  void operator-=(const int a)
+  void operator-=(const i32  a)
   {
     x -= a;
     y -= a;
     z -= a;
   }
-  void operator*=(const int a)
+  void operator*=(const i32  a)
   {
     x *= a;
     y *= a;
     z *= a;
   }
-  void operator/=(const int a)
+  void operator/=(const i32  a)
   {
     x /= a;
     y /= a;
@@ -487,7 +487,7 @@ struct iv3
 };
 struct iv4
 {
-  int x, y, z, w;
+  i32  x, y, z, w;
   iv4()
   {
     this->x = 0;
@@ -495,7 +495,7 @@ struct iv4
     this->z = 0;
     this->w = 0;
   }
-  iv4(int x, int y, int z, int w)
+  iv4(i32  x, i32  y, i32  z, i32  w)
   {
     this->x = x;
     this->y = y;
@@ -516,7 +516,7 @@ struct iv4
     this->z = 0;
     this->w = 0;
   }
-  iv4(int d)
+  iv4(i32  d)
   {
     this->x = d;
     this->y = 0;
@@ -525,10 +525,10 @@ struct iv4
   }
   iv4(const v4 &base)
   {
-    this->x = (int)floor(base.x);
-    this->y = (int)floor(base.y);
-    this->z = (int)floor(base.z);
-    this->w = (int)floor(base.w);
+    this->x = (i32 )floor(base.x);
+    this->y = (i32 )floor(base.y);
+    this->z = (i32 )floor(base.z);
+    this->w = (i32 )floor(base.w);
   }
   bool operator==(const iv4 &a)
   {
@@ -554,32 +554,32 @@ struct iv4
     z -= a.z;
     w -= a.w;
   }
-  iv4 operator+(const int a) { return iv4(x + a, y + a, z + a, w + a); }
-  iv4 operator-(const int a) { return iv4(x - a, y - a, z - a, w - a); }
-  iv4 operator*(const int a) { return iv4(x * a, y * a, z * a, w * a); }
-  iv4 operator/(const int a) { return iv4(x / a, y / a, z / a, w / a); }
-  void operator+=(const int a)
+  iv4 operator+(const i32  a) { return iv4(x + a, y + a, z + a, w + a); }
+  iv4 operator-(const i32  a) { return iv4(x - a, y - a, z - a, w - a); }
+  iv4 operator*(const i32  a) { return iv4(x * a, y * a, z * a, w * a); }
+  iv4 operator/(const i32  a) { return iv4(x / a, y / a, z / a, w / a); }
+  void operator+=(const i32  a)
   {
     x += a;
     y += a;
     z += a;
     z += a;
   }
-  void operator-=(const int a)
+  void operator-=(const i32  a)
   {
     x -= a;
     y -= a;
     z -= a;
     z -= a;
   }
-  void operator*=(const int a)
+  void operator*=(const i32  a)
   {
     x *= a;
     y *= a;
     z *= a;
     z *= a;
   }
-  void operator/=(const int a)
+  void operator/=(const i32  a)
   {
     x /= a;
     y /= a;
@@ -804,7 +804,7 @@ static iv4 IV4Init(i32 x, i32 y, i32 z, i32 w)
 #endif
 #define toV2(v) v2(v.x,v.y)
 #define toV3(v) v2(v.x,v.y,v.y)
-#define toV4(v) v2(v.x, v.y,v.y,v.w)
+#define toV4(v) v2(v.x, v.y)
 
 static f32 V2Dot(v2 a, v2 b)
 {
@@ -938,9 +938,9 @@ static m4 M4MultiplyM4(m4 a, m4 b)
 {
   m4 c = {0};
 
-  for (int j = 0; j < 4; ++j)
+  for (i32  j = 0; j < 4; ++j)
   {
-    for (int i = 0; i < 4; ++i)
+    for (i32  i = 0; i < 4; ++i)
     {
       c.elements[i][j] = (a.elements[0][j] * b.elements[i][0] +
                           a.elements[1][j] * b.elements[i][1] +
@@ -953,9 +953,9 @@ static m4 M4MultiplyM4(m4 a, m4 b)
 }
 static m4 M4MultiplyF32(m4 a, f32 b)
 {
-  for (int j = 0; j < 4; ++j)
+  for (i32  j = 0; j < 4; ++j)
   {
-    for (int i = 0; i < 4; ++i)
+    for (i32  i = 0; i < 4; ++i)
     {
       a.elements[i][j] *= b;
     }
@@ -991,7 +991,7 @@ static v4 V4MultiplyM4(v4 v, m4 m)
 {
   v4 result = v4(0, 0, 0, 0);
 
-  for (int i = 0; i < 4; ++i)
+  for (i32  i = 0; i < 4; ++i)
   {
     result.elements[i] = (v.elements[0] * m.elements[0][i] +
                           v.elements[1] * m.elements[1][i] +
@@ -1212,7 +1212,7 @@ static bool CharIsDigit(char c)
 {
   return (c >= '0' && c <= '9');
 }
-static int CharToLower(int c)
+static i32  CharToLower(i32  c)
 {
   if (c >= 'A' && c <= 'Z')
   {
@@ -1220,7 +1220,7 @@ static int CharToLower(int c)
   }
   return c;
 }
-static int CharToUpper(int c)
+static i32  CharToUpper(i32  c)
 {
   if (c >= 'a' && c <= 'z')
   {
@@ -1231,7 +1231,7 @@ static int CharToUpper(int c)
 static u32 HashCString(char *string)
 {
   u32 hash = 5381;
-  int c;
+  i32  c;
   while ((c = *string++))
   {
     hash = ((hash << 5) + hash) + c;
@@ -1515,9 +1515,9 @@ static i32 GetFirstI32FromCString(char *str)
 {
   i32 result = 0;
 
-  int last_digit = -1;
+  i32  last_digit = -1;
 
-  for (int i = 0; str[i]; ++i)
+  for (i32  i = 0; str[i]; ++i)
   {
     if (CharIsDigit(str[i]))
     {
@@ -1531,13 +1531,13 @@ static i32 GetFirstI32FromCString(char *str)
 
   if (last_digit >= 0)
   {
-    int digit_multiplier = 1;
+    i32  digit_multiplier = 1;
 
-    for (int i = last_digit; i >= 0; --i)
+    for (i32  i = last_digit; i >= 0; --i)
     {
       if (CharIsDigit(str[i]))
       {
-        int digit = str[i] - '0';
+        i32  digit = str[i] - '0';
         result += digit_multiplier * digit;
         digit_multiplier *= 10;
       }
@@ -1801,15 +1801,15 @@ enum Key
 
 static void SeedRandomNumberGenerator(void)
 {
-  srand((unsigned int)time(0));
+  srand((u32 )time(0));
 }
 static f32 randf()
 {
   return ((float)rand() / (RAND_MAX));
 }
 #ifdef perlinNoise
-static int global_perlin_noise_seed = 0;
-static int global_perlin_noise_hash[] = {
+static i32  global_perlin_noise_seed = 0;
+static i32  global_perlin_noise_hash[] = {
     208, 34, 231, 213, 32, 248, 233, 56, 161, 78, 24, 140, 71, 48, 140, 254, 245, 255, 247, 247, 40,
     185, 248, 251, 245, 28, 124, 204, 204, 76, 36, 1, 107, 28, 234, 163, 202, 224, 245, 128, 167, 204,
     9, 92, 217, 54, 239, 174, 173, 102, 193, 189, 190, 121, 100, 108, 167, 44, 43, 77, 180, 204, 8, 81,
@@ -1823,9 +1823,9 @@ static int global_perlin_noise_hash[] = {
     135, 176, 183, 191, 253, 115, 184, 21, 233, 58, 129, 233, 142, 39, 128, 211, 118, 137, 139, 255,
     114, 20, 218, 113, 154, 27, 127, 246, 250, 1, 8, 198, 250, 209, 92, 222, 173, 21, 88, 102, 219};
 
-static int PerlinNoise2(int x, int y)
+static i32  PerlinNoise2(i32  x, i32  y)
 {
-  int tmp = global_perlin_noise_hash[(y + global_perlin_noise_seed) % 256];
+  i32  tmp = global_perlin_noise_hash[(y + global_perlin_noise_seed) % 256];
   return global_perlin_noise_hash[(tmp + x) % 256];
 }
 static f32 PerlinLinearlyInterpolate(f32 x, f32 y, f32 s)
@@ -1838,19 +1838,19 @@ static f32 PerlinSmoothlyInterpolate(f32 x, f32 y, f32 s)
 }
 static f32 PerlinNoise2D(f32 x, f32 y)
 {
-  int x_int = (int)x;
-  int y_int = (int)y;
+  i32  x_int = (i32 )x;
+  i32  y_int = (i32 )y;
   f32 x_frac = x - x_int;
   f32 y_frac = y - y_int;
-  int s = PerlinNoise2(x_int, y_int);
-  int t = PerlinNoise2(x_int + 1, y_int);
-  int u = PerlinNoise2(x_int, y_int + 1);
-  int v = PerlinNoise2(x_int + 1, y_int + 1);
+  i32  s = PerlinNoise2(x_int, y_int);
+  i32  t = PerlinNoise2(x_int + 1, y_int);
+  i32  u = PerlinNoise2(x_int, y_int + 1);
+  i32  v = PerlinNoise2(x_int + 1, y_int + 1);
   f32 low = PerlinSmoothlyInterpolate((f32)s, (f32)t, x_frac);
   f32 high = PerlinSmoothlyInterpolate((f32)u, (f32)v, x_frac);
   return PerlinSmoothlyInterpolate(low, high, y_frac);
 }
-static f32 Perlin2D(f32 x, f32 y, f32 freq, int depth)
+static f32 Perlin2D(f32 x, f32 y, f32 freq, i32  depth)
 {
   f32 xa = x * freq;
   f32 ya = y * freq;
@@ -1858,7 +1858,7 @@ static f32 Perlin2D(f32 x, f32 y, f32 freq, int depth)
   f32 fin = 0;
   f32 div = 0.0;
 
-  for (int i = 0; i < depth; i++)
+  for (i32  i = 0; i < depth; i++)
   {
     div += 256 * amp;
     fin += PerlinNoise2D(xa, ya) * amp;
@@ -1988,7 +1988,7 @@ static f32 fast_sin(f32 angle)
                                      6402373705728000,
                                      121645100408832000,
                                      2432902008176640000};
-  for (int i = 1; i < precision && i < factorialPrecision; i += 4)
+  for (i32  i = 1; i < precision && i < factorialPrecision; i += 4)
   {
     res += x / factorials[i];
     x *= t_angle * t_angle;
@@ -2008,7 +2008,7 @@ static f32 fast_atan(f32 a)
     f32 res = 0;
     f32 x = a;
     i32 precision = fast_calc_precision;
-    for (int i = 1; i < precision * 2; i += 2)
+    for (i32  i = 1; i < precision * 2; i += 2)
     {
       res += x / (4 * i - 3);
       x *= a * a;
@@ -2021,8 +2021,8 @@ static f32 fast_atan(f32 a)
   {
     f32 res = 0;
     f32 x = -a;
-    int precision = 11;
-    for (int i = 1; i < precision * 2; i += 2)
+    i32  precision = 11;
+    for (i32  i = 1; i < precision * 2; i += 2)
     {
       res += 1.0 / ((4 * i - 3) * x);
       x *= a * a;
@@ -2041,7 +2041,7 @@ static f32 fast_atan(f32 a)
   }
 }
 
-static void sleepMillis(unsigned int millis)
+static void sleepMillis(u32  millis)
 {
 #ifdef _WIN32
   Sleep(millis);
@@ -2062,7 +2062,7 @@ public:
     this->targetMin = v4(0, 0, 0, 0);
     this->targetMax = v4(0, 0, 0, 0);
   }
-  mapper(float min, float max, float targetMin, float targetMax)
+  mapper(f32 min, f32 max, f32 targetMin, f32 targetMax)
   {
     this->min = v4(min,0,0,0);
     this->max = v4(max,0,0,0);
@@ -2090,33 +2090,33 @@ public:
     this->targetMin = targetMin;
     this->targetMax = targetMax;
   }
-  float map(float n)
+  f32 map(f32 n)
   {
-    float scale = (n - min.x) / (max.x - min.x);
+    f32 scale = (n - min.x) / (max.x - min.x);
     return scale * (targetMax.x - targetMin.x) + targetMin.x;
   }
   v2 map(v2 n)
   {
-    float xScale = V4MinusV4(v4(n.x,n.y,0,0),min).x/(V4MinusV4(max, min)).x;
-    float yScale = V4MinusV4(v4(n.x, n.y, 0, 0), min).y / (V4MinusV4(max, min)).y;
+    f32 xScale = V4MinusV4(v4(n.x,n.y,0,0),min).x/(V4MinusV4(max, min)).x;
+    f32 yScale = V4MinusV4(v4(n.x, n.y, 0, 0), min).y / (V4MinusV4(max, min)).y;
     return v2(xScale * V4MinusV4(targetMax, targetMin).x + targetMin.x,
               yScale * V4MinusV4(targetMax, targetMin).y + targetMin.y);
   }
   v3 map(v3 n)
   {
-    float xScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).x / (V4MinusV4(max, min)).x;
-    float yScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).y / (V4MinusV4(max, min)).y;
-    float zScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).z / (V4MinusV4(max, min)).z;
+    f32 xScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).x / (V4MinusV4(max, min)).x;
+    f32 yScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).y / (V4MinusV4(max, min)).y;
+    f32 zScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).z / (V4MinusV4(max, min)).z;
     return v3(xScale * V4MinusV4(targetMax, targetMin).x + targetMin.x,
               yScale * V4MinusV4(targetMax, targetMin).y + targetMin.y,
               zScale * V4MinusV4(targetMax, targetMin).z + targetMin.z);
   }
   v4 map(v4 n)
   {
-    float xScale = V4MinusV4(n, min).x / (V4MinusV4(max, min)).x;
-    float yScale = V4MinusV4(n, min).y / (V4MinusV4(max, min)).y;
-    float zScale = V4MinusV4(n, min).z / (V4MinusV4(max, min)).z;
-    float wScale = V4MinusV4(n, min).w / (V4MinusV4(max, min)).w;
+    f32 xScale = V4MinusV4(n, min).x / (V4MinusV4(max, min)).x;
+    f32 yScale = V4MinusV4(n, min).y / (V4MinusV4(max, min)).y;
+    f32 zScale = V4MinusV4(n, min).z / (V4MinusV4(max, min)).z;
+    f32 wScale = V4MinusV4(n, min).w / (V4MinusV4(max, min)).w;
     return v4(xScale * V4MinusV4(targetMax, targetMin).x + targetMin.x,
               yScale * V4MinusV4(targetMax, targetMin).y + targetMin.y,
               zScale * V4MinusV4(targetMax, targetMin).z + targetMin.z,

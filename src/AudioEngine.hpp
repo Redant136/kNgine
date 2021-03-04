@@ -23,7 +23,7 @@ namespace kNgine
   class SoundListenerComponent : public ObjectComponent // there can only be one sound player
   {
   public:
-    float globalVolume=1.0f;
+    f32 globalVolume=1.0f;
     SoundListenerComponent(GameObject *object);
     virtual ~SoundListenerComponent();
   };
@@ -35,7 +35,7 @@ namespace kNgine
   private:
     SoundListenerComponent *player;
     bool playing=false;
-    float volume=1.0f;
+    f32 volume=1.0f;
     threaded_job job=threaded_job([](){});
   public:
     BaseAudioBuffer *buffer;
@@ -55,7 +55,7 @@ namespace kNgine
       BaseAudioBuffer*buffer;
       bool discard=true;
       bool loop=false;
-      float volume=1.0f;
+      f32 volume=1.0f;
       bool stop=false;
       AudioQueue(std::string name,threaded_job job,BaseAudioBuffer*buffer):job(job){
         this->name=name;
@@ -84,10 +84,10 @@ namespace kNgine
     void play(BaseAudioBuffer* buffer);
     void queueBuffer(const char*name,BaseAudioBuffer*buffer,bool loop=false);
 
-    void play(unsigned int index=0){queue[index]->job.start();}
-    void setLoop(bool loop,unsigned int index = 0) { queue[index]->loop = loop; }
-    void setVolume(float volume,unsigned int index = 0) { queue[index]->volume = volume; }
-    void terminate(unsigned int index=0){queue[index]->stop=true;}
+    void play(u32  index=0){queue[index]->job.start();}
+    void setLoop(bool loop,u32  index = 0) { queue[index]->loop = loop; }
+    void setVolume(f32 volume,u32  index = 0) { queue[index]->volume = volume; }
+    void terminate(u32  index=0){queue[index]->stop=true;}
     void init(std::vector<EngineObject*>objects){
       for(EngineObject*obj:objects){
 

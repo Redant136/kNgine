@@ -11,7 +11,7 @@ namespace kNgine
   {
   public:
     mapper posMapper;
-    float fov;
+    f32 fov;
     std::vector<std::string> blackList = std::vector<std::string>();
     enum
     {
@@ -23,10 +23,10 @@ namespace kNgine
     } fovType = MAX_WH;
     bool showDebugHitBox = false;
     Camera();
-    Camera(float fov, int windowWidth, int windowHeight);
+    Camera(f32 fov, i32  windowWidth, i32  windowHeight);
     ~Camera();
 
-    void updateWindowSize(int windowWidth, int windowHeight);
+    void updateWindowSize(i32  windowWidth, i32  windowHeight);
 
     void render(std::vector<ComponentGameObject *> objects);
     void renderObject(ComponentGameObject *object);

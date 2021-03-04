@@ -21,38 +21,38 @@ namespace kNgine{
     colorMap[2] = 0;
     colorMap[3] = 0;
   }
-  Sprite::Sprite(int width, int height, rgbcolor colorFill) {
+  Sprite::Sprite(i32  width, i32  height, rgbcolor colorFill) {
     this->width = width;
     this->height = height;
     this->numChannels = 4;
     this->colorMap = std::vector<unsigned char>(width * height * numChannels);
-    for (int i = 0; i < width * height * numChannels; i += numChannels) {
+    for (i32  i = 0; i < width * height * numChannels; i += numChannels) {
       colorMap[i] = colorFill.r;
       colorMap[i + 1] = colorFill.g;
       colorMap[i + 2] = colorFill.b;
       colorMap[i + 3] = colorFill.a;
     }
   }
-  Sprite::Sprite(int width, int height, unsigned char *colorMap) {
+  Sprite::Sprite(i32  width, i32  height, unsigned char *colorMap) {
     this->width = width;
     this->height = height;
     this->numChannels = 4;
     this->colorMap = std::vector<unsigned char>(width * height * numChannels);
-    for (int i = 0; i < width * height * numChannels; i++) {
+    for (i32  i = 0; i < width * height * numChannels; i++) {
       this->colorMap[i] = colorMap[i];
     }
   }
-  Sprite::Sprite(int width, int height, int numChannels,
+  Sprite::Sprite(i32  width, i32  height, i32  numChannels,
                 unsigned char *colorMap) {
     this->width = width;
     this->height = height;
     this->numChannels = numChannels;
     this->colorMap = std::vector<unsigned char>(width * height * numChannels);
-    for (int i = 0; i < width * height * numChannels; i++) {
+    for (i32  i = 0; i < width * height * numChannels; i++) {
       this->colorMap[i] = colorMap[i];
     }
   }
-  Sprite::Sprite(int width, int height, int numChannels,
+  Sprite::Sprite(i32  width, i32  height, i32  numChannels,
                 std::vector<unsigned char> colorMap) {
     this->width = width;
     this->height = height;
@@ -66,11 +66,11 @@ namespace kNgine{
     this->colorMap = base.colorMap;
   }
   Sprite::~Sprite() {}
-  void Sprite::resize(int newWidth, int newHeight) {
+  void Sprite::resize(i32  newWidth, i32  newHeight) {
     // if image is same size with accuracy of 1 pixel, do nothing
     if (abs(width - newWidth) <= 2 && abs(height - newHeight) <= 2) return;
     std::vector<rgbcolor> newColorMap = std::vector<rgbcolor>();
-    for (int i = 0; i < width * height * numChannels; i += numChannels) {
+    for (i32  i = 0; i < width * height * numChannels; i += numChannels) {
       if (numChannels == 3)
         newColorMap.push_back(rgbcolor(this->colorMap[i], this->colorMap[i + 1],
                                     this->colorMap[i + 2], 255));
@@ -81,21 +81,21 @@ namespace kNgine{
     }
 
     std::vector<rgbcolor> temp = std::vector<rgbcolor>(newWidth * newHeight);
-    float x_ratio = width / (float)newWidth;
-    float y_ratio = height / (float)newHeight;
-    float px, py;
-    for (int i = 0; i < newHeight; i++) {
-      for (int j = 0; j < newWidth; j++) {
-        px = (int)(j * x_ratio);
-        py = (int)(i * y_ratio);
-        temp[(i * newWidth) + j] = newColorMap[(int)((py * width) + px)];
+    f32 x_ratio = width / (float)newWidth;
+    f32 y_ratio = height / (float)newHeight;
+    f32 px, py;
+    for (i32  i = 0; i < newHeight; i++) {
+      for (i32  j = 0; j < newWidth; j++) {
+        px = (i32 )(j * x_ratio);
+        py = (i32 )(i * y_ratio);
+        temp[(i * newWidth) + j] = newColorMap[(i32 )((py * width) + px)];
       }
     }
     this->width = newWidth;
     this->height = newHeight;
     this->numChannels = 4;
     this->colorMap = std::vector<unsigned char>();
-    for (int i = 0; i < temp.size(); i++) {
+    for (i32  i = 0; i < temp.size(); i++) {
       this->colorMap.push_back(temp[i].r);
       this->colorMap.push_back(temp[i].g);
       this->colorMap.push_back(temp[i].b);
@@ -126,7 +126,7 @@ namespace kNgine{
   }
   ComponentGameObject::ComponentGameObject(const ComponentGameObject &base) :GameObject(base){
     this->components=std::vector<ObjectComponent*>();
-    for(int i=0;i<base.components.size();i++){
+    for(i32  i=0;i<base.components.size();i++){
       ObjectComponent*comp=new ObjectComponent(this);
       *comp=*base.components[i];
       this->components.push_back(comp);
@@ -134,7 +134,7 @@ namespace kNgine{
     }
   }
   ComponentGameObject::~ComponentGameObject() {
-    for (int i = 0; i < components.size(); i++) {
+    for (i32  i = 0; i < components.size(); i++) {
       delete components[i];
     }
   }
@@ -144,7 +144,7 @@ namespace kNgine{
     }
   }
   void ComponentGameObject::removeComponent(ObjectComponent*component){
-    for(int i=0;i<components.size();i++){
+    for(i32  i=0;i<components.size();i++){
       if(components[i]==component){
         delete components[i];
         components.erase(components.begin()+i);
@@ -216,12 +216,12 @@ namespace kNgine{
   }
 
   Sprite importSprite(const char *filename) {
-    int width, height, numChannels;
+    i32  width, height, numChannels;
     unsigned char *data = stbi_load(filename, &width, &height, &numChannels, 0);
     Sprite res;
     if (numChannels == 3) {
       unsigned char *data2 = new unsigned char[width * height * 4];
-      for (int i = 0; i < width * height; i++) {
+      for (i32  i = 0; i < width * height; i++) {
         data2[4 * i] = data[numChannels * i];
         data2[4 * i + 1] = data[numChannels * i + 1];
         data2[4 * i + 2] = data[numChannels * i + 2];
@@ -241,7 +241,7 @@ namespace kNgine{
     events.push_back(event);
   }
   void callEvent(std::string name){
-    for(int i=0;i<events.size();i++){
+    for(i32  i=0;i<events.size();i++){
       if(events[i].name==name){
         events[i].event(*events[i].objects);
       }
@@ -269,8 +269,8 @@ namespace kNgine{
 
     png_init_io(png, fp);
     png_read_info(png, info);
-    int width = png_get_image_width(png, info);
-    int height = png_get_image_height(png, info);
+    i32  width = png_get_image_width(png, info);
+    i32  height = png_get_image_height(png, info);
     png_byte color_type = png_get_color_type(png, info);
     png_byte bit_depth = png_get_bit_depth(png, info);
     if (bit_depth == 16) png_set_strip_16(png);
@@ -294,7 +294,7 @@ namespace kNgine{
     }
     png_read_update_info(png, info);
     png_bytep *row_pointers = new png_bytep[height];
-    for (int y = 0; y < height; y++) {
+    for (i32  y = 0; y < height; y++) {
       row_pointers[y] = (png_byte *)malloc(png_get_rowbytes(png, info));
     }
     png_read_image(png, row_pointers);
@@ -302,9 +302,9 @@ namespace kNgine{
 
     std::vector<color> colorMap = std::vector<color>();
     unsigned char *newColors = new unsigned char[width * height * 4];
-    for (int y = 0; y < height; y++) {
+    for (i32  y = 0; y < height; y++) {
       png_bytep row = row_pointers[y];
-      for (int x = 0; x < width; x++) {
+      for (i32  x = 0; x < width; x++) {
         png_bytep px = &(row[x * 4]);
         colorMap.push_back(
             color(px[0] / 255.0, px[1] / 255.0, px[2] / 255.0, px[3] / 255.0));

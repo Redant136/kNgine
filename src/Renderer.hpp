@@ -11,10 +11,10 @@ namespace renderer {
 
 // page creation methods
 // call in order init>size>setup>draw>launch
-void init(int argc, const char** argv);
-void setWindowSize(int width, int height);
+void init(i32  argc, const char** argv);
+void setWindowSize(i32  width, i32  height);
 void setWindowName(const char* windowName);
-void createWindow(int width, int height, const char* windowName);
+void createWindow(i32  width, i32  height, const char* windowName);
 void setupWindow(std::function<void(void)> startDisplayFunc);
 void setDrawFunction(std::function<void(void)> refreshFunction);
 // only call at the end of draw function
@@ -32,14 +32,14 @@ void drawRect(v2 startPos, double width, double height);
 void drawTriangle(v2 points[3]);
 void drawLine(v2 points[2]);
 void drawPoint(v2 point);
-void drawLineLoop(v2* points, int numPoints);
+void drawLineLoop(v2* points, i32  numPoints);
 void drawCircle(v2 startPoint, double radius);
-void drawColorMap(unsigned char* colors, v2 position, int width, int height,
-                  int realWidth, int realHeight, int numChannels,v3 rotation);
-void bindTexture(unsigned int* textureIndex, unsigned char* colors, v2 position, int width,
-                 int height, int realWidth, int realHeight, int numChannels);
-void drawTexture(unsigned int textureIndex,v2 position,int width,int height,v3 rotation);
-void unbindTexture(unsigned int textureIndex);
+void drawColorMap(unsigned char* colors, v2 position, i32  width, i32  height,
+                  i32  realWidth, i32  realHeight, i32  numChannels,v3 rotation);
+void bindTexture(u32 * textureIndex, unsigned char* colors, v2 position, i32  width,
+                 i32  height, i32  realWidth, i32  realHeight, i32  numChannels);
+void drawTexture(u32  textureIndex,v2 position,i32  width,i32  height,v3 rotation);
+void unbindTexture(u32  textureIndex);
 
 //key events methods
 bool keyStatusPressed(Key e);
@@ -48,8 +48,8 @@ v2 cursorPosition();
 bool mouseStatusPressed(Key e);
 
 // utils methods
-int getWindowWidth();
-int getWindowHeight();
+i32  getWindowWidth();
+i32  getWindowHeight();
 v2 getWindowSize();
 
 
