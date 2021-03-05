@@ -38,8 +38,8 @@ namespace kNgine
 
   void Camera::updateWindowSize(i32 windowWidth, i32 windowHeight)
   {
-    this->posMapper.targetMax = v4(windowWidth, 0,0,0);
-    this->posMapper.targetMin = v4(0, windowHeight,0,0);
+    this->posMapper.targetMax = v4(windowWidth, 0, 0, 0);
+    this->posMapper.targetMin = v4(0, windowHeight, 0, 0);
     if (fovType == MAX_WH)
     {
       if (windowWidth < windowHeight)
@@ -135,8 +135,8 @@ namespace kNgine
         SpriteAccessor *compn =
             objects[i]->findComponent<SpriteAccessor>("[sprite]");
         v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(objects[i]->position),
-                                            toV2(compn->getSpriteDimensions()))),
-                              posMapper.map(toV2(objects[i]->position)));
+                                                              toV2(compn->getSpriteDimensions()))),
+                                        posMapper.map(toV2(objects[i]->position)));
         u8 *colorMap = compn->getSprite()->colorMap;
 
         v2 spriteOffset = compn->getSpriteLocation();
@@ -145,10 +145,11 @@ namespace kNgine
         renderer::drawColorMap(
             colorMap,
             V2AddV2(posMapper.map(V2MinusV2(toV2(objects[i]->position), toV2(position))),
-                spriteOffset),
+                    spriteOffset),
             spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
             compn->getSprite()->height, compn->getSprite()->numChannels, objects[i]->rotation);
-        if (showDebugHitBox){
+        if (showDebugHitBox)
+        {
           // showLines(objects[i], posMapper, position);
         }
       }
@@ -160,34 +161,39 @@ namespace kNgine
     {
       SpriteAccessor *compn =
           object->findComponent<SpriteAccessor>("[sprite]");
-      i32 numSprite=1;
-      bool isSpriteList=false;
-      if(!(compn)){
+      i32 numSprite = 1;
+      bool isSpriteList = false;
+      if (!(compn))
+      {
         numSprite = object->findComponent<SpriteList>("[sprite_list]")->getSpriteListLength();
-        isSpriteList=true;
+        isSpriteList = true;
       }
 
-      for(i32 i=0;i<numSprite;i++){
+      for (i32 i = 0; i < numSprite; i++)
+      {
         if (isSpriteList)
         {
           compn = object->findComponent<SpriteList>("[sprite_list]")->getSpriteList()[i];
         }
         v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(object->position),
-                                            compn->getSpriteDimensions())),
-                              posMapper.map(toV2(object->position)));
+                                                              compn->getSpriteDimensions())),
+                                        posMapper.map(toV2(object->position)));
         spriteDimensions.y *= -1;
         u8 *colorMap = compn->getSprite()->colorMap;
         v2 spriteOffset = compn->getSpriteLocation();
         spriteOffset.x *= spriteDimensions.x;
         spriteOffset.y *= spriteDimensions.y;
+        v3 rotation = object->rotation;
+        rotation.z *= std::abs(spriteDimensions.x) / spriteDimensions.x;
+        rotation.z *= std::abs(spriteDimensions.y) / spriteDimensions.y;
         if (compn->hasToSave())
         {
           renderer::drawColorMap(
               colorMap,
               V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
-                  spriteOffset),
+                      spriteOffset),
               spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
-              compn->getSprite()->height, compn->getSprite()->numChannels, object->rotation);
+              compn->getSprite()->height, compn->getSprite()->numChannels, rotation);
         }
         else
         {
@@ -195,11 +201,12 @@ namespace kNgine
           renderer::drawTexture(
               ref->spriteList->texIndex[ref->getMapIndex()],
               V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
-                  spriteOffset),
-              spriteDimensions.x, spriteDimensions.y, object->rotation);
+                      spriteOffset),
+              spriteDimensions.x, spriteDimensions.y, rotation);
         }
       }
-      if (showDebugHitBox){
+      if (showDebugHitBox)
+      {
         // showLines(object, posMapper, position);
       }
     }
