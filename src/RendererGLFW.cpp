@@ -13,7 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-const i32  GLFW_KEYS[] = {GLFW_KEY_SPACE,
+const i32 GLFW_KEYS[] = {GLFW_KEY_SPACE,
                          GLFW_KEY_APOSTROPHE /* ' */,
                          GLFW_KEY_COMMA /* , */,
                          GLFW_KEY_MINUS /* - */,
@@ -108,11 +108,11 @@ namespace renderer {
 GLFWwindow* window;
 std::function<void()> displayFunction;
 std::function<void()> drawFunction;
-unsigned char* currentColor=new unsigned char[4];
-u32  storedVBO = 0;
-u32  storedVAO = 0;
-u32  storedEBO = 0;
-i32  shaderProgram;
+u8* currentColor=new u8[4];
+u32 storedVBO = 0;
+u32 storedVAO = 0;
+u32 storedEBO = 0;
+i32 shaderProgram;
 // can only draw triangle
 const char* vertexShaderSource =
     "#version 330 core\n"
@@ -144,22 +144,22 @@ const char* fragmentShaderSource =
     "       FragColor = texture(textureMap, TexCoord)*color;\n"
     "   }"
     "}\0";
-void framebuffer_size_callback(GLFWwindow* window, i32  width, i32  height) {
+void framebuffer_size_callback(GLFWwindow* window, i32 width, i32 height) {
   glViewport(0, 0, width, height);
 }
 
-i32  getWindowWidth() {
-  i32  width, height;
+i32 getWindowWidth() {
+  i32 width, height;
   glfwGetWindowSize(window, &width, &height);
   return width;
 }
-i32  getWindowHeight() {
-  i32  width, height;
+i32 getWindowHeight() {
+  i32 width, height;
   glfwGetWindowSize(window, &width, &height);
   return height;
 }
 v2 getWindowSize() {
-  i32  width, height;
+  i32 width, height;
   glfwGetWindowSize(window, &width, &height);
   return v2(width, height);
 }
@@ -191,11 +191,11 @@ bool mouseStatusPressed(Key e){
 }
 // private
 void compileShaders() {
-  i32  vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  i32 vertexShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
   glCompileShader(vertexShader);
   // check for shader compile errors
-  i32  success;
+  i32 success;
   char infoLog[512];
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
   if (!success) {
@@ -203,7 +203,7 @@ void compileShaders() {
     throw "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n";
   }
   // fragment shader
-  i32  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  i32 fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
   glCompileShader(fragmentShader);
   // check for shader compile errors
@@ -227,9 +227,9 @@ void compileShaders() {
   glDeleteShader(fragmentShader);
 }
 
-void init(i32  argc, const char** argv) {
-  currentColor = new unsigned char[4];
-  for(i32  i=0;i<boundFunctions.size();i++){
+void init(i32 argc, const char** argv) {
+  currentColor = new u8[4];
+  for(i32 i=0;i<boundFunctions.size();i++){
     boundFunctions[i]=[](){};
   }
   glfwInit();
@@ -240,12 +240,12 @@ void init(i32  argc, const char** argv) {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 }
-void setWindowSize(i32  width, i32  height) { glViewport(0, 0, width, height); }
+void setWindowSize(i32 width, i32 height) { glViewport(0, 0, width, height); }
 void setWindowName(const char* windowName) {
   window = glfwCreateWindow(1920, 1080, windowName, NULL, NULL);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 }
-void createWindow(i32  width, i32  height, const char* windowName) {
+void createWindow(i32 width, i32 height, const char* windowName) {
   window = glfwCreateWindow(width, height, windowName, NULL, NULL);
   if (window == NULL) {
     glfwTerminate();
@@ -263,9 +263,9 @@ void setupWindow(std::function<void(void)> startDisplayFunc) {
 void setDrawFunction(std::function<void(void)> refreshFunction) {
   drawFunction = refreshFunction;
 }
-void key_callback(GLFWwindow* window, i32  key, i32  scancode, i32  action, i32  mods)
+void key_callback(GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mods)
 {
-  for(i32  i=0;i<boundFunctions.size()-1;i++){
+  for(i32 i=0;i<boundFunctions.size()-1;i++){
     if(key==GLFW_KEYS[i] && action==GLFW_PRESS){
       boundFunctions[i]();
     }
@@ -287,14 +287,14 @@ void launch() {
   glfwTerminate();
 }
 
-void setDrawColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void setDrawColor(u8 r, u8 g, u8 b, u8 a) {
   // glColor4ub(r, g, b, a);
   currentColor[0] = r;
   currentColor[1] = g;
   currentColor[2] = b;
   currentColor[3] = a;
 }
-void clear(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void clear(u8 r, u8 g, u8 b, u8 a) {
   glClearColor(r / 255.0, g / 255.0, b / 255.0, a / 255.0);
   glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -337,8 +337,8 @@ void drawRect(v2 points[4]) {
       currentColor[3] / 255.0f,
       1.1f,
       1.1f};
-  u32  indices[] = {0, 1, 3, 0, 2, 3};
-  u32  VBO, VAO, EBO;
+  u32 indices[] = {0, 1, 3, 0, 2, 3};
+  u32 VBO, VAO, EBO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glBindVertexArray(VAO);  // setup variables in gpu memory
@@ -362,7 +362,7 @@ void drawRect(v2 points[4]) {
                GL_STATIC_DRAW);
   // draw------
   glm::mat4 transform = glm::mat4(1.0f);
-  u32  transformLoc = glGetUniformLocation(shaderProgram, "transform");
+  u32 transformLoc = glGetUniformLocation(shaderProgram, "transform");
   glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -409,7 +409,7 @@ void drawTriangle(v2 points[3]) {
       currentColor[3] / 255.0f,
       1.1f,
       1.1f};
-  u32  VBO, VAO;
+  u32 VBO, VAO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glBindVertexArray(VAO);  // setup variables in gpu memory
@@ -428,7 +428,7 @@ void drawTriangle(v2 points[3]) {
   glEnableVertexAttribArray(2);
   // draw------
   glm::mat4 transform = glm::mat4(1.0f);
-  u32  transformLoc = glGetUniformLocation(shaderProgram, "transform");
+  u32 transformLoc = glGetUniformLocation(shaderProgram, "transform");
   glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -458,7 +458,7 @@ void drawLine(v2 points[2]) {
       currentColor[3] / 255.0f,
       1.1f,
       1.1f};
-  u32  VBO, VAO;
+  u32 VBO, VAO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glBindVertexArray(VAO);  // setup variables in gpu memory
@@ -478,7 +478,7 @@ void drawLine(v2 points[2]) {
 
   // draw------
   glm::mat4 transform = glm::mat4(1.0f);
-  u32  transformLoc = glGetUniformLocation(shaderProgram, "transform");
+  u32 transformLoc = glGetUniformLocation(shaderProgram, "transform");
   glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -490,8 +490,8 @@ void drawLine(v2 points[2]) {
   glDeleteBuffers(1, &VBO);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
-void drawLineLoop(v2* points, i32  numPoints) {
-  for (i32  i = 0; i < numPoints; i++) {
+void drawLineLoop(v2* points, i32 numPoints) {
+  for (i32 i = 0; i < numPoints; i++) {
     v2 lines[2] = {points[i], points[(i + 1) % 4]};
     renderer::drawLine(lines);
   }
@@ -501,20 +501,20 @@ void drawPoint(v2 point)  // very slow
   renderer::drawRect(point, 1, 1);
 }
 void drawCircle(v2 startPoint, double radius) {
-  for (i32  a = 0; a < 360; a++) {
+  for (i32 a = 0; a < 360; a++) {
     double angle = a * M_PI / 180;
     v2 line[2] = {startPoint, V2AddV2(startPoint, v2(std::cos(angle) * radius, std::sin(angle) * radius))};
     renderer::drawLine(line);
   }
 }
-void drawColorMap(unsigned char* colors, v2 position, i32  width, i32  height,
-                  i32  realWidth, i32  realHeight, i32  numChannels, v3 rotation) {
+void drawColorMap(u8* colors, v2 position, i32 width, i32 height,
+                  i32 realWidth, i32 realHeight, i32 numChannels, v3 rotation) {
   f32 vertices[] = {0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
                       0.5,   -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
                       -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
                       -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-  u32  indices[] = {0, 1, 3, 0, 2, 3};
-  u32  VBO, VAO, EBO;
+  u32 indices[] = {0, 1, 3, 0, 2, 3};
+  u32 VBO, VAO, EBO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glBindVertexArray(VAO);  // setup variables in gpu memory
@@ -536,7 +536,7 @@ void drawColorMap(unsigned char* colors, v2 position, i32  width, i32  height,
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                GL_STATIC_DRAW);
 
-  u32  texture;
+  u32 texture;
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -582,7 +582,7 @@ void drawColorMap(unsigned char* colors, v2 position, i32  width, i32  height,
   transform = glm::rotate(transform, -rotation.z,
                           glm::vec3(0.0f, 0.0f, 1.0f));
   glUseProgram(shaderProgram);
-  u32  transformLoc = glGetUniformLocation(shaderProgram, "transform");
+  u32 transformLoc = glGetUniformLocation(shaderProgram, "transform");
   glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBindVertexArray(VAO);
@@ -594,15 +594,15 @@ void drawColorMap(unsigned char* colors, v2 position, i32  width, i32  height,
   glDeleteBuffers(1, &VBO);
   glDeleteBuffers(1, &EBO);
 }
-void bindTexture(u32 * textureIndex, unsigned char* colors, v2 position,
-                 i32  width, i32  height, i32  realWidth, i32  realHeight,
-                 i32  numChannels) {
+void bindTexture(u32 * textureIndex, u8* colors, v2 position,
+                 i32 width, i32 height, i32 realWidth, i32 realHeight,
+                 i32 numChannels) {
   if (storedVBO == 0) {
     f32 vertices[] = { 0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
                          0.5, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
                         -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
                         -0.5f,-0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f};
-    u32  indices[] = {0, 1, 3, 0, 2, 3};
+    u32 indices[] = {0, 1, 3, 0, 2, 3};
     glGenBuffers(1, &storedVBO);
     glBindBuffer(GL_ARRAY_BUFFER, storedVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
@@ -635,7 +635,7 @@ void bindTexture(u32 * textureIndex, unsigned char* colors, v2 position,
                GL_UNSIGNED_BYTE, colors);
   glGenerateMipmap(GL_TEXTURE_2D);
 }
-void drawTexture(u32  textureIndex, v2 position, i32  width, i32  height,
+void drawTexture(u32 textureIndex, v2 position, i32 width, i32 height,
                  v3 rotation) {
   glBindVertexArray(storedVAO);  // setup variables in gpu memory
   glBindBuffer(GL_ARRAY_BUFFER, storedVBO);
@@ -669,7 +669,7 @@ void drawTexture(u32  textureIndex, v2 position, i32  width, i32  height,
   transform = glm::rotate(transform, -rotation.z,
                           glm::vec3(0.0f, 0.0f, 1.0f));
   glUseProgram(shaderProgram);
-  u32  transformLoc = glGetUniformLocation(shaderProgram, "transform");
+  u32 transformLoc = glGetUniformLocation(shaderProgram, "transform");
   glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, storedEBO);
   glBindVertexArray(storedVAO);
@@ -677,7 +677,7 @@ void drawTexture(u32  textureIndex, v2 position, i32  width, i32  height,
   transform = glm::mat4(1.0f);
   glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 }
-void unbindTexture(u32  textureIndex) {
+void unbindTexture(u32 textureIndex) {
   glDeleteTextures(1, &textureIndex);
 }
 

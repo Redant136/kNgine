@@ -21,7 +21,7 @@ namespace kNgine
       f32 time;
       Key key;
       v2 cursorPos;
-    } msgBody;
+    };
   };
   enum objectFlags
   {
@@ -44,22 +44,47 @@ namespace kNgine
     AUDIOPLAYER
   };
 
+
+  typedef struct {
+    u32 width,height,numChannels;
+    u8*colorMap;
+  } Sprite;
+  inline Sprite SpriteInit(u32 width,u32 height,u32 numChannels,u8*colorMap){
+    Sprite spr={width,height,numChannels,colorMap};
+    return spr;
+  }
+  #define Sprite(width, height, channels, map) SpriteInit(width, height, channels, map)
+  inline Sprite fillSprite(u32 width,u32 height,rgbcolor fill){
+    u8*colorMap=new u8[width*height*4];
+    for(int i=0;i<width*height*4;i+=4){
+      colorMap[i + 0] = fill.r;
+      colorMap[i + 1] = fill.g;
+      colorMap[i + 2] = fill.b;
+      colorMap[i + 3] = fill.a;
+    }
+    return Sprite(width,height,4,colorMap);
+  }
+  inline void freeSprite(Sprite sprite){
+    delete[]sprite.colorMap;
+  }
+
   // an object containing important info to draw image for the engine
-  struct Sprite
-  {
-    // in pixels
-    i32  width, height, numChannels;
-    std::vector<unsigned char> colorMap;
-    Sprite();
-    Sprite(i32  width, i32  height, rgbcolor colorFill);
-    Sprite(i32  width, i32  height, unsigned char *colorMap);
-    Sprite(i32  width, i32  height, i32  numChannels, unsigned char *colorMap);
-    Sprite(i32  width, i32  height, i32  numChannels,
-           std::vector<unsigned char> colorMap);
-    Sprite(const Sprite &base);
-    ~Sprite();
-    void resize(i32  newWidth, i32  newHeight);
-  };
+  // struct Sprite
+  // {
+  //   // in pixels
+  //   i32 width, height, numChannels;
+  //   std::vector<u8> colorMap;
+  //   Sprite();
+  //   Sprite(i32 width, i32 height, rgbcolor colorFill);
+  //   Sprite(i32 width, i32 height, u8 *colorMap);
+  //   Sprite(i32 width, i32 height, i32 numChannels, u8 *colorMap);
+  //   Sprite(i32 width, i32 height, i32 numChannels,
+  //          std::vector<u8> colorMap);
+  //   Sprite(const Sprite &base);
+  //   ~Sprite();
+  //   void resize(i32 newWidth, i32 newHeight);
+  // };
+
   // objects for engine
   class EngineObject
   {
@@ -383,9 +408,9 @@ namespace kNgine
     if(objects.size()==0){
       return std::vector<T*>();
     }
-    for (i32  i = 0; i < objects.size() - 1; i++)
+    for (i32 i = 0; i < objects.size() - 1; i++)
     {
-      for (i32  j = 0; j < objects.size() - 1 - i; j++)
+      for (i32 j = 0; j < objects.size() - 1 - i; j++)
       {
         if (objects[j]->position.z > objects[j + 1]->position.z)
         {
@@ -396,7 +421,7 @@ namespace kNgine
       }
     }
     std::vector<T *> res = std::vector<T *>(objects.size());
-    for (i32  i = 0; i < objects.size(); i++)
+    for (i32 i = 0; i < objects.size(); i++)
     {
       res[i] = (T *)objects[i];
     }

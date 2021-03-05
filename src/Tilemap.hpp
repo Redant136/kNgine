@@ -19,13 +19,13 @@ namespace kNgine{
   private:
     struct Tile{
       v2 pos;
-      u32  index;
+      u32 index;
     };
   public:
     // bool preJoinSprites=false;// instead of rendering multiple sprites, should joins tiles into one sprite and should (to test) improves performance at the cost of ram.
     class TileDef{
     public:
-      u32  spriteMapIndex;
+      u32 spriteMapIndex;
       enum
       {
         nocollider,
@@ -41,7 +41,7 @@ namespace kNgine{
         this->spriteMapIndex=spriteList->list.size();
         spriteList->list.push_back(sprite);
       }
-      TileDef(u32  spriteMapIndex)
+      TileDef(u32 spriteMapIndex)
       {
         this->spriteMapIndex=spriteMapIndex;
       }
@@ -59,9 +59,9 @@ namespace kNgine{
     virtual ~Tilemap();
     void addTileDef(TileDef tileDef){tileDefs.push_back(tileDef);}
     void addTileDef(Sprite spr);
-    void addTileDef(std::vector<Sprite>sprites){for(i32  i=0;i<sprites.size();i++){addTileDef(sprites[i]);}}
+    void addTileDef(std::vector<Sprite>sprites){for(i32 i=0;i<sprites.size();i++){addTileDef(sprites[i]);}}
     void addTile(v2 pos, TileDef tileDef);
-    void addTile(v2 pos,u32  tileDefIndex);
+    void addTile(v2 pos,u32 tileDefIndex);
     virtual void init(std::vector<EngineObject*>objects);
     virtual void end(std::vector<EngineObject *> objects);
   };

@@ -27,7 +27,9 @@
 #define EULERS_NUMBER 2.7182818284590452353602874713527
 #define EULERS_NUMBERf 2.7182818284590452353602874713527f
 
-#define fast_calc_precision 11
+#ifndef fast_calc_precision
+#define fast_calc_precision 9
+#endif
 
 typedef int8_t i8;
 typedef int16_t i16;
@@ -335,13 +337,13 @@ struct v4
 };
 struct iv2
 {
-  i32  x, y;
+  i32 x, y;
   iv2()
   {
     this->x = 0;
     this->y = 0;
   }
-  iv2(i32  x, i32  y)
+  iv2(i32 x, i32 y)
   {
     this->x = x;
     this->y = y;
@@ -351,7 +353,7 @@ struct iv2
     this->x = base.x;
     this->y = base.y;
   }
-  iv2(i32  d)
+  iv2(i32 d)
   {
     this->x = d;
     this->y = 0;
@@ -375,26 +377,26 @@ struct iv2
     x -= a.x;
     y -= a.y;
   }
-  iv2 operator+(const i32  a) { return iv2(x + a, y + a); }
-  iv2 operator-(const i32  a) { return iv2(x - a, y - a); }
-  iv2 operator*(const i32  a) { return iv2(x * a, y * a); }
-  iv2 operator/(const i32  a) { return iv2(x / a, y / a); }
-  void operator+=(const i32  a)
+  iv2 operator+(const i32 a) { return iv2(x + a, y + a); }
+  iv2 operator-(const i32 a) { return iv2(x - a, y - a); }
+  iv2 operator*(const i32 a) { return iv2(x * a, y * a); }
+  iv2 operator/(const i32 a) { return iv2(x / a, y / a); }
+  void operator+=(const i32 a)
   {
     x += a;
     y += a;
   }
-  void operator-=(const i32  a)
+  void operator-=(const i32 a)
   {
     x -= a;
     y -= a;
   }
-  void operator*=(const i32  a)
+  void operator*=(const i32 a)
   {
     x *= a;
     y *= a;
   }
-  void operator/=(const i32  a)
+  void operator/=(const i32 a)
   {
     x /= a;
     y /= a;
@@ -402,14 +404,14 @@ struct iv2
 };
 struct iv3
 {
-  i32  x, y, z;
+  i32 x, y, z;
   iv3()
   {
     this->x = 0;
     this->y = 0;
     this->z = 0;
   }
-  iv3(i32  x, i32  y, i32  z)
+  iv3(i32 x, i32 y, i32 z)
   {
     this->x = x;
     this->y = y;
@@ -421,7 +423,7 @@ struct iv3
     this->y = vector2.y;
     this->z = 0;
   }
-  iv3(i32  d)
+  iv3(i32 d)
   {
     this->x = d;
     this->y = 0;
@@ -449,29 +451,29 @@ struct iv3
     y -= a.y;
     z -= a.z;
   }
-  iv3 operator+(const i32  a) { return iv3(x + a, y + a, z + a); }
-  iv3 operator-(const i32  a) { return iv3(x - a, y - a, z - a); }
-  iv3 operator*(const i32  a) { return iv3(x * a, y * a, z * a); }
-  iv3 operator/(const i32  a) { return iv3(x / a, y / a, z / a); }
-  void operator+=(const i32  a)
+  iv3 operator+(const i32 a) { return iv3(x + a, y + a, z + a); }
+  iv3 operator-(const i32 a) { return iv3(x - a, y - a, z - a); }
+  iv3 operator*(const i32 a) { return iv3(x * a, y * a, z * a); }
+  iv3 operator/(const i32 a) { return iv3(x / a, y / a, z / a); }
+  void operator+=(const i32 a)
   {
     x += a;
     y += a;
     z += a;
   }
-  void operator-=(const i32  a)
+  void operator-=(const i32 a)
   {
     x -= a;
     y -= a;
     z -= a;
   }
-  void operator*=(const i32  a)
+  void operator*=(const i32 a)
   {
     x *= a;
     y *= a;
     z *= a;
   }
-  void operator/=(const i32  a)
+  void operator/=(const i32 a)
   {
     x /= a;
     y /= a;
@@ -487,7 +489,7 @@ struct iv3
 };
 struct iv4
 {
-  i32  x, y, z, w;
+  i32 x, y, z, w;
   iv4()
   {
     this->x = 0;
@@ -495,7 +497,7 @@ struct iv4
     this->z = 0;
     this->w = 0;
   }
-  iv4(i32  x, i32  y, i32  z, i32  w)
+  iv4(i32 x, i32 y, i32 z, i32 w)
   {
     this->x = x;
     this->y = y;
@@ -516,7 +518,7 @@ struct iv4
     this->z = 0;
     this->w = 0;
   }
-  iv4(i32  d)
+  iv4(i32 d)
   {
     this->x = d;
     this->y = 0;
@@ -554,32 +556,32 @@ struct iv4
     z -= a.z;
     w -= a.w;
   }
-  iv4 operator+(const i32  a) { return iv4(x + a, y + a, z + a, w + a); }
-  iv4 operator-(const i32  a) { return iv4(x - a, y - a, z - a, w - a); }
-  iv4 operator*(const i32  a) { return iv4(x * a, y * a, z * a, w * a); }
-  iv4 operator/(const i32  a) { return iv4(x / a, y / a, z / a, w / a); }
-  void operator+=(const i32  a)
+  iv4 operator+(const i32 a) { return iv4(x + a, y + a, z + a, w + a); }
+  iv4 operator-(const i32 a) { return iv4(x - a, y - a, z - a, w - a); }
+  iv4 operator*(const i32 a) { return iv4(x * a, y * a, z * a, w * a); }
+  iv4 operator/(const i32 a) { return iv4(x / a, y / a, z / a, w / a); }
+  void operator+=(const i32 a)
   {
     x += a;
     y += a;
     z += a;
     z += a;
   }
-  void operator-=(const i32  a)
+  void operator-=(const i32 a)
   {
     x -= a;
     y -= a;
     z -= a;
     z -= a;
   }
-  void operator*=(const i32  a)
+  void operator*=(const i32 a)
   {
     x *= a;
     y *= a;
     z *= a;
     z *= a;
   }
-  void operator/=(const i32  a)
+  void operator/=(const i32 a)
   {
     x /= a;
     y /= a;
@@ -650,12 +652,12 @@ inline v4::v4(const iv4 &base)
   }
 
 #else
-typedef struct v2
+typedef struct
 {
   f32 x;
   f32 y;
 } v2;
-typedef union v3
+typedef union
 {
   struct
   {
@@ -673,7 +675,7 @@ typedef union v3
 
   f32 elements[3];
 } v3;
-typedef union v4
+typedef union
 {
   struct
   {
@@ -716,22 +718,19 @@ typedef union v4
   f32 elements[4];
 } v4;
 
-static v2
-V2Init(f32 x, f32 y)
+static v2 V2Init(f32 x, f32 y)
 {
   v2 v = {x, y};
   return v;
 }
 #define v2(x, y) V2Init(x, y)
-static v3
-V3Init(f32 x, f32 y, f32 z)
+static v3 V3Init(f32 x, f32 y, f32 z)
 {
   v3 v = {x, y, z};
   return v;
 }
 #define v3(x, y, z) V3Init(x, y, z)
-static v4
-V4Init(f32 x, f32 y, f32 z, f32 w)
+static v4 V4Init(f32 x, f32 y, f32 z, f32 w)
 {
   v4 v = {x, y, z, w};
   return v;
@@ -938,9 +937,9 @@ static m4 M4MultiplyM4(m4 a, m4 b)
 {
   m4 c = {0};
 
-  for (i32  j = 0; j < 4; ++j)
+  for (i32 j = 0; j < 4; ++j)
   {
-    for (i32  i = 0; i < 4; ++i)
+    for (i32 i = 0; i < 4; ++i)
     {
       c.elements[i][j] = (a.elements[0][j] * b.elements[i][0] +
                           a.elements[1][j] * b.elements[i][1] +
@@ -953,9 +952,9 @@ static m4 M4MultiplyM4(m4 a, m4 b)
 }
 static m4 M4MultiplyF32(m4 a, f32 b)
 {
-  for (i32  j = 0; j < 4; ++j)
+  for (i32 j = 0; j < 4; ++j)
   {
-    for (i32  i = 0; i < 4; ++i)
+    for (i32 i = 0; i < 4; ++i)
     {
       a.elements[i][j] *= b;
     }
@@ -991,7 +990,7 @@ static v4 V4MultiplyM4(v4 v, m4 m)
 {
   v4 result = v4(0, 0, 0, 0);
 
-  for (i32  i = 0; i < 4; ++i)
+  for (i32 i = 0; i < 4; ++i)
   {
     result.elements[i] = (v.elements[0] * m.elements[0][i] +
                           v.elements[1] * m.elements[1][i] +
@@ -1212,7 +1211,7 @@ static bool CharIsDigit(char c)
 {
   return (c >= '0' && c <= '9');
 }
-static i32  CharToLower(i32  c)
+static i32 CharToLower(i32 c)
 {
   if (c >= 'A' && c <= 'Z')
   {
@@ -1220,7 +1219,7 @@ static i32  CharToLower(i32  c)
   }
   return c;
 }
-static i32  CharToUpper(i32  c)
+static i32 CharToUpper(i32 c)
 {
   if (c >= 'a' && c <= 'z')
   {
@@ -1231,7 +1230,7 @@ static i32  CharToUpper(i32  c)
 static u32 HashCString(char *string)
 {
   u32 hash = 5381;
-  i32  c;
+  i32 c;
   while ((c = *string++))
   {
     hash = ((hash << 5) + hash) + c;
@@ -1515,9 +1514,9 @@ static i32 GetFirstI32FromCString(char *str)
 {
   i32 result = 0;
 
-  i32  last_digit = -1;
+  i32 last_digit = -1;
 
-  for (i32  i = 0; str[i]; ++i)
+  for (i32 i = 0; str[i]; ++i)
   {
     if (CharIsDigit(str[i]))
     {
@@ -1531,13 +1530,13 @@ static i32 GetFirstI32FromCString(char *str)
 
   if (last_digit >= 0)
   {
-    i32  digit_multiplier = 1;
+    i32 digit_multiplier = 1;
 
-    for (i32  i = last_digit; i >= 0; --i)
+    for (i32 i = last_digit; i >= 0; --i)
     {
       if (CharIsDigit(str[i]))
       {
-        i32  digit = str[i] - '0';
+        i32 digit = str[i] - '0';
         result += digit_multiplier * digit;
         digit_multiplier *= 10;
       }
@@ -1808,8 +1807,8 @@ static f32 randf()
   return ((float)rand() / (RAND_MAX));
 }
 #ifdef perlinNoise
-static i32  global_perlin_noise_seed = 0;
-static i32  global_perlin_noise_hash[] = {
+static i32 global_perlin_noise_seed = 0;
+static i32 global_perlin_noise_hash[] = {
     208, 34, 231, 213, 32, 248, 233, 56, 161, 78, 24, 140, 71, 48, 140, 254, 245, 255, 247, 247, 40,
     185, 248, 251, 245, 28, 124, 204, 204, 76, 36, 1, 107, 28, 234, 163, 202, 224, 245, 128, 167, 204,
     9, 92, 217, 54, 239, 174, 173, 102, 193, 189, 190, 121, 100, 108, 167, 44, 43, 77, 180, 204, 8, 81,
@@ -1823,9 +1822,9 @@ static i32  global_perlin_noise_hash[] = {
     135, 176, 183, 191, 253, 115, 184, 21, 233, 58, 129, 233, 142, 39, 128, 211, 118, 137, 139, 255,
     114, 20, 218, 113, 154, 27, 127, 246, 250, 1, 8, 198, 250, 209, 92, 222, 173, 21, 88, 102, 219};
 
-static i32  PerlinNoise2(i32  x, i32  y)
+static i32 PerlinNoise2(i32 x, i32 y)
 {
-  i32  tmp = global_perlin_noise_hash[(y + global_perlin_noise_seed) % 256];
+  i32 tmp = global_perlin_noise_hash[(y + global_perlin_noise_seed) % 256];
   return global_perlin_noise_hash[(tmp + x) % 256];
 }
 static f32 PerlinLinearlyInterpolate(f32 x, f32 y, f32 s)
@@ -1838,19 +1837,19 @@ static f32 PerlinSmoothlyInterpolate(f32 x, f32 y, f32 s)
 }
 static f32 PerlinNoise2D(f32 x, f32 y)
 {
-  i32  x_int = (i32 )x;
-  i32  y_int = (i32 )y;
+  i32 x_int = (i32 )x;
+  i32 y_int = (i32 )y;
   f32 x_frac = x - x_int;
   f32 y_frac = y - y_int;
-  i32  s = PerlinNoise2(x_int, y_int);
-  i32  t = PerlinNoise2(x_int + 1, y_int);
-  i32  u = PerlinNoise2(x_int, y_int + 1);
-  i32  v = PerlinNoise2(x_int + 1, y_int + 1);
+  i32 s = PerlinNoise2(x_int, y_int);
+  i32 t = PerlinNoise2(x_int + 1, y_int);
+  i32 u = PerlinNoise2(x_int, y_int + 1);
+  i32 v = PerlinNoise2(x_int + 1, y_int + 1);
   f32 low = PerlinSmoothlyInterpolate((f32)s, (f32)t, x_frac);
   f32 high = PerlinSmoothlyInterpolate((f32)u, (f32)v, x_frac);
   return PerlinSmoothlyInterpolate(low, high, y_frac);
 }
-static f32 Perlin2D(f32 x, f32 y, f32 freq, i32  depth)
+static f32 Perlin2D(f32 x, f32 y, f32 freq, i32 depth)
 {
   f32 xa = x * freq;
   f32 ya = y * freq;
@@ -1858,7 +1857,7 @@ static f32 Perlin2D(f32 x, f32 y, f32 freq, i32  depth)
   f32 fin = 0;
   f32 div = 0.0;
 
-  for (i32  i = 0; i < depth; i++)
+  for (i32 i = 0; i < depth; i++)
   {
     div += 256 * amp;
     fin += PerlinNoise2D(xa, ya) * amp;
@@ -1931,7 +1930,7 @@ static f32 fast_cos(f32 angle)
   f32 x = 1;
   i32 precision = fast_calc_precision;
   i32 factorialPrecision = 20;
-  unsigned long long factorials[] = {1,
+  unsigned long long factorials[] = {0,
                                      1,
                                      2,
                                      6,
@@ -1951,7 +1950,7 @@ static f32 fast_cos(f32 angle)
                                      355687428096000,
                                      6402373705728000,
                                      121645100408832000};
-  for (i32 i = 0; i < precision && i < factorialPrecision; i += 4)
+  for (i32 i = 0; i <= precision && i < factorialPrecision; i += 4)
   {
     res += x / factorials[i];
     x *= t_angle * t_angle;
@@ -1967,7 +1966,7 @@ static f32 fast_sin(f32 angle)
   f32 x = t_angle;
   i32 precision = fast_calc_precision;
   i32 factorialPrecision = 21;
-  unsigned long long factorials[] = {1,
+  unsigned long long factorials[] = {0,
                                      1,
                                      2,
                                      6,
@@ -1988,7 +1987,7 @@ static f32 fast_sin(f32 angle)
                                      6402373705728000,
                                      121645100408832000,
                                      2432902008176640000};
-  for (i32  i = 1; i < precision && i < factorialPrecision; i += 4)
+  for (i32 i = 1; i <= precision && i < factorialPrecision; i += 4)
   {
     res += x / factorials[i];
     x *= t_angle * t_angle;
@@ -2008,7 +2007,7 @@ static f32 fast_atan(f32 a)
     f32 res = 0;
     f32 x = a;
     i32 precision = fast_calc_precision;
-    for (i32  i = 1; i < precision * 2; i += 2)
+    for (i32 i = 1; i <= precision; i += 2)
     {
       res += x / (4 * i - 3);
       x *= a * a;
@@ -2021,8 +2020,8 @@ static f32 fast_atan(f32 a)
   {
     f32 res = 0;
     f32 x = -a;
-    i32  precision = 11;
-    for (i32  i = 1; i < precision * 2; i += 2)
+    i32 precision = 11;
+    for (i32 i = 1; i < precision * 2; i += 2)
     {
       res += 1.0 / ((4 * i - 3) * x);
       x *= a * a;
@@ -2041,7 +2040,7 @@ static f32 fast_atan(f32 a)
   }
 }
 
-static void sleepMillis(u32  millis)
+static void sleepMillis(u32 millis)
 {
 #ifdef _WIN32
   Sleep(millis);

@@ -4,12 +4,16 @@
 #include "Renderer.hpp"
 #include "SpriteUtils.hpp"
 #include "../extern/stb/stb_image.h"
-#include <iostream>
 
+#include <iostream>
 namespace kNgine
 {
   SpriteMap::SpriteMap() { this->flags.push_back(objectFlags::Sprite_List); }
   SpriteMap::~SpriteMap(){
+    for (i32 i = 0; i < list.size(); i++)
+    {
+      freeSprite(list[i]);
+    }
   }
   void SpriteMap::init(std::vector<EngineObject*>objects){
     if(loadOnInit){
@@ -23,15 +27,15 @@ namespace kNgine
   }
   void SpriteMap::load(){
     texIndex = std::vector<u32 >();
-    for (i32  i = 0; i < list.size(); i++) {
-      u32  texture, VBO;
-      renderer::bindTexture(&texture, list[i].colorMap.data(), v2(0, 0), 1, 1,
+    for (i32 i = 0; i < list.size(); i++) {
+      u32 texture, VBO;
+      renderer::bindTexture(&texture, list[i].colorMap, v2(0, 0), 1, 1,
                             list[i].width, list[i].height, list[i].numChannels);
       texIndex.push_back(texture);
     }
   }
   void SpriteMap::unload(){
-    for (i32  i = 0; i < list.size(); i++) {
+    for (i32 i = 0; i < list.size(); i++) {
       renderer::unbindTexture(texIndex[i]);
     }
   }
@@ -41,7 +45,7 @@ namespace kNgine
   }
 
   SpriteReferenceComponent::SpriteReferenceComponent(ComponentGameObject *base, SpriteMap *spriteList,
-                                                     i32  index)
+                                                     i32 index)
       : SpriteMapAccessor(base)
   {
     this->spriteLocation = CENTER;
@@ -67,8 +71,7 @@ namespace kNgine
     this->spriteLocation = base.spriteLocation;
     this->spriteDimension = base.spriteDimension;
   }
-  SpriteReferenceComponent::SpriteReferenceComponent(
-      const SpriteReferenceComponent &base)
+  SpriteReferenceComponent::SpriteReferenceComponent(const SpriteReferenceComponent &base)
       : SpriteMapAccessor(base.object)
   {
     this->spriteList = base.spriteList;
@@ -79,7 +82,7 @@ namespace kNgine
   }
   SpriteReferenceComponent::~SpriteReferenceComponent() {}
   void SpriteReferenceComponent::update(std::vector<msg>msgs) {}
-  u32  SpriteReferenceComponent::getMapIndex() {return mapIndex;}
+  u32 SpriteReferenceComponent::getMapIndex() {return mapIndex;}
   Sprite *SpriteReferenceComponent::getSprite() {
     return &(spriteList->list[mapIndex]);
   }
@@ -94,7 +97,7 @@ namespace kNgine
     this->frameLength=frameLength;
     this->spritesIndexes=indexes;
     this->spriteDimensions=std::vector<v2>(indexes.size());
-    for(i32  i=0;i<indexes.size();i++){
+    for(i32 i=0;i<indexes.size();i++){
       this->spriteDimensions[i]=spriteDimension;
     }
   }
@@ -107,7 +110,7 @@ namespace kNgine
     this->frameLength = frameLength;
     this->spritesIndexes=std::vector<u32 >(sprites.size());
     this->spriteDimensions=std::vector<v2>(sprites.size());
-    for(i32  i=0;i<sprites.size();i++){
+    for(i32 i=0;i<sprites.size();i++){
       this->spritesIndexes[i]=spriteList->list.size();
       this->spriteDimensions[i]=spriteDimension;
       this->spriteList->list.push_back(sprites[i]);
@@ -131,7 +134,7 @@ namespace kNgine
     this->frame = 0;
     this->frameLength = frameLength;
     this->spriteDimensions = spriteDimensions;
-    for (i32  i = 0; i < sprites.size(); i++)
+    for (i32 i = 0; i < sprites.size(); i++)
     {
       this->spritesIndexes[i] = this->spriteList->list.size();
       this->spriteList->list.push_back(sprites[i]);
@@ -151,9 +154,9 @@ namespace kNgine
   }
   void SpriteAnimation::update(std::vector<msg> msgs){
     f32 timeElapsed=0;
-    for(i32  i=0;i<msgs.size();i++){
+    for(i32 i=0;i<msgs.size();i++){
       if(msgs[i].msgType==msg::TIME_ELAPSED){
-        timeElapsed=msgs[i].msgBody.time;
+        timeElapsed=msgs[i].time;
         break;
       }
     }
@@ -166,7 +169,7 @@ namespace kNgine
       }
     }
   }
-  u32  SpriteAnimation::getMapIndex() { return spritesIndexes[frame]; }
+  u32 SpriteAnimation::getMapIndex() { return spritesIndexes[frame]; }
   Sprite* SpriteAnimation::getSprite(){
     return &(spriteList->list[spritesIndexes[frame]]);
   }
@@ -174,22 +177,28 @@ namespace kNgine
     return spriteDimensions[frame];
   }
 
-  std::vector<Sprite> importSpriteSheet(const char *filename, i32  spriteWidth,
-                                        i32  spriteHeight) {
-    i32  width, height, numChannels;
+  std::vector<Sprite> importSpriteSheet(const char *filename, i32 spriteWidth,
+                                        i32 spriteHeight) {
+    i32 width, height, numChannels;
     unsigned char *data = stbi_load(filename, &width, &height, &numChannels, 0);
 
-    i32  numSpritesHor=width/spriteWidth;
-    i32  numSpritesVert=height/spriteHeight;
+    i32 numSpritesHor=width/spriteWidth;
+    i32 numSpritesVert=height/spriteHeight;
     std::vector<Sprite>sprites=std::vector<Sprite>();
-    for(i32  i=0;i<numSpritesVert;i++){
-      for(i32  j=0;j<numSpritesHor;j++){
-        std::vector<unsigned char>sprite=std::vector<unsigned char>();
-        for (i32  y = 0; y < spriteHeight; y++) {
-          for (i32  x = 0; x < spriteWidth; x++) {
-            for(i32  c=0;c<numChannels;c++){
-              sprite.push_back(
-                  data[((x + j * spriteWidth) + (y + i * spriteHeight) * width) * numChannels + c]);
+    for(i32 i=0;i<numSpritesVert;i++){
+      for(i32 j=0;j<numSpritesHor;j++){
+        //alloc error
+        // std::vector<unsigned char>sprite=std::vector<unsigned char>();
+        u8 *sprite = new u8[spriteWidth * spriteHeight * numChannels];
+        for (i32 y = 0; y < spriteHeight; y++) 
+        {
+          for (i32 x = 0; x < spriteWidth; x++)
+          {
+            for(i32 c = 0;c < numChannels; c++){
+              // sprite.push_back(
+              //     data[((x + j * spriteWidth) + (y + i * spriteHeight) * width) * numChannels + c]);
+              // sprite[(x+y*width)*numChannels+c]=data[((x + j * spriteWidth) + (y + i * spriteHeight) * width) * numChannels + c];
+              sprite[(x + y * spriteWidth) * numChannels + c] = data[((x + j * spriteWidth) + (y + i * spriteHeight) * width) * numChannels + c];
             }
           }
         }

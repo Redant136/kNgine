@@ -28,16 +28,16 @@ namespace kNgine
     }
   }
   void Tilemap::addTile(v2 pos, TileDef tileDef){
-    u32  index=this->tileDefs.size();
+    u32 index=this->tileDefs.size();
     this->tiles.push_back({pos,index});
   }
-  void Tilemap::addTile(v2 pos, u32  tileDefIndex){
+  void Tilemap::addTile(v2 pos, u32 tileDefIndex){
     this->tiles.push_back({pos,tileDefIndex});
   }
   void Tilemap::init(std::vector<EngineObject *> objects){
     std::vector<b2FixtureDef>fixtures;
     std::vector<SpriteAccessor *> spritesRefs;
-    for(i32  i=0;i<tiles.size();i++){
+    for(i32 i=0;i<tiles.size();i++){
       if(tileDefs[tiles[i].index].tileType==TileDef::rect){
         b2FixtureDef def;
         b2PolygonShape *shape = new b2PolygonShape();
@@ -64,7 +64,7 @@ namespace kNgine
     addComponent(new physics::b2PhysicsBodyComponent(this,fixtures));
   }
   void Tilemap::end(std::vector<EngineObject *> objects){
-    for(i32  i=0;i<shapesList.size();i++){
+    for(i32 i=0;i<shapesList.size();i++){
       delete shapesList[i];
     }
   }

@@ -60,7 +60,7 @@ namespace kNgine
     currentTime = std::chrono::high_resolution_clock::now();
     std::vector<msg> msgs = std::vector<msg>();
     msgs.push_back({msg::TIME_ELAPSED, time});
-    for (i32  i = 0; i < Key::KEY_LAST; i++)
+    for (i32 i = 0; i < Key::KEY_LAST; i++)
     {
       if (renderer::keyStatusPressed((Key)i))
       {
@@ -84,13 +84,13 @@ namespace kNgine
           std::vector<GameObject *>(cameras.begin(), cameras.end()));
       sprites = orderObjectsByZ<ComponentGameObject>(
           std::vector<GameObject *>(sprites.begin(), sprites.end()));
-      for (i32  i = 0; i < cameras.size(); i++)
+      for (i32 i = 0; i < cameras.size(); i++)
       {
         cameras[i]->showDebugHitBox = true;
         v2 windowSize = renderer::getWindowSize();
         cameras[i]->updateWindowSize(windowSize.x,
                                      windowSize.y);
-        for (i32  j = 0; j < sprites.size(); j++)
+        for (i32 j = 0; j < sprites.size(); j++)
         {
           if (cameras[i]->position.z <= sprites[j]->position.z)
           {
@@ -108,7 +108,7 @@ namespace kNgine
     }
   }
 
-  inline void start(i32  argc, const char **argv)
+  inline void start(i32 argc, const char **argv)
   {
     includeChildren();
     renderer::init(argc, argv);
@@ -190,31 +190,31 @@ namespace kNgine
         v2 rendPos = renderer::cursorPosition();
         msg m = msg();
         m.msgType = msg::CURSOR;
-        m.msgBody.cursorPos = rendPos;
+        m.cursorPos = rendPos;
         msgs.push_back(m);
       }
-      for (i32  i = 0; i < Key::KEY_LAST; i++)
+      for (i32 i = 0; i < Key::KEY_LAST; i++)
       {
         if (renderer::keyStatusPressed((Key)i))
         {
           msg m = msg();
           m.msgType = msg::KEY;
-          m.msgBody.key = ((Key)i);
+          m.key = ((Key)i);
           msgs.push_back(m);
         }
       }
-      for(i32  i=Key::KEY_LAST+1;i<Key::MOUSE_LAST;i++){
+      for(i32 i=Key::KEY_LAST+1;i<Key::MOUSE_LAST;i++){
         if(renderer::mouseStatusPressed((Key)i)){
           msg m = msg();
           m.msgType = msg::KEY;
-          m.msgBody.key = ((Key)i);
+          m.key = ((Key)i);
           msgs.push_back(m);
         }
       }
       renderer::clear(0, 0, 0, 0);
       workingObjects.clear();
       std::vector<LayerRenderer *> background = findObject<LayerRenderer>(workingObjects, objectFlags::BACKGROUND);
-      for (i32  i = 0; i < background.size(); i++)
+      for (i32 i = 0; i < background.size(); i++)
       {
         if (background[i]->isEnabled())background[i]->render();
       }
@@ -235,12 +235,12 @@ namespace kNgine
             std::vector<GameObject *>(cameras.begin(), cameras.end()));
         sprites = orderObjectsByZ<ComponentGameObject>(
             std::vector<GameObject *>(sprites.begin(), sprites.end()));
-        for (i32  i = 0; i < cameras.size(); i++)
+        for (i32 i = 0; i < cameras.size(); i++)
         {
           v2 windowSize = renderer::getWindowSize();
           cameras[i]->updateWindowSize(windowSize.x,
                                        windowSize.y);
-          for (i32  j = 0; j < sprites.size(); j++)
+          for (i32 j = 0; j < sprites.size(); j++)
           {
             if (cameras[i]->position.z <= sprites[j]->position.z)
             {
@@ -250,7 +250,7 @@ namespace kNgine
           }
         }
         std::vector<LayerRenderer *> UI = findObject<LayerRenderer>(workingObjects, objectFlags::UI);
-        for(i32  i=0;i<UI.size();i++){
+        for(i32 i=0;i<UI.size();i++){
           if(UI[i]->isEnabled())UI[i]->render();
         }
         // 60fps ~= 0.016
@@ -267,7 +267,7 @@ namespace kNgine
       objects.push_back(object);
     }
 
-    void start(i32  argc, const char **argv)
+    void start(i32 argc, const char **argv)
     {
       srand(time(NULL));
       includeChildren();

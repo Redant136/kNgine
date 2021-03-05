@@ -14,7 +14,7 @@ namespace kNgine
   Camera::Camera() : Camera(1, 1920, 1080)
   {
   }
-  Camera::Camera(f32 fov, i32  windowWidth, i32  windowHeight)
+  Camera::Camera(f32 fov, i32 windowWidth, i32 windowHeight)
   {
     this->position = v3(0, 0, 1);
     if (windowWidth < windowHeight)
@@ -36,7 +36,7 @@ namespace kNgine
   }
   Camera::~Camera() {}
 
-  void Camera::updateWindowSize(i32  windowWidth, i32  windowHeight)
+  void Camera::updateWindowSize(i32 windowWidth, i32 windowHeight)
   {
     this->posMapper.targetMax = v4(windowWidth, 0,0,0);
     this->posMapper.targetMin = v4(0, windowHeight,0,0);
@@ -128,7 +128,7 @@ namespace kNgine
   {
     objects = orderObjectsByZ<ComponentGameObject>(
         std::vector<GameObject *>(objects.begin(), objects.end()));
-    for (i32  i = 0; i < objects.size() && objects[i]->position.z < position.z; i++)
+    for (i32 i = 0; i < objects.size() && objects[i]->position.z < position.z; i++)
     {
       if (!isBlacklist(objects[i]->labels))
       {
@@ -137,7 +137,7 @@ namespace kNgine
         v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(objects[i]->position),
                                             toV2(compn->getSpriteDimensions()))),
                               posMapper.map(toV2(objects[i]->position)));
-        unsigned char *colorMap = compn->getSprite()->colorMap.data();
+        u8 *colorMap = compn->getSprite()->colorMap;
 
         v2 spriteOffset = compn->getSpriteLocation();
         spriteOffset.x *= spriteDimensions.x;
@@ -160,14 +160,14 @@ namespace kNgine
     {
       SpriteAccessor *compn =
           object->findComponent<SpriteAccessor>("[sprite]");
-      i32  numSprite=1;
+      i32 numSprite=1;
       bool isSpriteList=false;
       if(!(compn)){
         numSprite = object->findComponent<SpriteList>("[sprite_list]")->getSpriteListLength();
         isSpriteList=true;
       }
 
-      for(i32  i=0;i<numSprite;i++){
+      for(i32 i=0;i<numSprite;i++){
         if (isSpriteList)
         {
           compn = object->findComponent<SpriteList>("[sprite_list]")->getSpriteList()[i];
@@ -176,7 +176,7 @@ namespace kNgine
                                             compn->getSpriteDimensions())),
                               posMapper.map(toV2(object->position)));
         spriteDimensions.y *= -1;
-        unsigned char *colorMap = compn->getSprite()->colorMap.data();
+        u8 *colorMap = compn->getSprite()->colorMap;
         v2 spriteOffset = compn->getSpriteLocation();
         spriteOffset.x *= spriteDimensions.x;
         spriteOffset.y *= spriteDimensions.y;

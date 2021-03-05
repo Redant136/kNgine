@@ -23,10 +23,10 @@ namespace kNgine
     } fovType = MAX_WH;
     bool showDebugHitBox = false;
     Camera();
-    Camera(f32 fov, i32  windowWidth, i32  windowHeight);
+    Camera(f32 fov, i32 windowWidth, i32 windowHeight);
     ~Camera();
 
-    void updateWindowSize(i32  windowWidth, i32  windowHeight);
+    void updateWindowSize(i32 windowWidth, i32 windowHeight);
 
     void render(std::vector<ComponentGameObject *> objects);
     void renderObject(ComponentGameObject *object);

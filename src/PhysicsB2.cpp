@@ -91,7 +91,7 @@ namespace kNgine
     {
       bodies.push_back(comp);
       comp->body = box2dWorld.CreateBody(&comp->bodyDef);
-      for (i32  i = 0; i < comp->shape.size(); i++)
+      for (i32 i = 0; i < comp->shape.size(); i++)
       {
         comp->body->CreateFixture(&comp->shape[i]);
       }
@@ -99,7 +99,7 @@ namespace kNgine
     void b2PhysicsEngine::init(std::vector<EngineObject *> objects)
     {
       std::vector<ComponentGameObject *> bods = findObject<ComponentGameObject>(objects, "[b2_physics_body]");
-      for (i32  i = 0; i < bods.size(); i++)
+      for (i32 i = 0; i < bods.size(); i++)
       {
         addBody(bods[i]->findComponent<b2PhysicsBodyComponent>("[b2_physics_body]"));
       }
@@ -111,12 +111,12 @@ namespace kNgine
       {
         if (mess.msgType == msg::TIME_ELAPSED)
         {
-          timeElapsed = mess.msgBody.time;
+          timeElapsed = mess.time;
           break;
         }
       }
 
-      for(i32  i=0;i<bodies.size();i++){
+      for(i32 i=0;i<bodies.size();i++){
         bodies[i]->body->SetEnabled(bodies[i]->object->isEnabled());
       }
       box2dWorld.Step(timeElapsed, 6, 2);
@@ -127,7 +127,7 @@ namespace kNgine
     }
     void b2PhysicsEngine::end(std::vector<EngineObject *> objects)
     {
-      for (i32  i = 0; i < bodies.size(); i++)
+      for (i32 i = 0; i < bodies.size(); i++)
       {
         bodies[i]->body = NULL;
       }
