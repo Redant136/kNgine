@@ -13,7 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-const i32 GLFW_KEYS[] = {GLFW_KEY_SPACE,
+static const i32 GLFW_KEYS[] = {GLFW_KEY_SPACE,
                          GLFW_KEY_APOSTROPHE /* ' */,
                          GLFW_KEY_COMMA /* , */,
                          GLFW_KEY_MINUS /* - */,
@@ -102,19 +102,19 @@ const i32 GLFW_KEYS[] = {GLFW_KEY_SPACE,
                          GLFW_KEY_RIGHT_CONTROL,
                          GLFW_KEY_RIGHT_ALT,
                          GLFW_KEY_UNKNOWN};
-std::vector<std::function<void(void)>> boundFunctions = std::vector<std::function<void(void)>>(Key::KEY_LAST);
+static std::vector<std::function<void(void)>> boundFunctions = std::vector<std::function<void(void)>>(Key::KEY_LAST);
 
 namespace renderer {
-GLFWwindow* window;
-std::function<void()> displayFunction;
-std::function<void()> drawFunction;
-u8* currentColor=new u8[4];
-u32 storedVBO = 0;
-u32 storedVAO = 0;
-u32 storedEBO = 0;
-i32 shaderProgram;
+static GLFWwindow* window;
+static std::function<void()> displayFunction;
+static std::function<void()> drawFunction;
+static u8* currentColor=new u8[4];
+static u32 storedVBO = 0;
+static u32 storedVAO = 0;
+static u32 storedEBO = 0;
+static i32 shaderProgram;
 // can only draw triangle
-const char* vertexShaderSource =
+static const char* vertexShaderSource =
     "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec4 aColor;\n"
@@ -128,7 +128,7 @@ const char* vertexShaderSource =
     "   color = aColor;\n"
     "   TexCoord = aTexCoord;\n"
     "}\0";
-const char* fragmentShaderSource =
+static const char* fragmentShaderSource =
     "#version 330 core\n"
     "out vec4 FragColor;\n"
     "in vec4 color;\n"

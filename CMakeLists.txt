@@ -1,8 +1,6 @@
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-option(BOX2DPHYSICS "if box2d is used" ON)
-
 if(APPLE)
   include_directories ( /usr/local/include) 
   link_directories( /usr/local/lib)
@@ -41,38 +39,24 @@ src/AudioEngine.hpp
 src/Renderer.hpp
 )
 
-if(BOX2DPHYSICS)
-  set(KNGINE_SOURCE_FILES
-    ${KNGINE_SOURCE_FILES}
-    src/PhysicsB2.cpp
-  )
-  set(KNGINE_HEADER_FILES
-    ${KNGINE_HEADER_FILES}
-    src/PhysicsB2.hpp
-  )
-
-else()
-  set(KNGINE_SOURCE_FILES
-    ${KNGINE_SOURCE_FILES}
-    src/Physics_2D.cpp
-  )
-  set(KNGINE_HEADER_FILES
-    ${KNGINE_HEADER_FILES}
-    src/Physics.hpp
-  )
-endif()
+set(KNGINE_SOURCE_FILES
+  ${KNGINE_SOURCE_FILES}
+  src/PhysicsB2.cpp
+)
+set(KNGINE_HEADER_FILES
+  ${KNGINE_HEADER_FILES}
+  src/PhysicsB2.hpp
+)
 
 add_library(kNgine
   ${KNGINE_SOURCE_FILES}
   ${KNGINE_HEADER_FILES}
 )
 
-if(BOX2DPHYSICS)
-  set(BOX2D_BUILD_UNIT_TESTS OFF)
-  set(BOX2D_BUILD_TESTBED OFF)
-  add_subdirectory(extern/box2d)
-  target_link_libraries(kNgine PRIVATE box2d)
-endif()
+set(BOX2D_BUILD_UNIT_TESTS OFF)
+set(BOX2D_BUILD_TESTBED OFF)
+add_subdirectory(extern/box2d)
+target_link_libraries(kNgine PRIVATE box2d)
 
 add_subdirectory(extern/glfw)
 target_link_libraries(kNgine PRIVATE glfw)
