@@ -11,8 +11,7 @@ namespace kNgine
     b2PhysicsBodyComponent::b2PhysicsBodyComponent(ComponentGameObject *base, std::vector<b2FixtureDef> shape) : ObjectComponent(base)
     {
       this->label = "[b2_physics_body]";
-      base->flags.push_back(objectFlags::Physics);
-      base->labels.push_back(label);
+      this->flags|=ObjectFlags::Physics;
       this->bodyDef.type = b2_dynamicBody;
       this->bodyDef.position.Set(object->position.x, object->position.y);
       this->shape = shape;
@@ -20,8 +19,7 @@ namespace kNgine
     b2PhysicsBodyComponent::b2PhysicsBodyComponent(ComponentGameObject *base, b2FixtureDef shape) : ObjectComponent(base)
     {
       this->label = "[b2_physics_body]";
-      base->flags.push_back(objectFlags::Physics);
-      base->labels.push_back(label);
+      this->flags|=ObjectFlags::Physics;
       this->bodyDef.type = b2_dynamicBody;
       this->bodyDef.position.Set(object->position.x, object->position.y);
       this->bodyDef.angle=object->rotation.z;
@@ -70,13 +68,13 @@ namespace kNgine
     b2PhysicsEngine::b2PhysicsEngine() : box2dWorld(b2Vec2(gravity.x, gravity.y))
     {
       this->gravity = v2(0,0);
-      this->flags.push_back(objectFlags::PhysicsEngine);
+      this->flags|=ObjectFlags::Physics;
       this->labels.push_back("b2Engine");
     }
     b2PhysicsEngine::b2PhysicsEngine(v2 grav) : box2dWorld(b2Vec2(grav.x, grav.y))
     {
       this->gravity = v2(0,0);
-      this->flags.push_back(objectFlags::PhysicsEngine);
+      this->flags |= ObjectFlags::Physics;
       this->labels.push_back("b2Engine");
     }
     b2PhysicsEngine::b2PhysicsEngine(const b2PhysicsEngine &base):box2dWorld(base.box2dWorld){

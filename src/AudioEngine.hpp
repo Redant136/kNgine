@@ -28,7 +28,7 @@ namespace kNgine
   {
   public:
     f32 globalVolume = 1.0f;
-    SoundListenerComponent(GameObject *object);
+    SoundListenerComponent(ComponentGameObject *object);
     virtual ~SoundListenerComponent();
   };
 
@@ -42,8 +42,8 @@ namespace kNgine
     f32 volume = 1.0f;
   public:
     BaseAudioBuffer *buffer;
-    SoundEmiterComponent(GameObject *object, const char *fileName, audiofiletype type, SoundListenerComponent *player);
-    SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player);
+    SoundEmiterComponent(ComponentGameObject *object, const char *fileName, audiofiletype type, SoundListenerComponent *player);
+    SoundEmiterComponent(ComponentGameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player);
     bool isPlaying() { return playing; }
     void play();
   };

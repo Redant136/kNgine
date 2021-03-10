@@ -23,40 +23,20 @@ namespace kNgine
       v2 cursorPos;
     };
   };
-  enum objectFlags
+  enum ObjectFlags
   {
-    ALL,
-    GAME_OBJECT,
-    COMPONENT,
-    PARENT,
-    CHILD,
-    //----
-    SPRITE,
-    Sprite_List,
-    BACKGROUND,
-    CAMERA,
-    UI,
-    //----
-    Physics,
-    PhysicsEngine,
-    //----
-    AUDIO,
-    AUDIOPLAYER
-  };
-  namespace temp{
-    enum objectFlags2
-    {
-      NONE          = 0<<0,
-      GAME_OBJECT   = 1<<0,
-      COMPONENT     = 1<<1,
-      PARENT        = 1<<2,
-      CHILD         = 1<<3,
-      SPRITE        = 1<<4,
-      Sprite_List   = 1<<5,
-      RENDERER      = 1<<6,
-      Physics       = 1<<7,
-      AUDIO         = 1<<8
-    };
+    NONE        = 0 << 0,
+    GAME_OBJECT = 1 << 0,
+    COMPONENT   = 1 << 1,
+    PARENT      = 1 << 2,
+    CHILD       = 1 << 3,
+    SPRITE      = 1 << 4,
+    Sprite_List = 1 << 5,
+    BACKGROUND  = 1 << 6,
+    CAMERA      = 1 << 7,
+    UI          = 1 << 8,
+    Physics     = 1 << 9,
+    AUDIO       = 1 << 10
   };
 
   typedef struct
@@ -105,11 +85,11 @@ namespace kNgine
       cut.x = offset;
       break;
     case SOUTH:
-      copyLine = iv2(0, sprite->height-1);
+      copyLine = iv2(0, sprite->height - 1);
       cut.y = -offset;
       break;
     case EAST:
-      copyLine = iv2(sprite->width-1, 0);
+      copyLine = iv2(sprite->width - 1, 0);
       cut.x = -offset;
       break;
     case NORTH_WEST:
@@ -118,17 +98,17 @@ namespace kNgine
       cut.x = offset;
       break;
     case NORTH_EAST:
-      copyLine = iv2(sprite->width-1, 0);
+      copyLine = iv2(sprite->width - 1, 0);
       cut.y = offset;
       cut.x = -offset;
       break;
     case SOUTH_WEST:
-      copyLine = iv2(0, sprite->height-1);
+      copyLine = iv2(0, sprite->height - 1);
       cut.y = -offset;
       cut.x = offset;
       break;
     case SOUTH_EAST:
-      copyLine = iv2(sprite->width-1, sprite->height-1);
+      copyLine = iv2(sprite->width - 1, sprite->height - 1);
       cut.y = -offset;
       cut.x = -offset;
       break;
@@ -186,11 +166,10 @@ namespace kNgine
     bool enabled = true;
   public:
     std::vector<std::string> labels = std::vector<std::string>();
-    std::vector<objectFlags> flags = std::vector<objectFlags>();
+    u64 flags = 0;
     EngineObject()
     {
       labels = std::vector<std::string>();
-      flags = std::vector<objectFlags>();
     }
     EngineObject(const EngineObject &base)
     {
@@ -205,8 +184,8 @@ namespace kNgine
     virtual void update(std::vector<msg> msgs) {}
     virtual void init(std::vector<EngineObject *> objects) {}
     virtual void end(std::vector<EngineObject *> objects) {}
-    virtual void load(std::vector<EngineObject*>object){}
-    virtual void unload(std::vector<EngineObject*>object) {}
+    virtual void load(std::vector<EngineObject *> object) {}
+    virtual void unload(std::vector<EngineObject *> object) {}
   };
   // object to be positionned in game
   class GameObject : public EngineObject
@@ -218,17 +197,8 @@ namespace kNgine
     GameObject(const GameObject &base);
     virtual ~GameObject() {}
   };
-  // modular objects for implementations, define modules labels using [name]
-  class ObjectComponent
-  {
-  public:
-    GameObject *object;
-    std::string label;
-    ObjectComponent(GameObject *base);
-    ObjectComponent(const ObjectComponent &base);
-    virtual ~ObjectComponent();
-    virtual void update(std::vector<msg> msgs);
-  };
+
+  class ObjectComponent;
   class ComponentGameObject : public GameObject
   {
   protected:
@@ -239,32 +209,44 @@ namespace kNgine
     ComponentGameObject(const ComponentGameObject &base);
     virtual ~ComponentGameObject();
     void update(std::vector<msg> msgs);
-    void addComponent(ObjectComponent *component)
-    {
-      components.push_back(component);
-    }
+    void addComponent(ObjectComponent *component);
     template <typename T = ObjectComponent>
-    T *findComponent(std::string flag)
-    {
-      for (ObjectComponent *mod : components)
-      {
-        if (mod->label == flag)
-        {
-          return (T *)mod;
-        }
-      }
-      return NULL;
-    }
+    T *findComponent(std::string flag);
     void removeComponent(ObjectComponent *component);
     void removeComponent(std::string flag) { removeComponent(findComponent(flag)); }
   };
+  // modular objects for implementations, define modules labels using [name]
+  class ObjectComponent
+  {
+  public:
+    ComponentGameObject *object;
+    std::string label;
+    u64 flags=0;
+    ObjectComponent(ComponentGameObject *base);
+    ObjectComponent(const ObjectComponent &base);
+    virtual ~ObjectComponent();
+    virtual void update(std::vector<msg> msgs);
+  };
+  template <typename T>
+  T *ComponentGameObject::findComponent(std::string flag)
+  {
+    for (ObjectComponent *mod : components)
+    {
+      if (mod->label == flag)
+      {
+        return (T *)mod;
+      }
+    }
+    return NULL;
+  }
+
   //[sprite]
   class SpriteAccessor : public ObjectComponent
   {
   public:
     cardinal8dir spriteLocation;
     v2 offset = {0.0f, 0.0f}; // offset in game units
-    SpriteAccessor(GameObject *base);
+    SpriteAccessor(ComponentGameObject *base);
     virtual bool hasToSave() = 0;
     virtual Sprite *getSprite() = 0; //pointer for not having to call copy
     virtual v2 getSpriteDimensions() = 0;
@@ -333,10 +315,10 @@ namespace kNgine
   struct EngineEvent
   {
     std::string name;
-    std::function<void*(void*)> event;
+    std::function<void *(void *)> event;
   };
   void addEvent(EngineEvent event);
-  void* callEvent(std::string name,void*arg=NULL);
+  void *callEvent(std::string name, void *arg = NULL);
 
   template <class T = EngineObject>
   std::vector<T *> findObject(std::vector<EngineObject *> objects,
@@ -379,33 +361,27 @@ namespace kNgine
   };
   template <class T = EngineObject>
   std::vector<T *> findObject(EngineObject **objects, u32 objectsSize,
-                              objectFlags flag)
+                              u64 flags)
   {
     std::vector<EngineObject *> valid = std::vector<EngineObject *>();
-    if (flag == objectFlags::ALL)
+    if (flags == ~ObjectFlags::NONE)
     {
-      valid=std::vector<EngineObject*>(objects,objects+objectsSize);
+      valid = std::vector<EngineObject *>(objects, objects + objectsSize);
     }
     else
     {
       for (u32 i = 0; i < objectsSize; i++)
       {
-        for (objectFlags f : objects[i]->flags)
+        if (objects[i]->flags & ObjectFlags::CHILD)
         {
-          if (f == objectFlags::CHILD)
+          if (((ChildrenObject *)objects[i])->object->flags & flags)
           {
-            for (objectFlags fchild : ((ChildrenObject *)objects[i])->object->flags)
-            {
-              if (fchild == objectFlags::ALL || fchild == flag)
-              {
-                valid.push_back(((ChildrenObject *)objects[i])->object);
-              }
-            }
+            valid.push_back(((ChildrenObject *)objects[i])->object);
           }
-          if (f == objectFlags::ALL || f == flag)
-          {
-            valid.push_back(objects[i]);
-          }
+        }
+        if (objects[i]->flags & flags)
+        {
+          valid.push_back(objects[i]);
         }
       }
     }
@@ -418,126 +394,9 @@ namespace kNgine
   };
   template <class T = EngineObject>
   std::vector<T *> findObject(std::vector<EngineObject *> objects,
-                              objectFlags flag)
+                              u64 flags)
   {
-    return findObject<T>(objects.data(),objects.size(),flag);
-  };
-  template <class T = EngineObject>
-  std::vector<T *> findObjectBlacklist(EngineObject **objects, u32 objectsSize,
-                                       objectFlags flag)
-  {
-    std::vector<EngineObject *> valid = std::vector<EngineObject *>();
-    if (flag == objectFlags::ALL)
-    {
-      return std::vector<T *>();
-    }
-    else
-    {
-      for (u32 i = 0; i < objectsSize; i++)
-      {
-        for (objectFlags f : objects[i]->flags)
-        {
-          if (f == objectFlags::CHILD)
-          {
-            for (objectFlags fchild : ((ChildrenObject *)objects[i])->object->flags)
-            {
-              if (!(fchild == objectFlags::ALL || fchild == flag))
-              {
-                valid.push_back(((ChildrenObject *)objects[i])->object);
-              }
-            }
-          }
-          if (!(f == objectFlags::ALL || f == flag))
-          {
-            valid.push_back(objects[i]);
-          }
-        }
-      }
-    }
-    std::vector<T *> res = std::vector<T *>();
-    for (EngineObject *obj : valid)
-    {
-      res.push_back((T *)obj);
-    }
-    return res;
-  };
-  template <class T = EngineObject>
-  std::vector<T *> findObjectBlacklist(std::vector<EngineObject *> objects,
-                                       objectFlags flag)
-  {
-    std::vector<EngineObject *> valid = std::vector<EngineObject *>();
-    if (flag == objectFlags::ALL)
-    {
-      return std::vector<T *>();
-    }
-    else
-    {
-      for (EngineObject *obj : objects)
-      {
-        for (objectFlags f : obj->flags)
-        {
-          if (f == objectFlags::CHILD)
-          {
-            for (objectFlags fchild : ((ChildrenObject *)obj)->object->flags)
-            {
-              if (!(fchild == objectFlags::ALL || fchild == flag))
-              {
-                valid.push_back(((ChildrenObject *)obj)->object);
-              }
-            }
-          }
-          if (!(f == objectFlags::ALL || f == flag))
-          {
-            valid.push_back(obj);
-          }
-        }
-      }
-    }
-    std::vector<T *> res = std::vector<T *>();
-    for (EngineObject *obj : valid)
-    {
-      res.push_back((T *)obj);
-    }
-    return res;
-  };
-  template <class T = EngineObject>
-  std::vector<T *> findObjectBlacklist(std::vector<EngineObject *> objects,
-                                       std::string label)
-  {
-    std::vector<EngineObject *> valid = std::vector<EngineObject *>();
-    if (label == "ALL")
-    {
-      return std::vector<T *>();
-    }
-    else
-    {
-      for (EngineObject *obj : objects)
-      {
-        for (std::string s : obj->labels)
-        {
-          if (s == "_CHILDREN_")
-          {
-            for (std::string schild : ((ChildrenObject *)obj)->object->labels)
-            {
-              if (!(schild == "ALL" || schild == label))
-              {
-                valid.push_back(((ChildrenObject *)obj)->object);
-              }
-            }
-          }
-          if (!(s == "ALL" || s == label))
-          {
-            valid.push_back(obj);
-          }
-        }
-      }
-    }
-    std::vector<T *> res = std::vector<T *>();
-    for (EngineObject *obj : valid)
-    {
-      res.push_back((T *)obj);
-    }
-    return res;
+    return findObject<T>(objects.data(), objects.size(), flags);
   };
 
   Sprite importSprite(const char *filename);

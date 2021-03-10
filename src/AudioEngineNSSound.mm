@@ -19,23 +19,21 @@ namespace kNgine{
     }
   };
 
-  SoundListenerComponent::SoundListenerComponent(GameObject *object) : ObjectComponent(object){
+  SoundListenerComponent::SoundListenerComponent(ComponentGameObject *object) : ObjectComponent(object){
     this->label = "[AudioPlayer]";
-    object->flags.push_back(objectFlags::AUDIO);
-    object->flags.push_back(objectFlags::AUDIOPLAYER);
+    object->flags|=AUDIO;
     object->labels.push_back(label);
   }
   SoundListenerComponent::~SoundListenerComponent(){
   }
 
-  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, const char* fileName,audiofiletype type, SoundListenerComponent *player) : SoundEmiterComponent(object, createBuffer(fileName,type),player)
+  SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, const char* fileName,audiofiletype type, SoundListenerComponent *player) : SoundEmiterComponent(object, createBuffer(fileName,type),player)
   {
   }
-  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player) : ObjectComponent(object)
+  SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player) : ObjectComponent(object)
   {
     this->label = "[AudioEmiter]";
-    object->flags.push_back(objectFlags::AUDIO);
-    object->labels.push_back(label);
+    this->flags|=AUDIO;
     this->buffer = buffer;
     this->player = player;
   }
@@ -45,7 +43,7 @@ namespace kNgine{
   }
 
   AudioEngine::AudioEngine(){
-    this->flags.push_back(objectFlags::AUDIO);
+    this->flags|=AUDIO;
     this->labels.push_back("AudioEngine");
   }
   void AudioEngine::play(const char* fileName,audiofiletype type){

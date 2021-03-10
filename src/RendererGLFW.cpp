@@ -13,95 +13,100 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-static const i32 GLFW_KEYS[] = {GLFW_KEY_SPACE,
-                         GLFW_KEY_APOSTROPHE /* ' */,
-                         GLFW_KEY_COMMA /* , */,
-                         GLFW_KEY_MINUS /* - */,
-                         GLFW_KEY_PERIOD /* . */,
-                         GLFW_KEY_SLASH /* / */,
-                         GLFW_KEY_0,
-                         GLFW_KEY_1,
-                         GLFW_KEY_2,
-                         GLFW_KEY_3,
-                         GLFW_KEY_4,
-                         GLFW_KEY_5,
-                         GLFW_KEY_6,
-                         GLFW_KEY_7,
-                         GLFW_KEY_8,
-                         GLFW_KEY_9,
-                         GLFW_KEY_SEMICOLON /* ; */,
-                         GLFW_KEY_EQUAL /* = */,
-                         GLFW_KEY_A,
-                         GLFW_KEY_B,
-                         GLFW_KEY_C,
-                         GLFW_KEY_D,
-                         GLFW_KEY_E,
-                         GLFW_KEY_F,
-                         GLFW_KEY_G,
-                         GLFW_KEY_H,
-                         GLFW_KEY_I,
-                         GLFW_KEY_J,
-                         GLFW_KEY_K,
-                         GLFW_KEY_L,
-                         GLFW_KEY_M,
-                         GLFW_KEY_N,
-                         GLFW_KEY_O,
-                         GLFW_KEY_P,
-                         GLFW_KEY_Q,
-                         GLFW_KEY_R,
-                         GLFW_KEY_S,
-                         GLFW_KEY_T,
-                         GLFW_KEY_U,
-                         GLFW_KEY_V,
-                         GLFW_KEY_W,
-                         GLFW_KEY_X,
-                         GLFW_KEY_Y,
-                         GLFW_KEY_Z,
-                         GLFW_KEY_LEFT_BRACKET /* [ */,
-                         GLFW_KEY_BACKSLASH /* \ */,
-                         GLFW_KEY_RIGHT_BRACKET /* ] */,
-                         GLFW_KEY_GRAVE_ACCENT /* ` */,
-                         GLFW_KEY_ESCAPE,
-                         GLFW_KEY_ENTER,
-                         GLFW_KEY_TAB,
-                         GLFW_KEY_BACKSPACE,
-                         GLFW_KEY_RIGHT,
-                         GLFW_KEY_LEFT,
-                         GLFW_KEY_DOWN,
-                         GLFW_KEY_UP,
-                         GLFW_KEY_F1,
-                         GLFW_KEY_F2,
-                         GLFW_KEY_F3,
-                         GLFW_KEY_F4,
-                         GLFW_KEY_F5,
-                         GLFW_KEY_F6,
-                         GLFW_KEY_F7,
-                         GLFW_KEY_F8,
-                         GLFW_KEY_F9,
-                         GLFW_KEY_F10,
-                         GLFW_KEY_F11,
-                         GLFW_KEY_F12,
-                         GLFW_KEY_F13,
-                         GLFW_KEY_F14,
-                         GLFW_KEY_F15,
-                         GLFW_KEY_F16,
-                         GLFW_KEY_F17,
-                         GLFW_KEY_F18,
-                         GLFW_KEY_F19,
-                         GLFW_KEY_F20,
-                         GLFW_KEY_F21,
-                         GLFW_KEY_F22,
-                         GLFW_KEY_F23,
-                         GLFW_KEY_F24,
-                         GLFW_KEY_F25,
-                         GLFW_KEY_LEFT_SHIFT,
-                         GLFW_KEY_LEFT_CONTROL,
-                         GLFW_KEY_LEFT_ALT,
-                         GLFW_KEY_LEFT_SUPER,
-                         GLFW_KEY_RIGHT_SHIFT,
-                         GLFW_KEY_RIGHT_CONTROL,
-                         GLFW_KEY_RIGHT_ALT,
-                         GLFW_KEY_UNKNOWN};
+static i32 KeyToGLFW(Key k){
+  switch (k)
+  {
+  case Key::SPACE : return GLFW_KEY_SPACE;break;
+  case Key::APOSTROPHE :return GLFW_KEY_APOSTROPHE /* ' */; break;
+  case Key::COMMA :return GLFW_KEY_COMMA /* , */; break;
+  case Key::MINUS :return GLFW_KEY_MINUS /* - */; break;
+  case Key::PERIOD :return GLFW_KEY_PERIOD /* . */; break;
+  case Key::SLASH :return GLFW_KEY_SLASH /* / */; break;
+  case Key::KEY_0 :return GLFW_KEY_0; break;
+  case Key::KEY_1 :return GLFW_KEY_1; break;
+  case Key::KEY_2 :return GLFW_KEY_2; break;
+  case Key::KEY_3 :return GLFW_KEY_3; break;
+  case Key::KEY_4 :return GLFW_KEY_4; break;
+  case Key::KEY_5 :return GLFW_KEY_5; break;
+  case Key::KEY_6 :return GLFW_KEY_6; break;
+  case Key::KEY_7 :return GLFW_KEY_7; break;
+  case Key::KEY_8 :return GLFW_KEY_8; break;
+  case Key::KEY_9 :return GLFW_KEY_9; break;
+  case Key::SEMICOLON :return GLFW_KEY_SEMICOLON /* ; */; break;
+  case Key::EQUAL :return GLFW_KEY_EQUAL /* = */; break;
+  case Key::KEY_A :return GLFW_KEY_A; break;
+  case Key::KEY_B :return GLFW_KEY_B; break;
+  case Key::KEY_C :return GLFW_KEY_C; break;
+  case Key::KEY_D :return GLFW_KEY_D; break;
+  case Key::KEY_E :return GLFW_KEY_E; break;
+  case Key::KEY_F :return GLFW_KEY_F; break;
+  case Key::KEY_G :return GLFW_KEY_G; break;
+  case Key::KEY_H :return GLFW_KEY_H; break;
+  case Key::KEY_I :return GLFW_KEY_I; break;
+  case Key::KEY_J :return GLFW_KEY_J; break;
+  case Key::KEY_K :return GLFW_KEY_K; break;
+  case Key::KEY_L :return GLFW_KEY_L; break;
+  case Key::KEY_M :return GLFW_KEY_M; break;
+  case Key::KEY_N :return GLFW_KEY_N; break;
+  case Key::KEY_O :return GLFW_KEY_O; break;
+  case Key::KEY_P :return GLFW_KEY_P; break;
+  case Key::KEY_Q :return GLFW_KEY_Q; break;
+  case Key::KEY_R :return GLFW_KEY_R; break;
+  case Key::KEY_S :return GLFW_KEY_S; break;
+  case Key::KEY_T :return GLFW_KEY_T; break;
+  case Key::KEY_U :return GLFW_KEY_U; break;
+  case Key::KEY_V :return GLFW_KEY_V; break;
+  case Key::KEY_W :return GLFW_KEY_W; break;
+  case Key::KEY_X :return GLFW_KEY_X; break;
+  case Key::KEY_Y :return GLFW_KEY_Y; break;
+  case Key::KEY_Z :return GLFW_KEY_Z; break;
+  case Key::LEFT_BRACKET :return GLFW_KEY_LEFT_BRACKET /* [ */; break;
+  case Key::BACKSLASH :return GLFW_KEY_BACKSLASH /* \ */; break;
+  case Key::RIGHT_BRACKET :return GLFW_KEY_RIGHT_BRACKET /* ] */; break;
+  case Key::GRAVE_ACCENT :return GLFW_KEY_GRAVE_ACCENT /* ` */; break;
+  case Key::ESCAPE :return GLFW_KEY_ESCAPE; break;
+  case Key::ENTER :return GLFW_KEY_ENTER; break;
+  case Key::TAB :return GLFW_KEY_TAB; break;
+  case Key::BACKSPACE :return GLFW_KEY_BACKSPACE; break;
+  case Key::KEY_RIGHT :return GLFW_KEY_RIGHT; break;
+  case Key::KEY_LEFT :return GLFW_KEY_LEFT; break;
+  case Key::KEY_DOWN :return GLFW_KEY_DOWN; break;
+  case Key::KEY_UP :return GLFW_KEY_UP; break;
+  case Key::F1 :return GLFW_KEY_F1; break;
+  case Key::F2 :return GLFW_KEY_F2; break;
+  case Key::F3 :return GLFW_KEY_F3; break;
+  case Key::F4 :return GLFW_KEY_F4; break;
+  case Key::F5 :return GLFW_KEY_F5; break;
+  case Key::F6 :return GLFW_KEY_F6; break;
+  case Key::F7 :return GLFW_KEY_F7; break;
+  case Key::F8 :return GLFW_KEY_F8; break;
+  case Key::F9 :return GLFW_KEY_F9; break;
+  case Key::F10 :return GLFW_KEY_F10; break;
+  case Key::F11 :return GLFW_KEY_F11; break;
+  case Key::F12 :return GLFW_KEY_F12; break;
+  case Key::F13 :return GLFW_KEY_F13; break;
+  case Key::F14 :return GLFW_KEY_F14; break;
+  case Key::F15 :return GLFW_KEY_F15; break;
+  case Key::F16 :return GLFW_KEY_F16; break;
+  case Key::F17 :return GLFW_KEY_F17; break;
+  case Key::F18 :return GLFW_KEY_F18; break;
+  case Key::F19 :return GLFW_KEY_F19; break;
+  case Key::F20 :return GLFW_KEY_F20; break;
+  case Key::F21 :return GLFW_KEY_F21; break;
+  case Key::F22 :return GLFW_KEY_F22; break;
+  case Key::F23 :return GLFW_KEY_F23; break;
+  case Key::F24 :return GLFW_KEY_F24; break;
+  case Key::F25 :return GLFW_KEY_F25; break;
+  case Key::LEFT_SHIFT :return GLFW_KEY_LEFT_SHIFT; break;
+  case Key::LEFT_CONTROL :return GLFW_KEY_LEFT_CONTROL; break;
+  case Key::LEFT_ALT :return GLFW_KEY_LEFT_ALT; break;
+  case Key::LEFT_SUPER :return GLFW_KEY_LEFT_SUPER; break;
+  case Key::RIGHT_SHIFT :return GLFW_KEY_RIGHT_SHIFT; break;
+  case Key::RIGHT_CONTROL :return GLFW_KEY_RIGHT_CONTROL; break;
+  case Key::RIGHT_ALT :return GLFW_KEY_RIGHT_ALT; break;
+    default : return GLFW_KEY_UNKNOWN; break;
+  }
+}
 static std::vector<std::function<void(void)>> boundFunctions = std::vector<std::function<void(void)>>(Key::KEY_LAST);
 
 namespace renderer {
@@ -166,7 +171,7 @@ v2 getWindowSize() {
 
 // key input
 bool keyStatusPressed(Key e) {
-  return glfwGetKey(window, GLFW_KEYS[e]) == GLFW_PRESS;
+  return glfwGetKey(window, KeyToGLFW(e)) == GLFW_PRESS;
 }
 void onKeyPress(std::function<void(void)>func,Key e){
   boundFunctions[e]=func;
@@ -266,7 +271,7 @@ void setDrawFunction(std::function<void(void)> refreshFunction) {
 void key_callback(GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mods)
 {
   for(i32 i=0;i<boundFunctions.size()-1;i++){
-    if(key==GLFW_KEYS[i] && action==GLFW_PRESS){
+    if(key==KeyToGLFW((Key)i) && action==GLFW_PRESS){
       boundFunctions[i]();
     }
   }

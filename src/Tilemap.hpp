@@ -6,12 +6,6 @@
 #include "SpriteUtils.hpp"
 
 namespace kNgine{
-  /* either object that simply serves as container for multiple pieces of ground and 
-    just shortens code writen to create multiple similar objects
-    or
-    tilemap that only holds a single copy of everything and improves performance
-  */
-
   // must be added before phys engine
   class Tilemap:public ComponentGameObject{
   private:

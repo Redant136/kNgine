@@ -7,7 +7,7 @@
 
 namespace kNgine
 {
-  SpriteMap::SpriteMap() { this->flags.push_back(objectFlags::Sprite_List); }
+  SpriteMap::SpriteMap() { this->flags|=ObjectFlags::Sprite_List;}
   SpriteMap::~SpriteMap()
   {
     for (i32 i = 0; i < list.size(); i++)
@@ -46,7 +46,7 @@ namespace kNgine
     }
   }
 
-  SpriteMapAccessor::SpriteMapAccessor(GameObject *base) : SpriteAccessor(base)
+  SpriteMapAccessor::SpriteMapAccessor(ComponentGameObject *base) : SpriteAccessor(base)
   {
   }
 

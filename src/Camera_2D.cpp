@@ -32,7 +32,7 @@ namespace kNgine
                  v2(0, windowHeight), v2(windowWidth, 0));
     }
     this->fov = fov;
-    this->flags.push_back(objectFlags::CAMERA);
+    this->flags|=ObjectFlags::CAMERA;
   }
   Camera::~Camera() {}
 

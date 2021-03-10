@@ -22,7 +22,7 @@ namespace kNgine
   class SpriteMapAccessor:public SpriteAccessor{
   public:
     SpriteMap* spriteList;
-    SpriteMapAccessor(GameObject *base);
+    SpriteMapAccessor(ComponentGameObject *base);
     bool hasToSave() { return false; }
     virtual u32 getMapIndex()=0;
   };
@@ -69,34 +69,34 @@ namespace kNgine
   //[animation_system]
   class SpriteAnimationSystem:public SpriteMapAccessor{//make sure that spriteanimation uses the same map
   protected:
-    std::vector<SpriteMapAccessor *> accessors;
-    std::vector<std::string>names;
+    struct accessor{
+      std::string name;
+      SpriteMapAccessor*accessor;
+    };
+    std::vector<accessor>accessors;
     SpriteMapAccessor *active;
   public:
     v2 spriteDimension;
-    SpriteAnimationSystem(GameObject *base, SpriteMap *spriteList) : SpriteMapAccessor(base)
+    SpriteAnimationSystem(ComponentGameObject *base, SpriteMap *spriteList) : SpriteMapAccessor(base)
     {
       this->spriteList=spriteList;
       active=NULL;
       spriteDimension=v2(1,1);
     }
     void addSprite(SpriteMapAccessor *accessor,std::string name){
-      i32 index = std::max(accessors.size(),names.size());
-      accessors.resize(index+1);
-      names.resize(index+1);
-      accessors[index]=accessor;
-      names[index]=name;
+      accessors.push_back({name,accessor});
+      accessor->object=this->object;
       if(active==NULL)active=accessor;
     }
     void setActive(std::string name) {
-      for(i32 i=0;i<names.size();i++){
-        if(names[i]==name){
-          this->active=accessors[i];
+      for(i32 i=0;i<accessors.size();i++){
+        if(accessors[i].name==name){
+          this->active=accessors[i].accessor;
         }
       }
     }
     void setActive(u32 index){
-      this->active=accessors[index];
+      this->active=accessors[index].accessor;
     }
     virtual void update(std::vector<msg> msgs){active->update(msgs);}
     u32 getMapIndex(){return active->getMapIndex();}
@@ -111,10 +111,10 @@ namespace kNgine
     std::vector<SpriteAccessor *> accessors;
   public:
     v2 spriteDimension;
-    SpriteList(GameObject *base, SpriteMap *spriteList) : SpriteList(base,std::vector<SpriteAccessor*>(),spriteList)
+    SpriteList(ComponentGameObject *base, SpriteMap *spriteList) : SpriteList(base, std::vector<SpriteAccessor *>(), spriteList)
     {
     }
-    SpriteList(GameObject *base, std::vector<SpriteAccessor *> accessors, SpriteMap *spriteList) : SpriteAccessor(base)
+    SpriteList(ComponentGameObject *base, std::vector<SpriteAccessor *> accessors, SpriteMap *spriteList) : SpriteAccessor(base)
     {
       this->label="[sprite_list]";
       this->accessors=accessors;

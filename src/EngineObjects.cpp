@@ -102,14 +102,15 @@ namespace kNgine{
   //   }
   // }
 
-  GameObject::GameObject() { flags.push_back(objectFlags::GAME_OBJECT); }
+  GameObject::GameObject() { flags |= ObjectFlags::GAME_OBJECT; }
   GameObject::GameObject(const GameObject&base):EngineObject(base)
   {
     this->position=base.position;
     this->rotation=base.rotation;
   }
 
-  ObjectComponent::ObjectComponent(GameObject *base) {
+  ObjectComponent::ObjectComponent(ComponentGameObject *base)
+  {
     this->object = base;
     this->label = "none";
   }
@@ -121,7 +122,7 @@ namespace kNgine{
   void ObjectComponent::update(std::vector<msg> msgs) {}
   ComponentGameObject::ComponentGameObject() {
     components = std::vector<ObjectComponent *>();
-    flags.push_back(objectFlags::COMPONENT);
+    flags |= ObjectFlags::COMPONENT;
   }
   ComponentGameObject::ComponentGameObject(const ComponentGameObject &base) :GameObject(base){
     this->components=std::vector<ObjectComponent*>();
@@ -136,6 +137,12 @@ namespace kNgine{
     for (i32 i = 0; i < components.size(); i++) {
       delete components[i];
     }
+  }
+  void ComponentGameObject::addComponent(ObjectComponent *component)
+  {
+    components.push_back(component);
+    this->labels.push_back(component->label);
+    this->flags |= component->flags;
   }
   void ComponentGameObject::update(std::vector<msg> msgs) {
     for (ObjectComponent *mod : components) {
@@ -152,10 +159,10 @@ namespace kNgine{
     }
   }
 
-  SpriteAccessor::SpriteAccessor(GameObject *base) : ObjectComponent(base) {
+  SpriteAccessor::SpriteAccessor(ComponentGameObject *base) : ObjectComponent(base)
+  {
     this->label = "[sprite]";
-    base->flags.push_back(objectFlags::SPRITE);
-    base->labels.push_back(label);
+    this->flags|=ObjectFlags::SPRITE;
   }
 
   SpriteComponent::SpriteComponent(ComponentGameObject *base)
@@ -183,7 +190,7 @@ namespace kNgine{
   v2 SpriteComponent::getSpriteDimensions() { return spriteDimension; }
 
   LayerRenderer::LayerRenderer(){
-    flags.push_back(objectFlags::UI);
+    flags|=ObjectFlags::UI;
     labels.push_back("UI");
   }
   void LayerRenderer::render(){
@@ -194,7 +201,7 @@ namespace kNgine{
     this->object = object;
     this->position = V3MinusV3(object->position,parentPosition);
     this->previousParentPosition = parentPosition;
-    this->flags.push_back(objectFlags::CHILD);
+    flags|=ObjectFlags::CHILD;
     labels.push_back("_CHILDREN_");
   }
   void ChildrenObject::update(std::vector<msg> msgs) {
@@ -206,7 +213,7 @@ namespace kNgine{
 
   ParentObject::ParentObject() {
     children = std::vector<GameObject *>();
-    flags.push_back(objectFlags::PARENT);
+    flags|=ObjectFlags::PARENT;
     labels.push_back("_PARENT_");
   }
   ParentObject::ParentObject(const ParentObject &base) : ComponentGameObject(base)

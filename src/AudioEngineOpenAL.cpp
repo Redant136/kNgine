@@ -125,12 +125,10 @@ namespace kNgine
     }
   };
 
-  SoundListenerComponent::SoundListenerComponent(GameObject *object) : ObjectComponent(object)
+  SoundListenerComponent::SoundListenerComponent(ComponentGameObject *object) : ObjectComponent(object)
   {
     this->label = "[AudioPlayer]";
-    object->flags.push_back(objectFlags::AUDIO);
-    object->flags.push_back(objectFlags::AUDIOPLAYER);
-    object->labels.push_back(label);
+    this->flags|=ObjectFlags::AUDIO;
     if(!openALDevice){
       openALDevice = alcOpenDevice(nullptr);
       if (!openALDevice)
@@ -166,14 +164,13 @@ namespace kNgine
     }
   }
 
-  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, const char *fileName, audiofiletype type, SoundListenerComponent *player) : SoundEmiterComponent(object, createBuffer(fileName,type), player)
+  SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, const char *fileName, audiofiletype type, SoundListenerComponent *player) : SoundEmiterComponent(object, createBuffer(fileName, type), player)
   {
   }
-  SoundEmiterComponent::SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player) : ObjectComponent(object)
+  SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player) : ObjectComponent(object)
   {
     this->label = "[AudioEmiter]";
-    object->flags.push_back(objectFlags::AUDIO);
-    object->labels.push_back(label);
+    this->flags|=ObjectFlags::AUDIO;
     this->buffer = buffer;
     this->player = player;
     // job.stop();
@@ -209,7 +206,7 @@ namespace kNgine
 
   AudioEngine::AudioEngine()
   {
-    this->flags.push_back(objectFlags::AUDIO);
+    this->flags|=ObjectFlags::AUDIO;
     this->labels.push_back("AudioEngine");
     if(!openALDevice){
       openALDevice = alcOpenDevice(nullptr);
