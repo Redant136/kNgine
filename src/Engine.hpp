@@ -141,7 +141,10 @@ namespace kNgine
     std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
     std::vector<EngineObject *> objects = std::vector<EngineObject *>();
   public:
-    std::vector<EngineObject*>workingObjects=std::vector<EngineObject*>();
+    u64 maxWorkingObjectsSize=64;
+    u64 workingObjectsSize=0;
+    EngineObject**workingObjects;
+    // std::vector<EngineObject*>workingObjects=std::vector<EngineObject*>();
     std::string window_name="Game";
     v2 window_size={1920.0f,1080.0f};
 
@@ -193,7 +196,7 @@ namespace kNgine
         m.cursorPos = rendPos;
         msgs.push_back(m);
       }
-      for (i32 i = 0; i < Key::KEY_LAST; i++)
+      for (u32 i = 0; i < Key::KEY_LAST; i++)
       {
         if (renderer::keyStatusPressed((Key)i))
         {
@@ -203,7 +206,7 @@ namespace kNgine
           msgs.push_back(m);
         }
       }
-      for(i32 i=Key::KEY_LAST+1;i<Key::MOUSE_LAST;i++){
+      for(u32 i=Key::KEY_LAST+1;i<Key::MOUSE_LAST;i++){
         if(renderer::mouseStatusPressed((Key)i)){
           msg m = msg();
           m.msgType = msg::KEY;
@@ -212,35 +215,31 @@ namespace kNgine
         }
       }
       renderer::clear(0, 0, 0, 0);
-      workingObjects.clear();
-      std::vector<LayerRenderer *> background = findObject<LayerRenderer>(workingObjects, objectFlags::BACKGROUND);
-      for (i32 i = 0; i < background.size(); i++)
+      for (u32 i=0;i<workingObjectsSize;i++)
       {
-        if (background[i]->isEnabled())background[i]->render();
+        workingObjects[i]->update(msgs);
       }
-
-      for (EngineObject *obj : objects)
+      if (workingObjectsSize > 0)
       {
-        if(obj->isEnabled()){
-          obj->update(msgs);
-          workingObjects.push_back(obj);
+        std::vector<LayerRenderer *> background = findObject<LayerRenderer>(workingObjects,workingObjectsSize, objectFlags::BACKGROUND);
+        for (u32 i = 0; i < background.size(); i++)
+        {
+          if (background[i]->isEnabled())
+            background[i]->render();
         }
-      }
-      if (workingObjects.size() > 0)
-      {
-        std::vector<Camera *> cameras = findObject<Camera>(workingObjects, objectFlags::CAMERA);
+        std::vector<Camera *> cameras = findObject<Camera>(workingObjects,workingObjectsSize, objectFlags::CAMERA);
         std::vector<ComponentGameObject *> sprites =
-            findObject<ComponentGameObject>(workingObjects, objectFlags::SPRITE);
+            findObject<ComponentGameObject>(workingObjects, workingObjectsSize, objectFlags::SPRITE);
         cameras = orderObjectsByZ<Camera>(
             std::vector<GameObject *>(cameras.begin(), cameras.end()));
         sprites = orderObjectsByZ<ComponentGameObject>(
             std::vector<GameObject *>(sprites.begin(), sprites.end()));
-        for (i32 i = 0; i < cameras.size(); i++)
+        for (u32 i = 0; i < cameras.size(); i++)
         {
           v2 windowSize = renderer::getWindowSize();
           cameras[i]->updateWindowSize(windowSize.x,
                                        windowSize.y);
-          for (i32 j = 0; j < sprites.size(); j++)
+          for (u32 j = 0; j < sprites.size(); j++)
           {
             if (cameras[i]->position.z <= sprites[j]->position.z)
             {
@@ -249,7 +248,7 @@ namespace kNgine
             cameras[i]->renderObject(sprites[j]);
           }
         }
-        std::vector<LayerRenderer *> UI = findObject<LayerRenderer>(workingObjects, objectFlags::UI);
+        std::vector<LayerRenderer *> UI = findObject<LayerRenderer>(workingObjects, workingObjectsSize, objectFlags::UI);
         for(i32 i=0;i<UI.size();i++){
           if(UI[i]->isEnabled())UI[i]->render();
         }
@@ -267,26 +266,78 @@ namespace kNgine
       objects.push_back(object);
     }
 
+    void reloadObjects() // slower, called during screen transition or stuff
+    {
+      for(u32 i=0;i<workingObjectsSize;i++){
+        workingObjects[i]->unload(std::vector<EngineObject*>(workingObjects,workingObjects+workingObjectsSize));
+      }
+      workingObjectsSize=0;
+      for (EngineObject *obj : objects)
+      {
+        if (obj->isEnabled())
+        {
+          assert(workingObjectsSize+1<maxWorkingObjectsSize);
+          workingObjects[workingObjectsSize]=obj;
+          workingObjectsSize++;
+        }
+      }
+      for(u32 i=0;i<workingObjectsSize;i++){
+        workingObjects[i]->load(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsSize));
+      }
+    }
+
     void start(i32 argc, const char **argv)
     {
-      srand(time(NULL));
+      seedRandomNumberGenerator();
       includeChildren();
       renderer::init(argc, argv);
       renderer::createWindow(window_size.x, window_size.y, window_name.c_str());
       sleepMillis(10);
       renderer::setupWindow(std::bind(&engine::frameUpdate,this));
       renderer::setDrawFunction(std::bind(&engine::frameUpdate, this));
-      this->workingObjects=std::vector<EngineObject*>();
+      workingObjects = new EngineObject *[maxWorkingObjectsSize];
       for (EngineObject *obj : objects)
       {
         obj->init(objects);
-        this->workingObjects.push_back(obj);
       }
+      reloadObjects();
       currentTime = std::chrono::high_resolution_clock::now();
       renderer::launch();
       for (EngineObject *obj : objects)
       {
         obj->end(objects);
+      }
+      delete[] workingObjects;
+    }
+
+    void enableObject(u32 index) // called during runtime of engine
+    {
+      enableObject(objects[index]);
+    }
+
+    void enableObject(EngineObject*object) // called during runtime of engine
+    {
+      if(!object->isEnabled()){
+        object->enable();
+        object->load(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsSize));
+        workingObjects[workingObjectsSize]=object;
+        workingObjectsSize++;
+      }
+    }
+
+    void disableObject(EngineObject* object)
+    {
+      if(object->isEnabled()){
+        object->disable();
+        object->unload(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsSize));
+        bool wasInList=false;
+        for(u32 i=0;i<workingObjectsSize;i++){
+          if(workingObjects[i]==object){
+            workingObjects[i]=workingObjects[workingObjectsSize-1];
+            wasInList=true;
+          }
+        }
+        if(wasInList)workingObjectsSize--;
       }
     }
 

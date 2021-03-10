@@ -67,28 +67,23 @@ target_link_libraries(kNgine PRIVATE glad)
 add_subdirectory(extern/glm)
 target_link_libraries(kNgine PRIVATE glm)
 
+set(wave_enable_tests OFF)
+add_subdirectory(extern/wave)
+target_link_libraries(kNgine PRIVATE wave)
 
 if(APPLE)
   target_link_directories(kNgine PUBLIC "/usr/local/lib")
   target_link_libraries(kNgine PRIVATE "-framework Foundation -framework AppKit -framework CoreAudio")
 elseif(WIN32)
-  set(wave_enable_tests OFF)
-  add_subdirectory(extern/wave)
-  target_link_libraries(kNgine PRIVATE wave)
-
   add_subdirectory(extern/openal-soft)
   target_link_libraries(kNgine PRIVATE OpenAL)
    
   target_link_libraries(kNgine PRIVATE "-lGL -ldl")
 elseif(UNIX)
-  set(wave_enable_tests OFF)
-  add_subdirectory(extern/wave)
-  target_link_libraries(kNgine PRIVATE wave)
-
   add_subdirectory(extern/openal-soft)
   target_link_libraries(kNgine PRIVATE OpenAL)
 
-  target_link_libraries(kNgine PRIVATE "-lGL -ldl -lopenal")
+  target_link_libraries(kNgine PRIVATE "-lGL -ldl")
 endif()
 
 target_include_directories(kNgine PUBLIC include/)

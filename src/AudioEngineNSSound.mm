@@ -48,36 +48,51 @@ namespace kNgine{
     this->flags.push_back(objectFlags::AUDIO);
     this->labels.push_back("AudioEngine");
   }
-  AudioEngine::~AudioEngine(){
-    for(i32 i=0;i<queue.size();i++){
-      queue[i]->loop=false;
-      queue[i]->stop=true;
-      queue[i]->job.join();
-    }
-  }
   void AudioEngine::play(const char* fileName,audiofiletype type){
     BaseAudioBuffer*buffer=createBuffer(fileName,type);
     play(buffer);
   }
   void AudioEngine::play(BaseAudioBuffer* buffer){
     queueBuffer("",buffer,false);
-    this->queue[this->queue.size()-1]->job.start();
+    play(queue.size()-1);
   }
   void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop)
   {
-    AudioQueue*current=new AudioQueue(name,threaded_job([this, index=this->queue.size(),loop]() {
-      NSSoundBuffer*buffer=(NSSoundBuffer*)this->queue[index]->buffer;
-      buffer->sound.loops=loop;
-      [buffer->sound play];
-      while(buffer->sound.playing && !this->queue[index]->stop){
+    this->queue.push_back(AudioQueue(name,buffer));
+  }
+  void AudioEngine::load(std::vector<EngineObject *> objects)
+  {
+  }
+  void AudioEngine::update(std::vector<msg> msgs)
+  {
+    for(u32 i=0;i<queue.size();i++){
+      AudioQueue q=queue[i];
+      NSSoundBuffer*buffer=(NSSoundBuffer*)q.buffer;
+      buffer->sound.loops=q.loop;
+      buffer->sound.volume=q.volume;
+
+      bool bufferPlaying=buffer->sound.playing;
+      if(q.isPlaying&&!bufferPlaying){
+        [buffer->sound play];
       }
-      [buffer->sound stop];
-      if(this->queue[index]->discard){
-        this->queue[index]->job.detach();
+      if(q.stop&&q.isPlaying){
+        [buffer->sound stop];
+        // [buffer->sound rewind];
+        q.isPlaying=false;
       }
-    }),buffer);
-    this->queue.push_back(current);
-   }
+      if(q.isPlaying){
+        q.isPlaying=buffer->sound.isPlaying;
+      }
+      if (q.discard&&!q.isPlaying)
+      {
+        delete buffer;
+        queue.erase(queue.begin()+i);
+      }
+    }
+  }
+  void AudioEngine::unload(std::vector<EngineObject *> objects)
+  {
+  }
 
   BaseAudioBuffer *createBuffer(const char* fileName,audiofiletype type){
     return new NSSoundBuffer(fileName);

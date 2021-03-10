@@ -5,8 +5,6 @@
 #include "EngineObjects.hpp"
 #include "SpriteUtils.hpp"
 
-#include <iostream>
-
 namespace kNgine{
   /* either object that simply serves as container for multiple pieces of ground and 
     just shortens code writen to create multiple similar objects

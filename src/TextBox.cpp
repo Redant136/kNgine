@@ -5,8 +5,6 @@
 #include "Renderer.hpp"
 #include "TextBox.hpp"
 
-#include <iostream>
-
 namespace kNgine{
   TextBoxRenderer::TextBoxRenderer(){
 

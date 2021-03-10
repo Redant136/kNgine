@@ -4,18 +4,22 @@
 #include <string>
 #include "EngineObjects.hpp"
 #include "utils.h"
-#include "kThread.h"
 
 namespace kNgine
 {
-  enum audiofiletype{wav,ogg};
+  enum audiofiletype
+  {
+    wav,
+    ogg
+  };
 
   struct BaseAudioBuffer
-  { //to be extended
+  { //to be extended, contains all library specific options
   protected:
     BaseAudioBuffer() {}
+
   public:
-    virtual ~BaseAudioBuffer(){}
+    virtual ~BaseAudioBuffer() {}
   };
 
   //[AudioPlayer]
@@ -23,7 +27,7 @@ namespace kNgine
   class SoundListenerComponent : public ObjectComponent // there can only be one sound player
   {
   public:
-    f32 globalVolume=1.0f;
+    f32 globalVolume = 1.0f;
     SoundListenerComponent(GameObject *object);
     virtual ~SoundListenerComponent();
   };
@@ -34,14 +38,13 @@ namespace kNgine
   {
   private:
     SoundListenerComponent *player;
-    bool playing=false;
-    f32 volume=1.0f;
-    threaded_job job=threaded_job([](){});
+    bool playing = false;
+    f32 volume = 1.0f;
   public:
     BaseAudioBuffer *buffer;
     SoundEmiterComponent(GameObject *object, const char *fileName, audiofiletype type, SoundListenerComponent *player);
-    SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer,SoundListenerComponent*player);
-    bool isPlaying(){return playing;}
+    SoundEmiterComponent(GameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player);
+    bool isPlaying() { return playing; }
     void play();
   };
 
@@ -49,51 +52,57 @@ namespace kNgine
   class AudioEngine : public EngineObject
   {
   private:
-    struct AudioQueue{
+    struct AudioQueue
+    {
       std::string name;
-      threaded_job job;
-      BaseAudioBuffer*buffer;
-      bool discard=true;
-      bool loop=false;
-      f32 volume=1.0f;
-      bool stop=false;
-      AudioQueue(std::string name,threaded_job job,BaseAudioBuffer*buffer):job(job){
-        this->name=name;
-        this->buffer=buffer;
+      bool isPlaying=false;
+      BaseAudioBuffer *buffer;
+      bool discard = true;
+      bool loop = false;
+      f32 volume = 1.0f;
+      bool stop = false;
+      AudioQueue(std::string name, BaseAudioBuffer *buffer)
+      {
+        this->name = name;
+        this->buffer = buffer;
       }
-      AudioQueue(const AudioQueue& base):job(base.job){
-        this->buffer=base.buffer;
-        this->discard=base.discard;
-        this->loop=base.loop;
-        this->volume=base.volume;
-        this->stop=base.stop;
+      AudioQueue(const AudioQueue &base)
+      {
+        this->buffer = base.buffer;
+        this->discard = base.discard;
+        this->loop = base.loop;
+        this->volume = base.volume;
+        this->stop = base.stop;
       }
       ~AudioQueue()
       {
-        job.join();
-        job.stop();
-        if(discard)delete buffer;
+        if (discard)
+          delete buffer;
       }
     };
-    std::vector<AudioQueue*>queue;
-    SoundListenerComponent *player=NULL;
+    std::vector<AudioQueue> queue;
   public:
     AudioEngine();
-    virtual ~AudioEngine();
-    void play(const char *fileName, audiofiletype type);
-    void play(BaseAudioBuffer* buffer);
-    void queueBuffer(const char*name,BaseAudioBuffer*buffer,bool loop=false);
-
-    void play(u32 index=0){queue[index]->job.start();}
-    void setLoop(bool loop,u32 index = 0) { queue[index]->loop = loop; }
-    void setVolume(f32 volume,u32 index = 0) { queue[index]->volume = volume; }
-    void terminate(u32 index=0){queue[index]->stop=true;}
-    void init(std::vector<EngineObject*>objects){
-      for(EngineObject*obj:objects){
-
+    virtual ~AudioEngine()
+    {
+      for(u32 i=0;i<queue.size();i++){
+        delete queue[i].buffer;
       }
     }
+    void play(const char *fileName, audiofiletype type);
+    void play(BaseAudioBuffer *buffer);
+    void queueBuffer(const char *name, BaseAudioBuffer *buffer, bool loop = false);
+
+    void play(u32 index = 0) { queue[index].isPlaying=true; }
+    void play(const char*name);// TODO(AC) implement this
+    bool isPlaying(u32 index = 0) { return queue[index].isPlaying; }
+    void setLoop(bool loop, u32 index = 0) { queue[index].loop = loop; }
+    void setVolume(f32 volume, u32 index = 0) { queue[index].volume = volume; }
+    void terminate(u32 index = 0) { queue[index].stop = true; }
+    virtual void load(std::vector<EngineObject *> objects);
+    virtual void update(std::vector<msg>msgs);
+    virtual void unload(std::vector<EngineObject *> objects);
   };
 
-  BaseAudioBuffer *createBuffer(const char* fileName,audiofiletype type);
+  BaseAudioBuffer *createBuffer(const char *fileName, audiofiletype type);
 } // namespace kNgine

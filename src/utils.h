@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 #include <math.h>
 #include <time.h>
 
@@ -1692,7 +1693,7 @@ static rgbcolor HSVToRGBColor(v3 hsv)
   return rgbcolor((i32)floorf(newColor.r * 255) % 255, (i32)floorf(newColor.g * 255) % 255, (i32)floorf(newColor.b * 255) % 255, 1);
 }
 
-enum Key
+typedef enum Key
 {
   SPACE,
   APOSTROPHE,
@@ -1796,9 +1797,22 @@ enum Key
   MOUSE7,
   MOUSE8,
   MOUSE_LAST = MOUSE8
-};
+} Key;
 
-static void SeedRandomNumberGenerator(void)
+typedef enum cardinal8dir
+{
+  NORTH,
+  SOUTH,
+  EAST,
+  WEST,
+  NORTH_EAST,
+  NORTH_WEST,
+  SOUTH_EAST,
+  SOUTH_WEST,
+  CENTER
+} cardinal8dir;
+
+static void seedRandomNumberGenerator(void)
 {
   srand((u32 )time(0));
 }

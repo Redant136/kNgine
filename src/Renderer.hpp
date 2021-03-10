@@ -34,7 +34,7 @@ void drawLine(v2 points[2]);
 void drawPoint(v2 point);
 void drawLineLoop(v2* points, i32 numPoints);
 void drawCircle(v2 startPoint, double radius);
-void drawColorMap(unsigned char* colors, v2 position, i32 width, i32 height,
+void drawBuffer(u8* colors, v2 position, i32 width, i32 height,
                   i32 realWidth, i32 realHeight, i32 numChannels,v3 rotation);
 void bindTexture(u32 * textureIndex, unsigned char* colors, v2 position, i32 width,
                  i32 height, i32 realWidth, i32 realHeight, i32 numChannels);

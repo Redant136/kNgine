@@ -13,39 +13,42 @@ static void kjoin(kThread &thread)
 {
   thread.thread.join();
 }
-static void threadDetach(std::function<void(void)> func)
+static void threadDetach(std::function<void*(void*)> func,void*arg)
 {
-  std::thread t = std::thread(func);
+  std::thread t = std::thread(func,arg);
   t.detach();
 }
-static kThread threadLaunch(std::function<void(void)> func)
+static kThread threadLaunch(std::function<void*(void*)> func,void*arg)
 {
-  return {std::thread(func)};
+  return {std::thread(func,arg)};
 }
 class threaded_job final
 { // use "fflush(stdout)" if printing
 private:
   bool jobStart = false, jobEnded = true, alive = true;
+  void*arg=NULL;
   kThread thread;
-  std::function<void(void)> job;
+  std::function<void*(void*)> job;
 
 public:
-  threaded_job(std::function<void(void)> job)
+  threaded_job(std::function<void*(void*)> job)
   {
     this->job = job;
-    thread = threadLaunch([this]() {
+    std::function<void*(void*)>f;
+    thread = threadLaunch([this](void*a)->void*{
       while (alive)
       {
         if (jobStart)
         {
           jobStart = false;
           jobEnded = false;
-          this->job();
+          this->job(this->arg);
           jobEnded = true;
         }
         sleepMillis(1); // WHY DO I NEED THIS?!?!?
       }
-    });
+      return NULL;
+    },NULL);
   }
   threaded_job(const threaded_job &base) : threaded_job(base.job) {}
   ~threaded_job()
@@ -54,10 +57,11 @@ public:
     kjoin(thread);
   }
 
-  void start() // start job
+  void start(void*arg=NULL) // start job
   {
     if (jobEnded)
     {
+      this->arg=arg;
       jobStart = true;
       jobEnded = false;
     }
@@ -77,34 +81,14 @@ public:
   {
     alive = false;
   }
-  void changeJob(std::function<void(void)> newJob) // changes the function called on job.start(), not tested
+  void changeJob(std::function<void*(void*)> newJob) // changes the function called on job.start(), not tested
   {
     this->job = newJob;
   }
 };
 #else
-typedef struct threaded_job
-{
-  kThread thread;
-  void (*job)();
-  bool jobStart;
-  bool jobEnded;
-  bool alive;
-} threaded_job;
-threaded_job threaded_jobInit(void (*function)());
-#define threaded_job(function) threaded_jobInit(function)
-static threaded_job jobInit(kThread thread, void (*function)())
-{
-  threaded_job job = {thread, function, false, false, true};
-  return job;
-}
 #ifdef _WIN32
 // windows.h already included
-static DWORD WINAPI threadLaunchFunction(LPVOID Param)
-{
-  ((void (*)())function)();
-  return 0;
-}
 typedef struct kThread
 {
   Handle threadHandle;
@@ -156,56 +140,95 @@ threaded_job threaded_jobInit(void (*function)())
 }
 #elif defined(__unix__) || defined(__APPLE__)
 #include <pthread.h>
-static void *threadLaunchFunction(void *function)
-{
-  ((void (*)())function)();
-  return NULL;
-}
 typedef struct kThread
 {
   pthread_t threadIndex;
 } kThread;
+static kThread kThreadInit(pthread_t threadIndex)
+{
+  kThread k = {threadIndex};
+  return k;
+}
 static void kjoin(kThread thread)
 {
   pthread_join(thread.threadIndex, NULL);
 }
-static void threadDetach(void (*function)())
+static void threadDetach(void*(*function)(void*),void*arg)
 {
   pthread_t thread;
-  pthread_create(&thread, NULL, threadLaunchFunction, function);
+  pthread_create(&thread, NULL, function, arg);
   pthread_detach(thread);
 }
-
-kThread threadLaunch(void (*function)())
+static kThread threadLaunch(void*(*function)(void*),void*arg)
 {
   pthread_t threadIndex;
-  pthread_create(&threadIndex, NULL, threadLaunchFunction, function);
+  pthread_create(&threadIndex, NULL, function, arg);
   return kThreadInit(threadIndex);
 }
+
+typedef struct threaded_job
+{
+  bool jobStart;
+  bool jobEnded;
+  bool alive;
+  kThread thread;
+  void *(*job)(void *);
+  void *arg;
+} threaded_job;
+
+#include <stdio.h>
+
+static threaded_job threaded_jobInit(void *(*function)(void *))
+{
+  threaded_job job = {false, true, true,{0},function,NULL};
+  return job;
+}
+#define threaded_job(function) threaded_jobInit(function)
 static void *threaded_jobFunc(void *pJob)
 {
-  threaded_job *job = (threaded_job *)job;
+  threaded_job *job = (threaded_job *)pJob;
   while (job->alive)
   {
     if (job->jobStart)
     {
       job->jobStart = false;
       job->jobEnded = false;
-      job->job();
+      job->job(job->arg);
       job->jobEnded = true;
     }
     sleepMillis(1);
   }
   return NULL;
 }
-threaded_job threaded_jobInit(void (*function)())
-{
+static void activateJob(threaded_job*job){
   pthread_t threadIndex;
-  threaded_job job;
-  pthread_create(&threadIndex, NULL, threaded_jobFunc, &job);
+  pthread_create(&threadIndex, NULL, threaded_jobFunc, job);
   kThread thread = {threadIndex};
-  job = jobInit(thread, function);
-  return job;
+  job->thread=thread;
 }
+#define threaded_jobCreateActivate(jobName, function) threaded_job(function);activateJob(&jobName);
+static void threaded_jobStart(threaded_job *job,void*arg)
+{
+  if(job->jobEnded){
+    job->arg=arg;
+    job->jobEnded=false;
+    job->jobStart=true;
+  }
+}
+static void threaded_jobJoin(threaded_job *job) // wait until job has finished executing
+{
+  while(!job->jobEnded){
+  }
+}
+static void threaded_jobStop(threaded_job*job) // use with caution, if used from inside thread, will cause hang loop
+{
+  job->alive=false;
+  kjoin(job->thread);
+}
+static void threaded_jobDetach(threaded_job*job) // stops thread but will only join when object destroyed
+{
+  job->alive=false;
+}
+
 #endif
 #endif

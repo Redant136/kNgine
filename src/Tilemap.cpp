@@ -6,7 +6,6 @@
 #include "PhysicsB2.hpp"
 #include "Tilemap.hpp"
 
-#include <iostream>
 namespace kNgine
 {
   std::vector<b2Shape*>shapesList;

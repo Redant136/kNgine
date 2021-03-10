@@ -11,15 +11,13 @@ namespace kNgine
   public:
     std::vector<Sprite> list = std::vector<Sprite>();
     std::vector<u32 > texIndex = std::vector<u32 >();
-    bool loadOnInit = true;
     SpriteMap();
     virtual ~SpriteMap();
     void init(std::vector<EngineObject *> objects);
     void end(std::vector<EngineObject *> objects);
-    void enable(){if(!enabled){load();enabled=true;}}
-    void disable(){if(enabled){unload();enabled=false;}}
-    void load();
-    void unload();
+    void load(std::vector<EngineObject *> objects);
+    void unload(std::vector<EngineObject *> objects);
+    void offsetPixelsInSprites(cardinal8dir dir, u32 offset);
   };
   class SpriteMapAccessor:public SpriteAccessor{
   public:

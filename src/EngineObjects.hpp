@@ -43,29 +43,123 @@ namespace kNgine
     AUDIO,
     AUDIOPLAYER
   };
+  namespace temp{
+    enum objectFlags2
+    {
+      NONE          = 0<<0,
+      GAME_OBJECT   = 1<<0,
+      COMPONENT     = 1<<1,
+      PARENT        = 1<<2,
+      CHILD         = 1<<3,
+      SPRITE        = 1<<4,
+      Sprite_List   = 1<<5,
+      RENDERER      = 1<<6,
+      Physics       = 1<<7,
+      AUDIO         = 1<<8
+    };
+  };
 
-
-  typedef struct {
-    u32 width,height,numChannels;
-    u8*colorMap;
+  typedef struct
+  {
+    u32 width, height, numChannels;
+    u8 *buffer;
   } Sprite;
-  inline Sprite SpriteInit(u32 width,u32 height,u32 numChannels,u8*colorMap){
-    Sprite spr={width,height,numChannels,colorMap};
+  inline Sprite SpriteInit(u32 width, u32 height, u32 numChannels, u8 *buffer)
+  {
+    Sprite spr = {width, height, numChannels, buffer};
     return spr;
   }
-  #define Sprite(width, height, channels, map) SpriteInit(width, height, channels, map)
-  inline Sprite fillSprite(u32 width,u32 height,rgbcolor fill){
-    u8*colorMap=new u8[width*height*4];
-    for(int i=0;i<width*height*4;i+=4){
+#define Sprite(width, height, channels, buffer) SpriteInit(width, height, channels, buffer)
+  inline Sprite fillSprite(u32 width, u32 height, rgbcolor fill)
+  {
+    u8 *colorMap = new u8[width * height * 4];
+    for (int i = 0; i < width * height * 4; i += 4)
+    {
       colorMap[i + 0] = fill.r;
       colorMap[i + 1] = fill.g;
       colorMap[i + 2] = fill.b;
       colorMap[i + 3] = fill.a;
     }
-    return Sprite(width,height,4,colorMap);
+    return Sprite(width, height, 4, colorMap);
   }
-  inline void freeSprite(Sprite sprite){
-    delete[]sprite.colorMap;
+  inline void freeSprite(Sprite sprite)
+  {
+    delete[] sprite.buffer;
+  }
+  inline void offsetPixelsInSprite(Sprite *sprite, cardinal8dir dir, u32 offset)
+  {
+    if (dir == CENTER)
+    {
+      return;
+    }
+    iv2 copyLine;
+    iv2 cut = iv2(0, 0);
+    switch (dir)
+    {
+    case NORTH:
+      copyLine = iv2(0, 0);
+      cut.y = offset;
+      break;
+    case WEST:
+      copyLine = iv2(0, 0);
+      cut.x = offset;
+      break;
+    case SOUTH:
+      copyLine = iv2(0, sprite->height-1);
+      cut.y = -offset;
+      break;
+    case EAST:
+      copyLine = iv2(sprite->width-1, 0);
+      cut.x = -offset;
+      break;
+    case NORTH_WEST:
+      copyLine = iv2(0, 0);
+      cut.y = offset;
+      cut.x = offset;
+      break;
+    case NORTH_EAST:
+      copyLine = iv2(sprite->width-1, 0);
+      cut.y = offset;
+      cut.x = -offset;
+      break;
+    case SOUTH_WEST:
+      copyLine = iv2(0, sprite->height-1);
+      cut.y = -offset;
+      cut.x = offset;
+      break;
+    case SOUTH_EAST:
+      copyLine = iv2(sprite->width-1, sprite->height-1);
+      cut.y = -offset;
+      cut.x = -offset;
+      break;
+    default:
+      copyLine = iv2(0, 0);
+      break;
+    }
+
+    u8 *newBuffer = new u8[sprite->width * sprite->height * sprite->numChannels];
+    for (u32 i = 0; i < sprite->height; i++)
+    {
+      i32 y = i - cut.y;
+      if (y < 0 || y >= sprite->height)
+      {
+        y = copyLine.y;
+      }
+      for (u32 j = 0; j < sprite->width; j++)
+      {
+        i32 x = j - cut.x;
+        if (x < 0 || x >= sprite->width)
+        {
+          x = copyLine.x;
+        }
+        for (u32 c = 0; c < sprite->numChannels; c++)
+        {
+          newBuffer[(j + i * sprite->width) * sprite->numChannels + c] = sprite->buffer[(x + y * sprite->width) * sprite->numChannels + c];
+        }
+      }
+    }
+    delete[] sprite->buffer;
+    sprite->buffer = newBuffer;
   }
 
   // an object containing important info to draw image for the engine
@@ -89,29 +183,40 @@ namespace kNgine
   class EngineObject
   {
   protected:
-    bool enabled=true;
+    bool enabled = true;
   public:
-    std::vector<std::string> labels;
-    std::vector<objectFlags> flags;
-    EngineObject(){ labels = std::vector<std::string>(); flags=std::vector<objectFlags>();}
-    EngineObject(const EngineObject&base){this->labels=base.labels;this->flags=base.flags;this->enabled=base.enabled;}
-    virtual ~EngineObject(){}
-    bool isEnabled(){return enabled;}
-    virtual void enable(){enabled=true;}
-    virtual void disable(){enabled=false;}
-    virtual void update(std::vector<msg> msgs){}
-    virtual void init(std::vector<EngineObject *> objects){}
-    virtual void end(std::vector<EngineObject *> objects){}
+    std::vector<std::string> labels = std::vector<std::string>();
+    std::vector<objectFlags> flags = std::vector<objectFlags>();
+    EngineObject()
+    {
+      labels = std::vector<std::string>();
+      flags = std::vector<objectFlags>();
+    }
+    EngineObject(const EngineObject &base)
+    {
+      this->labels = base.labels;
+      this->flags = base.flags;
+      this->enabled = base.enabled;
+    }
+    virtual ~EngineObject() {}
+    bool isEnabled() { return enabled; }
+    virtual void enable() { enabled = true; }
+    virtual void disable() { enabled = false; }
+    virtual void update(std::vector<msg> msgs) {}
+    virtual void init(std::vector<EngineObject *> objects) {}
+    virtual void end(std::vector<EngineObject *> objects) {}
+    virtual void load(std::vector<EngineObject*>object){}
+    virtual void unload(std::vector<EngineObject*>object) {}
   };
   // object to be positionned in game
   class GameObject : public EngineObject
   {
   public:
-    v3 position=v3(0,0,0);
-    v3 rotation=v3(0,0,0); // v3(yz,xz,xy)
+    v3 position = v3(0, 0, 0);
+    v3 rotation = v3(0, 0, 0); // v3(yz,xz,xy)
     GameObject();
-    GameObject(const GameObject&base);
-    virtual ~GameObject(){}
+    GameObject(const GameObject &base);
+    virtual ~GameObject() {}
   };
   // modular objects for implementations, define modules labels using [name]
   class ObjectComponent
@@ -128,6 +233,7 @@ namespace kNgine
   {
   protected:
     std::vector<ObjectComponent *> components;
+
   public:
     ComponentGameObject();
     ComponentGameObject(const ComponentGameObject &base);
@@ -150,25 +256,14 @@ namespace kNgine
       return NULL;
     }
     void removeComponent(ObjectComponent *component);
-    void removeComponent(std::string flag) { removeComponent(findComponent(flag));}
+    void removeComponent(std::string flag) { removeComponent(findComponent(flag)); }
   };
   //[sprite]
   class SpriteAccessor : public ObjectComponent
   {
   public:
-    enum
-    {
-      CENTER,
-      TOP_LEFT,
-      TOP_RIGHT,
-      BOT_LEFT,
-      BOT_RIGHT,
-      TOP,
-      BOT,
-      RIGHT,
-      LEFT
-    } spriteLocation;
-    v2 offset={0.0f,0.0f};// offset in game units
+    cardinal8dir spriteLocation;
+    v2 offset = {0.0f, 0.0f}; // offset in game units
     SpriteAccessor(GameObject *base);
     virtual bool hasToSave() = 0;
     virtual Sprite *getSprite() = 0; //pointer for not having to call copy
@@ -179,13 +274,13 @@ namespace kNgine
       {
       case CENTER:
         return v2(-0.5, -0.5);
-      case TOP_LEFT:
+      case NORTH_WEST:
         return v2(0, 0);
-      case TOP_RIGHT:
+      case NORTH_EAST:
         return v2(-1, 0);
-      case BOT_LEFT:
+      case SOUTH_WEST:
         return v2(0, -1);
-      case BOT_RIGHT:
+      case SOUTH_EAST:
         return v2(-1, -1);
       default:
         return v2(0, 0);
@@ -209,10 +304,11 @@ namespace kNgine
     v2 getSpriteDimensions();
   };
 
-  class LayerRenderer:public EngineObject{
+  class LayerRenderer : public EngineObject
+  {
   public:
     LayerRenderer();
-    LayerRenderer(const LayerRenderer&base):EngineObject(base){}
+    LayerRenderer(const LayerRenderer &base) : EngineObject(base) {}
     virtual void render();
   };
   // do not implement, is automatically generated when starting engine for the
@@ -231,17 +327,16 @@ namespace kNgine
   public:
     std::vector<GameObject *> children;
     ParentObject();
-    ParentObject(const ParentObject&base);
+    ParentObject(const ParentObject &base);
   };
 
   struct EngineEvent
   {
     std::string name;
-    std::vector<EngineObject *> *objects;
-    std::function<void(std::vector<EngineObject *> objects)> event;
+    std::function<void*(void*)> event;
   };
   void addEvent(EngineEvent event);
-  void callEvent(std::string name);
+  void* callEvent(std::string name,void*arg=NULL);
 
   template <class T = EngineObject>
   std::vector<T *> findObject(std::vector<EngineObject *> objects,
@@ -283,33 +378,78 @@ namespace kNgine
     return res;
   };
   template <class T = EngineObject>
-  std::vector<T *> findObject(std::vector<EngineObject *> objects,
+  std::vector<T *> findObject(EngineObject **objects, u32 objectsSize,
                               objectFlags flag)
   {
     std::vector<EngineObject *> valid = std::vector<EngineObject *>();
     if (flag == objectFlags::ALL)
     {
-      valid = objects;
+      valid=std::vector<EngineObject*>(objects,objects+objectsSize);
     }
     else
     {
-      for (EngineObject *obj : objects)
+      for (u32 i = 0; i < objectsSize; i++)
       {
-        for (objectFlags f : obj->flags)
+        for (objectFlags f : objects[i]->flags)
         {
           if (f == objectFlags::CHILD)
           {
-            for (objectFlags fchild : ((ChildrenObject *)obj)->object->flags)
+            for (objectFlags fchild : ((ChildrenObject *)objects[i])->object->flags)
             {
               if (fchild == objectFlags::ALL || fchild == flag)
               {
-                valid.push_back(((ChildrenObject *)obj)->object);
+                valid.push_back(((ChildrenObject *)objects[i])->object);
               }
             }
           }
           if (f == objectFlags::ALL || f == flag)
           {
-            valid.push_back(obj);
+            valid.push_back(objects[i]);
+          }
+        }
+      }
+    }
+    std::vector<T *> res = std::vector<T *>();
+    for (EngineObject *obj : valid)
+    {
+      res.push_back((T *)obj);
+    }
+    return res;
+  };
+  template <class T = EngineObject>
+  std::vector<T *> findObject(std::vector<EngineObject *> objects,
+                              objectFlags flag)
+  {
+    return findObject<T>(objects.data(),objects.size(),flag);
+  };
+  template <class T = EngineObject>
+  std::vector<T *> findObjectBlacklist(EngineObject **objects, u32 objectsSize,
+                                       objectFlags flag)
+  {
+    std::vector<EngineObject *> valid = std::vector<EngineObject *>();
+    if (flag == objectFlags::ALL)
+    {
+      return std::vector<T *>();
+    }
+    else
+    {
+      for (u32 i = 0; i < objectsSize; i++)
+      {
+        for (objectFlags f : objects[i]->flags)
+        {
+          if (f == objectFlags::CHILD)
+          {
+            for (objectFlags fchild : ((ChildrenObject *)objects[i])->object->flags)
+            {
+              if (!(fchild == objectFlags::ALL || fchild == flag))
+              {
+                valid.push_back(((ChildrenObject *)objects[i])->object);
+              }
+            }
+          }
+          if (!(f == objectFlags::ALL || f == flag))
+          {
+            valid.push_back(objects[i]);
           }
         }
       }
@@ -405,8 +545,9 @@ namespace kNgine
   template <class T = GameObject>
   std::vector<T *> orderObjectsByZ(std::vector<GameObject *> objects)
   {
-    if(objects.size()==0){
-      return std::vector<T*>();
+    if (objects.size() == 0)
+    {
+      return std::vector<T *>();
     }
     for (i32 i = 0; i < objects.size() - 1; i++)
     {

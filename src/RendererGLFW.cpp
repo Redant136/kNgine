@@ -507,7 +507,7 @@ void drawCircle(v2 startPoint, double radius) {
     renderer::drawLine(line);
   }
 }
-void drawColorMap(u8* colors, v2 position, i32 width, i32 height,
+void drawBuffer(u8* colors, v2 position, i32 width, i32 height,
                   i32 realWidth, i32 realHeight, i32 numChannels, v3 rotation) {
   f32 vertices[] = {0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
                       0.5,   -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,

@@ -154,8 +154,8 @@ namespace kNgine{
 
   SpriteAccessor::SpriteAccessor(GameObject *base) : ObjectComponent(base) {
     this->label = "[sprite]";
-    this->object->flags.push_back(objectFlags::SPRITE);
-    this->object->labels.push_back(label);
+    base->flags.push_back(objectFlags::SPRITE);
+    base->labels.push_back(label);
   }
 
   SpriteComponent::SpriteComponent(ComponentGameObject *base)
@@ -239,12 +239,13 @@ namespace kNgine{
   void addEvent(EngineEvent event){
     events.push_back(event);
   }
-  void callEvent(std::string name){
+  void* callEvent(std::string name,void*arg){
     for(i32 i=0;i<events.size();i++){
       if(events[i].name==name){
-        events[i].event(*events[i].objects);
+        return events[i].event(arg);
       }
     }
+    return NULL;
   }
 
   #ifdef PNG_H

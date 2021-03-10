@@ -16,7 +16,6 @@
 #endif
 
 #include <iostream>
-#include <thread>
 
 bool check_alc_errors(const std::string &filename, const std::uint_fast32_t line, ALCdevice *device)
 {
@@ -45,6 +44,7 @@ bool check_alc_errors(const std::string &filename, const std::uint_fast32_t line
       std::cerr << "UNKNOWN ALC ERROR: " << error;
     }
     std::cerr << std::endl;
+    assert(0);
     return false;
   }
   return true;
@@ -59,6 +59,7 @@ namespace kNgine
   {
   public:
     ALuint buffer;
+    ALuint source=0;
     OpenALBuffer(const char* fileName,audiofiletype type)
     {
       if(type==audiofiletype::wav){
@@ -175,36 +176,35 @@ namespace kNgine
     object->labels.push_back(label);
     this->buffer = buffer;
     this->player = player;
-    job.stop();
-    job = threaded_job([this](){
-      ALuint source;
-      alGenSources(1, &source);
-      alSourcef(source, AL_PITCH, 1);
-      // store volume in player obj
-      alSourcef(source, AL_GAIN, this->volume);
-      alSource3f(source, AL_POSITION, this->object->position.x - this->player->object->position.x, this->object->position.y - this->player->object->position.y, this->object->position.z - this->player->object->position.z);
-      //nope nope nope
-      alSource3f(source, AL_VELOCITY, 0, 0, 0);
-      alSourcei(source, AL_LOOPING, AL_FALSE);
-      alSourcei(source, AL_BUFFER, ((OpenALBuffer*)this->buffer)->buffer);
-      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
-      {
-        return;
-      }
-
-      alSourcePlay(source);
-      ALint state = AL_PLAYING;
-      while (state == AL_PLAYING)
-      {
-        alGetSourcei(source, AL_SOURCE_STATE, &state);
-      }
-      alDeleteSources(1, &source);
-    });
+    // job.stop();
+    // job = threaded_job([this](){
+    //   ALuint source;
+    //   alGenSources(1, &source);
+    //   alSourcef(source, AL_PITCH, 1);
+    //   // store volume in player obj
+    //   alSourcef(source, AL_GAIN, this->volume);
+    //   alSource3f(source, AL_POSITION, this->object->position.x - this->player->object->position.x, this->object->position.y - this->player->object->position.y, this->object->position.z - this->player->object->position.z);
+    //   //nope nope nope
+    //   alSource3f(source, AL_VELOCITY, 0, 0, 0);
+    //   alSourcei(source, AL_LOOPING, AL_FALSE);
+    //   alSourcei(source, AL_BUFFER, ((OpenALBuffer*)this->buffer)->buffer);
+    //   if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+    //   {
+    //     return;
+    //   }
+    //   alSourcePlay(source);
+    //   ALint state = AL_PLAYING;
+    //   while (state == AL_PLAYING)
+    //   {
+    //     alGetSourcei(source, AL_SOURCE_STATE, &state);
+    //   }
+    //   alDeleteSources(1, &source);
+    // });
   }
   void SoundEmiterComponent::play()
   {
-    job.join();
-    job.start();
+    // job.join();
+    // job.start();
   }
 
   AudioEngine::AudioEngine()
@@ -235,9 +235,8 @@ namespace kNgine
   AudioEngine::~AudioEngine(){
     for (i32 i = 0; i < queue.size(); i++)
     {
-      queue[i]->loop = false;
-      queue[i]->stop = true;
-      queue[i]->job.join();
+      queue[i].loop = false;
+      queue[i].stop = true;
     }
     if (!(openALDevice))
     {
@@ -255,6 +254,7 @@ namespace kNgine
       }
     }
   }
+  
   void AudioEngine::play(const char *fileName, audiofiletype type)
   {
     BaseAudioBuffer *buffer = createBuffer(fileName,type);
@@ -262,42 +262,77 @@ namespace kNgine
   }
   void AudioEngine::play(BaseAudioBuffer* buffer){
     queueBuffer("",buffer,false);
-    this->queue[this->queue.size()-1]->job.start();
+    play(queue.size()-1);
   }
   void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop){
-    AudioQueue*current=new AudioQueue(name,threaded_job([this,index=this->queue.size(),loop]() {
-        AudioQueue*current=this->queue[index];
-        ALuint buffer=((OpenALBuffer *)current->buffer)->buffer;
-        ALuint source;
-        // store volume in player obj
-        alGenSources(1, &source);
-        alSourcef(source, AL_PITCH, 1);
-        alSourcef(source, AL_GAIN, current->volume);
-        alSource3f(source, AL_POSITION, 0, 0, 0);
-        alSource3f(source, AL_VELOCITY, 0, 0, 0);
-        if(current->loop){
-          alSourcei(source, AL_LOOPING, AL_TRUE);
-        }else{
-          alSourcei(source, AL_LOOPING, AL_FALSE);
-        }
-        alSourcei(source, AL_BUFFER, buffer);
-        if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
-        {
-          std::cerr << "gen source" << std::endl;
-        }
-        alSourcePlay(source);
-        ALint state = AL_PLAYING;
-        while (state == AL_PLAYING && !current->stop)
-        {
-          alGetSourcei(source, AL_SOURCE_STATE, &state);
-        }
-        alDeleteSources(1, &source);
-        if (current->discard)
-        {
-          current->job.detach();
-        }
-      }),buffer);
-    queue.push_back(current);
+    this->queue.push_back(AudioQueue(name,buffer));
+  }
+  void AudioEngine::load(std::vector<EngineObject *> objects)
+  {
+    for(AudioQueue q:queue){
+      ALuint albuffer = ((OpenALBuffer *)q.buffer)->buffer;
+      ALuint source;
+      alGenSources(1, &source);
+      alSourcef(source, AL_PITCH, 1);
+      alSource3f(source, AL_POSITION, 0, 0, 0);
+      alSource3f(source, AL_VELOCITY, 0, 0, 0);
+      alSourcei(source, AL_BUFFER, albuffer);
+      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+      {
+        std::cerr << "gen source" << std::endl;
+      }
+      ((OpenALBuffer *)q.buffer)->source=source;
+    }
+  }
+  void AudioEngine::update(std::vector<msg> msgs)
+  {
+    for(u32 i=0;i<queue.size();i++){
+      AudioQueue q=queue[i];
+      OpenALBuffer*buffer=(OpenALBuffer*)q.buffer;
+      alSourcef(buffer->source, AL_GAIN, q.volume);
+      if (q.loop)
+      {
+        alSourcei(buffer->source, AL_LOOPING, AL_TRUE);
+      }
+      else
+      {
+        alSourcei(buffer->source, AL_LOOPING, AL_FALSE);
+      }
+      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+      {
+        std::cerr << "gen source" << std::endl;
+      }
+      ALint state = AL_PLAYING;
+      alGetSourcei(buffer->source, AL_SOURCE_STATE, &state);
+      if(q.isPlaying&&state==AL_STOPPED){
+        alSourcePlay(buffer->source);
+        state = AL_PLAYING;
+      }
+      if(q.stop&&q.isPlaying){
+        alSourceStop(buffer->source);
+        alSourceRewind(buffer->source);
+        q.isPlaying=false;
+      }
+      if(q.isPlaying){
+        alGetSourcei(buffer->source, AL_SOURCE_STATE, &state);
+        q.isPlaying=state==AL_PLAYING;
+      }
+      if (q.discard&&!q.isPlaying)
+      {
+        alDeleteSources(1, &buffer->source);
+        buffer->source = 0;
+        delete buffer;
+        queue.erase(queue.begin()+i);
+      }
+    }
+  }
+  void AudioEngine::unload(std::vector<EngineObject *> objects)
+  {
+    for(AudioQueue q:queue){
+      OpenALBuffer *buffer = (OpenALBuffer *)q.buffer;
+      alDeleteSources(1, &buffer->source);
+      buffer->source=0;
+    }
   }
 
   BaseAudioBuffer *createBuffer(const char *fileName, audiofiletype type)
