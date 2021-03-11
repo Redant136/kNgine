@@ -51,7 +51,7 @@ namespace kNgine
   }
   static void addLayerOrderDef(LayerOrder*order, const char *layer)
   {
-    assert(order->orderLength + 1 < order->maxOrderLength);
+    assert(order->orderLength < order->maxOrderLength);
     order->ids[order->orderLength] = {order->orderLength, layer};
     order->orderLength++;
   }

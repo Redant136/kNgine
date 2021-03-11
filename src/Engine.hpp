@@ -58,7 +58,7 @@ namespace kNgine
     EngineObject**workingObjects;
     std::string window_name="Game";
     v2 window_size={1920.0f,1080.0f};
-    LayerOrder renderingLayerOrder;// layer order must have camera layer
+    LayerOrder renderingLayerOrder; // layer order must have a DEFAULT_LAYER layer at index 0
 
     void frameUpdate()
     {
@@ -129,11 +129,11 @@ namespace kNgine
       renderer::setDrawFunction(std::bind(&engine::frameUpdate, this));
       // std::cout<<renderingLayerOrder.maxOrderLength<<std::endl;
       if(renderingLayerOrder.maxOrderLength<=0){
-        renderingLayerOrder = LayerOrder(32);
+        renderingLayerOrder = LayerOrder(3);
+        addLayerOrderDef(renderingLayerOrder, DEFAULT_LAYER);
         addLayerOrderDef(renderingLayerOrder, BACKGROUND);
-        addLayerOrderDef(renderingLayerOrder, CAMERA);
         addLayerOrderDef(renderingLayerOrder, UI);
-        renderingLayerOrder.order = (u32[]){layerO(renderingLayerOrder, BACKGROUND), layerO(renderingLayerOrder, CAMERA), layerO(renderingLayerOrder, CAMERA)};
+        renderingLayerOrder.order = (u32[]){layerO(renderingLayerOrder, BACKGROUND), layerO(renderingLayerOrder, DEFAULT_LAYER), layerO(renderingLayerOrder, CAMERA)};
       }
       workingObjects = new EngineObject *[maxWorkingObjectsLength];
       addEvent({"getEngineObjects",[this](void*arg)->void*{
@@ -182,7 +182,7 @@ namespace kNgine
       {
         if (obj->isEnabled())
         {
-          assert(workingObjectsLength + 1 < maxWorkingObjectsLength);
+          assert(workingObjectsLength < maxWorkingObjectsLength);
           workingObjects[workingObjectsLength] = obj;
           workingObjectsLength++;
         }

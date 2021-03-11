@@ -3,17 +3,17 @@
 # main branch
 
 ## currently working on
-- [x] fix openal audioEngine, cant be f rn
-- [x] renderer flag with another object to determine rendering order 
 - [ ] audio engine audioqueue obj not pointer
+- [ ] text in renderer
+- [ ] display debug info such as fps
 ## testing
 - [ ] test openal audio engine
 ## next step
-- [ ] text in renderer
-- [ ] display debug info such as fps
 ## research
-- [ ] improve renderer
+- [ ] improve glfw renderer
 ## procrastinating
+- [ ] object info tool
+- [ ] map editor tool
 - [ ] tileset auto mapping
 - [ ] tileset prejoin sprites (implement + test)
 - [ ] tileset round hitbox
@@ -30,6 +30,7 @@
 ## next step
 - [ ] loading ogg audio files (mp3 requires license)
 ## procrastinating
+## research
 - [ ] coreaudio
 - [ ] metal api
 ## someday... maybe

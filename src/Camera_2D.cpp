@@ -38,7 +38,7 @@ namespace kNgine
 
   void Camera::init(std::vector<EngineObject *> objects){
     this->engineInfo = {(u64 *)callEvent("getEngineObjectsSize"), (EngineObject **)callEvent("getEngineObjects")};
-    this->layer = layerO(*(LayerOrder*)callEvent("getEngineRendererLayers"),CAMERA);
+    this->layer = layerO(*(LayerOrder *)callEvent("getEngineRendererLayers"), DEFAULT_LAYER);
   }
 
   void Camera::updateWindowSize(i32 windowWidth, i32 windowHeight)
