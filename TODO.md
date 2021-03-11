@@ -3,19 +3,21 @@
 # main branch
 
 ## currently working on
-- [x] bitfield object flags
+- [x] fix openal audioEngine, cant be f rn
+- [x] renderer flag with another object to determine rendering order 
+- [ ] audio engine audioqueue obj not pointer
 ## testing
+- [ ] test openal audio engine
 ## next step
-- [ ] fix openal audioEngine, cant be f rn
 - [ ] text in renderer
 - [ ] display debug info such as fps
 ## research
 - [ ] improve renderer
 ## procrastinating
-- [ ] renderer flag with another object to determine rendering order 
 - [ ] tileset auto mapping
 - [ ] tileset prejoin sprites (implement + test)
 - [ ] tileset round hitbox
+- [ ] hitbox blacklist
 - [ ] datadesk https://github.com/ryanfleury/data_desk
 ## someday... maybe
 - [ ] select audio out openAL

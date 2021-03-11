@@ -50,7 +50,7 @@ bool mouseStatusPressed(Key e);
 // utils methods
 i32 getWindowWidth();
 i32 getWindowHeight();
-v2 getWindowSize();
+iv2 getWindowSize();
 
 
 }  // namespace renderer

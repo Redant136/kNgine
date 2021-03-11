@@ -32,23 +32,52 @@ namespace kNgine
     CHILD       = 1 << 3,
     SPRITE      = 1 << 4,
     Sprite_List = 1 << 5,
-    BACKGROUND  = 1 << 6,
-    CAMERA      = 1 << 7,
-    UI          = 1 << 8,
-    Physics     = 1 << 9,
-    AUDIO       = 1 << 10
+    RENDERER_LAYER    = 1 << 6,
+    Physics     = 1 << 7,
+    AUDIO       = 1 << 8
   };
 
-  typedef struct
+  struct LayerOrder{
+     u32 maxOrderLength;
+     u32 orderLength;
+     struct {u32 layerId;const char*name;}*ids;
+     u32*order;
+  };
+  static LayerOrder layerOrderInit(u32 maxSize)// have to allocate array
   {
-    u32 width, height, numChannels;
-    u8 *buffer;
-  } Sprite;
-  inline Sprite SpriteInit(u32 width, u32 height, u32 numChannels, u8 *buffer)
-  {
-    Sprite spr = {width, height, numChannels, buffer};
-    return spr;
+    LayerOrder lo = {maxSize, 0, NULL, NULL};
+    lo.ids = (typeof(lo.ids))malloc(sizeof(*lo.ids) * maxSize);
+    return lo;
   }
+  static void addLayerOrderDef(LayerOrder*order, const char *layer)
+  {
+    assert(order->orderLength + 1 < order->maxOrderLength);
+    order->ids[order->orderLength] = {order->orderLength, layer};
+    order->orderLength++;
+  }
+  static u32 layerO(LayerOrder order,const char*name)
+  {
+    for(u32 i=0;i<order.orderLength;i++){
+      if(order.ids[i].name==name){
+        return order.ids[i].layerId;
+      }
+    }
+    return 0;
+  }
+#define LayerOrder(maxSize) layerOrderInit(maxSize)
+#define addLayerOrderDef(order, layer) addLayerOrderDef(&order, #layer)
+#define layerO(order, layer) layerO(order, #layer)
+
+  typedef struct
+ {
+   u32 width, height, numChannels;
+   u8 *buffer;
+ } Sprite;
+ inline Sprite SpriteInit(u32 width, u32 height, u32 numChannels, u8 *buffer)
+ {
+   Sprite spr = {width, height, numChannels, buffer};
+   return spr;
+ }
 #define Sprite(width, height, channels, buffer) SpriteInit(width, height, channels, buffer)
   inline Sprite fillSprite(u32 width, u32 height, rgbcolor fill)
   {
@@ -141,23 +170,6 @@ namespace kNgine
     delete[] sprite->buffer;
     sprite->buffer = newBuffer;
   }
-
-  // an object containing important info to draw image for the engine
-  // struct Sprite
-  // {
-  //   // in pixels
-  //   i32 width, height, numChannels;
-  //   std::vector<u8> colorMap;
-  //   Sprite();
-  //   Sprite(i32 width, i32 height, rgbcolor colorFill);
-  //   Sprite(i32 width, i32 height, u8 *colorMap);
-  //   Sprite(i32 width, i32 height, i32 numChannels, u8 *colorMap);
-  //   Sprite(i32 width, i32 height, i32 numChannels,
-  //          std::vector<u8> colorMap);
-  //   Sprite(const Sprite &base);
-  //   ~Sprite();
-  //   void resize(i32 newWidth, i32 newHeight);
-  // };
 
   // objects for engine
   class EngineObject
@@ -286,13 +298,25 @@ namespace kNgine
     v2 getSpriteDimensions();
   };
 
-  class LayerRenderer : public EngineObject
+  class LayerRenderer : public GameObject
   {
   public:
-    LayerRenderer();
-    LayerRenderer(const LayerRenderer &base) : EngineObject(base) {}
-    virtual void render();
+    u32 layer=0;// to be used in conjunction with LayerOrder
+    LayerRenderer() { this->flags |= ObjectFlags::RENDERER_LAYER; }
+    LayerRenderer(const LayerRenderer &base) : GameObject(base) {}
+    virtual void updateWindowSize(i32 windowWidth, i32 windowHeight){}
+    virtual void render(){}
   };
+  static std::vector<LayerRenderer*>getRenderersAtLayer(std::vector<LayerRenderer*>renderers,u32 layer){
+    std::vector<LayerRenderer*>res;
+    for(u32 i=0;i<renderers.size();i++){
+      if(renderers[i]->layer==layer){
+        res.push_back(renderers[i]);
+      }
+    }
+    return res;
+  }
+
   // do not implement, is automatically generated when starting engine for the
   // parent object
   class ChildrenObject final : public GameObject
@@ -302,7 +326,12 @@ namespace kNgine
     v3 &parentPosition;
     v3 previousParentPosition;
     ChildrenObject(GameObject *object, v3 &parentPosition);
+    ~ChildrenObject(){delete object;}
+    void init(std::vector<EngineObject*>obj){object->init(obj);}
+    void load(std::vector<EngineObject*>obj){object->load(obj);}
     void update(std::vector<msg> msgs);
+    void unload(std::vector<EngineObject *> obj) { object->unload(obj); }
+    void end(std::vector<EngineObject *> obj) { object->end(obj); }
   };
   class ParentObject : public ComponentGameObject
   {
@@ -320,8 +349,8 @@ namespace kNgine
   void addEvent(EngineEvent event);
   void *callEvent(std::string name, void *arg = NULL);
 
-  template <class T = EngineObject>
-  std::vector<T *> findObject(std::vector<EngineObject *> objects,
+  template <class T = EngineObject,class I = EngineObject>
+  std::vector<T *> findObject(std::vector<I *> objects,
                               std::string label)
   {
     std::vector<EngineObject *> valid = std::vector<EngineObject *>();
@@ -359,8 +388,47 @@ namespace kNgine
     }
     return res;
   };
-  template <class T = EngineObject>
-  std::vector<T *> findObject(EngineObject **objects, u32 objectsSize,
+  template <class T = EngineObject, class I = EngineObject>
+  std::vector<T *> findObjectBlacklist(std::vector<I *> objects,
+                                       std::string label) // returns all objects that dont have the label
+  {
+    std::vector<EngineObject *> valid = std::vector<EngineObject *>();
+    if (label == "ALL")
+    {
+      return std::vector<T *>();
+    }
+    else
+    {
+      for (EngineObject *obj : objects)
+      {
+        for (std::string s : obj->labels)
+        {
+          if (s == "_CHILDREN_")
+          {
+            for (std::string schild : ((ChildrenObject *)obj)->object->labels)
+            {
+              if (!(schild == "ALL" || schild == label))
+              {
+                valid.push_back(((ChildrenObject *)obj)->object);
+              }
+            }
+          }
+          if (!(s == "ALL" || s == label))
+          {
+            valid.push_back(obj);
+          }
+        }
+      }
+    }
+    std::vector<T *> res = std::vector<T *>();
+    for (EngineObject *obj : valid)
+    {
+      res.push_back((T *)obj);
+    }
+    return res;
+  };
+  template <class T = EngineObject, class I = EngineObject>
+  std::vector<T *> findObject(I **objects, u32 objectsSize,
                               u64 flags)
   {
     std::vector<EngineObject *> valid = std::vector<EngineObject *>();
@@ -392,8 +460,8 @@ namespace kNgine
     }
     return res;
   };
-  template <class T = EngineObject>
-  std::vector<T *> findObject(std::vector<EngineObject *> objects,
+  template <class T = EngineObject, class I = EngineObject>
+  std::vector<T *> findObject(std::vector<I *> objects,
                               u64 flags)
   {
     return findObject<T>(objects.data(), objects.size(), flags);
@@ -401,8 +469,8 @@ namespace kNgine
 
   Sprite importSprite(const char *filename);
 
-  template <class T = GameObject>
-  std::vector<T *> orderObjectsByZ(std::vector<GameObject *> objects)
+  template <class T = GameObject, class I = GameObject>
+  std::vector<T *> orderObjectsByZ(std::vector<I *> objects)
   {
     if (objects.size() == 0)
     {
@@ -414,7 +482,7 @@ namespace kNgine
       {
         if (objects[j]->position.z > objects[j + 1]->position.z)
         {
-          GameObject *temp = objects[j];
+          I *temp = objects[j];
           objects[j] = objects[j + 1];
           objects[j + 1] = temp;
         }

@@ -5,12 +5,16 @@
 #include "kThread.h"
 #include "AudioEngine.hpp"
 
+#include <stdio.h>
+
 namespace kNgine{
   struct NSSoundBuffer:public BaseAudioBuffer
   {
   public:
+    int number=0;
     NSSound*sound;
     NSSoundBuffer(const char* fileName){
+      number=1;
       NSURL *inputFileURL = [NSURL fileURLWithPath:[NSString stringWithUTF8String:fileName]];
       sound=[[NSSound alloc]initWithContentsOfURL:inputFileURL byReference:NO];
     }
@@ -46,6 +50,13 @@ namespace kNgine{
     this->flags|=AUDIO;
     this->labels.push_back("AudioEngine");
   }
+  AudioEngine::~AudioEngine()
+  {
+    for(u32 i=0;i<queue.size();i++){
+      delete queue[i];
+    }
+  }
+
   void AudioEngine::play(const char* fileName,audiofiletype type){
     BaseAudioBuffer*buffer=createBuffer(fileName,type);
     play(buffer);
@@ -56,7 +67,7 @@ namespace kNgine{
   }
   void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop)
   {
-    this->queue.push_back(AudioQueue(name,buffer));
+    queue.push_back(new AudioQueue(name,buffer));
   }
   void AudioEngine::load(std::vector<EngineObject *> objects)
   {
@@ -64,24 +75,30 @@ namespace kNgine{
   void AudioEngine::update(std::vector<msg> msgs)
   {
     for(u32 i=0;i<queue.size();i++){
-      AudioQueue q=queue[i];
-      NSSoundBuffer*buffer=(NSSoundBuffer*)q.buffer;
-      buffer->sound.loops=q.loop;
-      buffer->sound.volume=q.volume;
+      AudioQueue*q=queue[i];
+      NSSoundBuffer*buffer=(NSSoundBuffer*)q->buffer;
+      buffer->sound.loops=q->loop;
+      buffer->sound.volume=q->volume;
 
-      bool bufferPlaying=buffer->sound.playing;
-      if(q.isPlaying&&!bufferPlaying){
+      bool bufferPlaying=false;
+      if(buffer->sound.playing){// i hate objective-c
+        bufferPlaying=true;
+      }else{
+        bufferPlaying=false;
+      }
+      if(q->isPlaying&&!bufferPlaying){
         [buffer->sound play];
       }
-      if(q.stop&&q.isPlaying){
+      if(q->stop&&q->isPlaying){
         [buffer->sound stop];
-        // [buffer->sound rewind];
-        q.isPlaying=false;
+        q->isPlaying=false;
       }
-      if(q.isPlaying){
-        q.isPlaying=buffer->sound.isPlaying;
+      if(buffer->sound.playing){// i hate objective-c
+        q->isPlaying=true;
+      }else{
+        q->isPlaying=false;
       }
-      if (q.discard&&!q.isPlaying)
+      if (q->discard&&!q->isPlaying)
       {
         delete buffer;
         queue.erase(queue.begin()+i);

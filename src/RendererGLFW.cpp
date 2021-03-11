@@ -163,10 +163,10 @@ i32 getWindowHeight() {
   glfwGetWindowSize(window, &width, &height);
   return height;
 }
-v2 getWindowSize() {
+iv2 getWindowSize() {
   i32 width, height;
   glfwGetWindowSize(window, &width, &height);
-  return v2(width, height);
+  return iv2(width, height);
 }
 
 // key input
@@ -562,7 +562,7 @@ void drawBuffer(u8* colors, v2 position, i32 width, i32 height,
   // draw------
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  v2 windowSize = getWindowSize();
+  iv2 windowSize = getWindowSize();
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);
   glm::mat4 transform = glm::mat4(1.0f);
@@ -649,7 +649,7 @@ void drawTexture(u32 textureIndex, v2 position, i32 width, i32 height,
   // draw------
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  v2 windowSize = getWindowSize();
+  iv2 windowSize = getWindowSize();
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, textureIndex);
   glm::mat4 transform = glm::mat4(1.0f);

@@ -12,7 +12,7 @@ namespace kNgine{
   void TextBoxRenderer::displayTextBox(v2 positionRatio, v2 displayRatioSize)
   {
     renderer::setDrawColor(255,255,255);
-    v2 displaySize=renderer::getWindowSize();
+    iv2 displaySize=renderer::getWindowSize();
     renderer::drawRect({positionRatio.x*displaySize.x,positionRatio.y*displaySize.y},displaySize.x*displayRatioSize.x,displaySize.y*displayRatioSize.y);
   }
   void TextBoxRenderer::update(std::vector<msg> msgs){

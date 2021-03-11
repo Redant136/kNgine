@@ -44,6 +44,6 @@ https://github.com/Redant136/kNgine.git
 - Tileset: object to hold a tileset/tilemap
 - Tileset::TileDef : a definition of a tile. add a tile using the position in the array of it's definition
 ## Events
-- an event contains a name, a pointer to the engine objects(use engine.workingObjects), a function as ``(std::vector<EngineObject*>){}``
+- an event contains a name and a function as ``void*(void*arg){}``
 - addEvent(Event)
 - callEvent(name)

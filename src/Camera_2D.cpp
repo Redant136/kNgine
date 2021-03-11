@@ -1,5 +1,3 @@
-#define engine_2D
-
 #include <vector>
 #include <string>
 #include <cmath>
@@ -8,6 +6,8 @@
 #include "Renderer.hpp"
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
+
+#include <iostream>
 
 namespace kNgine
 {
@@ -32,9 +32,14 @@ namespace kNgine
                  v2(0, windowHeight), v2(windowWidth, 0));
     }
     this->fov = fov;
-    this->flags|=ObjectFlags::CAMERA;
+    this->flags|=ObjectFlags::RENDERER_LAYER;
   }
   Camera::~Camera() {}
+
+  void Camera::init(std::vector<EngineObject *> objects){
+    this->engineInfo = {(u64 *)callEvent("getEngineObjectsSize"), (EngineObject **)callEvent("getEngineObjects")};
+    this->layer = layerO(*(LayerOrder*)callEvent("getEngineRendererLayers"),CAMERA);
+  }
 
   void Camera::updateWindowSize(i32 windowWidth, i32 windowHeight)
   {
@@ -124,91 +129,65 @@ namespace kNgine
     }
   }
 
-  void Camera::render(std::vector<ComponentGameObject *> objects)
+  void Camera::render()
   {
-    objects = orderObjectsByZ<ComponentGameObject>(
-        std::vector<GameObject *>(objects.begin(), objects.end()));
-    for (i32 i = 0; i < objects.size() && objects[i]->position.z < position.z; i++)
-    {
-      if (!isBlacklist(objects[i]->labels))
-      {
-        SpriteAccessor *compn =
-            objects[i]->findComponent<SpriteAccessor>("[sprite]");
-        v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(objects[i]->position),
-                                                              toV2(compn->getSpriteDimensions()))),
-                                        posMapper.map(toV2(objects[i]->position)));
-        u8 *colorMap = compn->getSprite()->buffer;
-
-        v2 spriteOffset = compn->getSpriteLocation();
-        spriteOffset.x *= spriteDimensions.x;
-        spriteOffset.y *= spriteDimensions.y;
-        renderer::drawBuffer(
-            colorMap,
-            V2AddV2(posMapper.map(V2MinusV2(toV2(objects[i]->position), toV2(position))),
-                    spriteOffset),
-            spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
-            compn->getSprite()->height, compn->getSprite()->numChannels, objects[i]->rotation);
-        if (showDebugHitBox)
-        {
-          // showLines(objects[i], posMapper, position);
-        }
-      }
+    std::vector<ComponentGameObject *> objects = findObject<ComponentGameObject>(this->engineInfo.engineObjects, *this->engineInfo.engineObjectLength, ObjectFlags::SPRITE);
+    objects = findObjectBlacklist<ComponentGameObject>(orderObjectsByZ<ComponentGameObject>(objects),"");
+    for(u32 i=0;i<objects.size();i++){
+      render(objects[i]);
     }
   }
-  void Camera::renderObject(ComponentGameObject *object)
-  {
-    if (!isBlacklist(object->labels))
-    {
-      SpriteAccessor *compn =
-          object->findComponent<SpriteAccessor>("[sprite]");
-      i32 numSprite = 1;
-      bool isSpriteList = false;
-      if (!(compn))
-      {
-        numSprite = object->findComponent<SpriteList>("[sprite_list]")->getSpriteListLength();
-        isSpriteList = true;
-      }
 
-      for (i32 i = 0; i < numSprite; i++)
+  void Camera::render(ComponentGameObject *object)
+  {
+    SpriteAccessor *compn =
+        object->findComponent<SpriteAccessor>("[sprite]");
+    i32 numSprite = 1;
+    bool isSpriteList = false;
+    if (!(compn))
+    {
+      numSprite = object->findComponent<SpriteList>("[sprite_list]")->getSpriteListLength();
+      isSpriteList = true;
+    }
+    for (i32 i = 0; i < numSprite; i++)
+    {
+      if (isSpriteList)
       {
-        if (isSpriteList)
-        {
-          compn = object->findComponent<SpriteList>("[sprite_list]")->getSpriteList()[i];
-        }
-        v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(object->position),
-                                                              compn->getSpriteDimensions())),
-                                        posMapper.map(toV2(object->position)));
-        spriteDimensions.y *= -1;
-        u8 *colorMap = compn->getSprite()->buffer;
-        v2 spriteOffset = compn->getSpriteLocation();
-        spriteOffset.x *= spriteDimensions.x;
-        spriteOffset.y *= spriteDimensions.y;
-        v3 rotation = object->rotation;
-        rotation.z *= std::abs(spriteDimensions.x) / spriteDimensions.x;
-        rotation.z *= std::abs(spriteDimensions.y) / spriteDimensions.y;
-        if (compn->hasToSave())
-        {
-          renderer::drawBuffer(
-              colorMap,
-              V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
-                      spriteOffset),
-              spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
-              compn->getSprite()->height, compn->getSprite()->numChannels, rotation);
-        }
-        else
-        {
-          SpriteMapAccessor *ref = (SpriteMapAccessor *)compn;
-          renderer::drawTexture(
-              ref->spriteList->texIndex[ref->getMapIndex()],
-              V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
-                      spriteOffset),
-              spriteDimensions.x, spriteDimensions.y, rotation);
-        }
+        compn = object->findComponent<SpriteList>("[sprite_list]")->getSpriteList()[i];
       }
-      if (showDebugHitBox)
+      v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(object->position),
+                                                            compn->getSpriteDimensions())),
+                                      posMapper.map(toV2(object->position)));
+      spriteDimensions.y *= -1;
+      u8 *colorMap = compn->getSprite()->buffer;
+      v2 spriteOffset = compn->getSpriteLocation();
+      spriteOffset.x *= spriteDimensions.x;
+      spriteOffset.y *= spriteDimensions.y;
+      v3 rotation = object->rotation;
+      rotation.z *= std::abs(spriteDimensions.x) / spriteDimensions.x;
+      rotation.z *= std::abs(spriteDimensions.y) / spriteDimensions.y;
+      if (compn->hasToSave())
       {
-        // showLines(object, posMapper, position);
+        renderer::drawBuffer(
+            colorMap,
+            V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
+                    spriteOffset),
+            spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
+            compn->getSprite()->height, compn->getSprite()->numChannels, rotation);
       }
+      else
+      {
+        SpriteMapAccessor *ref = (SpriteMapAccessor *)compn;
+        renderer::drawTexture(
+            ref->spriteList->texIndex[ref->getMapIndex()],
+            V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
+                    spriteOffset),
+            spriteDimensions.x, spriteDimensions.y, rotation);
+      }
+    }
+    if (showDebugHitBox)
+    {
+      // showLines(object, posMapper, position);
     }
   }
 } // namespace kNgine

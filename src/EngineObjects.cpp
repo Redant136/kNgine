@@ -11,97 +11,6 @@
 namespace kNgine{
   std::vector<EngineEvent> events;
 
-  // Sprite::Sprite() {
-  //   width = 1;
-  //   height = 1;
-  //   numChannels = 4;
-  //   colorMap = std::vector<unsigned char>(4);
-  //   colorMap[0] = 0;
-  //   colorMap[1] = 0;
-  //   colorMap[2] = 0;
-  //   colorMap[3] = 0;
-  // }
-  // Sprite::Sprite(i32 width, i32 height, rgbcolor colorFill) {
-  //   this->width = width;
-  //   this->height = height;
-  //   this->numChannels = 4;
-  //   this->colorMap = std::vector<unsigned char>(width * height * numChannels);
-  //   for (i32 i = 0; i < width * height * numChannels; i += numChannels) {
-  //     colorMap[i] = colorFill.r;
-  //     colorMap[i + 1] = colorFill.g;
-  //     colorMap[i + 2] = colorFill.b;
-  //     colorMap[i + 3] = colorFill.a;
-  //   }
-  // }
-  // Sprite::Sprite(i32 width, i32 height, unsigned char *colorMap) {
-  //   this->width = width;
-  //   this->height = height;
-  //   this->numChannels = 4;
-  //   this->colorMap = std::vector<unsigned char>(width * height * numChannels);
-  //   for (i32 i = 0; i < width * height * numChannels; i++) {
-  //     this->colorMap[i] = colorMap[i];
-  //   }
-  // }
-  // Sprite::Sprite(i32 width, i32 height, i32 numChannels,
-  //               unsigned char *colorMap) {
-  //   this->width = width;
-  //   this->height = height;
-  //   this->numChannels = numChannels;
-  //   this->colorMap = std::vector<unsigned char>(width * height * numChannels);
-  //   for (i32 i = 0; i < width * height * numChannels; i++) {
-  //     this->colorMap[i] = colorMap[i];
-  //   }
-  // }
-  // Sprite::Sprite(i32 width, i32 height, i32 numChannels,
-  //               std::vector<unsigned char> colorMap) {
-  //   this->width = width;
-  //   this->height = height;
-  //   this->numChannels = numChannels;
-  //   this->colorMap = colorMap;
-  // }
-  // Sprite::Sprite(const Sprite &base) {
-  //   this->width = base.width;
-  //   this->height = base.height;
-  //   this->numChannels = base.numChannels;
-  //   this->colorMap = base.colorMap;
-  // }
-  // Sprite::~Sprite() {}
-  // void Sprite::resize(i32 newWidth, i32 newHeight) {
-  //   // if image is same size with accuracy of 1 pixel, do nothing
-  //   if (abs(width - newWidth) <= 2 && abs(height - newHeight) <= 2) return;
-  //   std::vector<rgbcolor> newColorMap = std::vector<rgbcolor>();
-  //   for (i32 i = 0; i < width * height * numChannels; i += numChannels) {
-  //     if (numChannels == 3)
-  //       newColorMap.push_back(rgbcolor(this->colorMap[i], this->colorMap[i + 1],
-  //                                   this->colorMap[i + 2], 255));
-  //     else
-  //       newColorMap.push_back(rgbcolor(this->colorMap[i], this->colorMap[i + 1],
-  //                                   this->colorMap[i + 2],
-  //                                   this->colorMap[i + 3]));
-  //   }
-  //   std::vector<rgbcolor> temp = std::vector<rgbcolor>(newWidth * newHeight);
-  //   f32 x_ratio = width / (float)newWidth;
-  //   f32 y_ratio = height / (float)newHeight;
-  //   f32 px, py;
-  //   for (i32 i = 0; i < newHeight; i++) {
-  //     for (i32 j = 0; j < newWidth; j++) {
-  //       px = (i32 )(j * x_ratio);
-  //       py = (i32 )(i * y_ratio);
-  //       temp[(i * newWidth) + j] = newColorMap[(i32 )((py * width) + px)];
-  //     }
-  //   }
-  //   this->width = newWidth;
-  //   this->height = newHeight;
-  //   this->numChannels = 4;
-  //   this->colorMap = std::vector<unsigned char>();
-  //   for (i32 i = 0; i < temp.size(); i++) {
-  //     this->colorMap.push_back(temp[i].r);
-  //     this->colorMap.push_back(temp[i].g);
-  //     this->colorMap.push_back(temp[i].b);
-  //     this->colorMap.push_back(temp[i].a);
-  //   }
-  // }
-
   GameObject::GameObject() { flags |= ObjectFlags::GAME_OBJECT; }
   GameObject::GameObject(const GameObject&base):EngineObject(base)
   {
@@ -188,13 +97,6 @@ namespace kNgine{
   void SpriteComponent::update(std::vector<msg> msgs) {}
   Sprite *SpriteComponent::getSprite() { return &sprite; }
   v2 SpriteComponent::getSpriteDimensions() { return spriteDimension; }
-
-  LayerRenderer::LayerRenderer(){
-    flags|=ObjectFlags::UI;
-    labels.push_back("UI");
-  }
-  void LayerRenderer::render(){
-  }
 
   ChildrenObject::ChildrenObject(GameObject *object, v3 &parentPosition)
       : parentPosition(parentPosition) {

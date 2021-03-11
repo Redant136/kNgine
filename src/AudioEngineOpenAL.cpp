@@ -230,10 +230,9 @@ namespace kNgine
     }
   }
   AudioEngine::~AudioEngine(){
-    for (i32 i = 0; i < queue.size(); i++)
+    for (u32 i = 0; i < queue.size(); i++)
     {
-      queue[i].loop = false;
-      queue[i].stop = true;
+      delete queue[i];
     }
     if (!(openALDevice))
     {
@@ -262,12 +261,12 @@ namespace kNgine
     play(queue.size()-1);
   }
   void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop){
-    this->queue.push_back(AudioQueue(name,buffer));
+    this->queue.push_back(new AudioQueue(name,buffer));
   }
   void AudioEngine::load(std::vector<EngineObject *> objects)
   {
-    for(AudioQueue q:queue){
-      ALuint albuffer = ((OpenALBuffer *)q.buffer)->buffer;
+    for(AudioQueue*q:queue){
+      ALuint albuffer = ((OpenALBuffer *)q->buffer)->buffer;
       ALuint source;
       alGenSources(1, &source);
       alSourcef(source, AL_PITCH, 1);
@@ -278,16 +277,16 @@ namespace kNgine
       {
         std::cerr << "gen source" << std::endl;
       }
-      ((OpenALBuffer *)q.buffer)->source=source;
+      ((OpenALBuffer *)q->buffer)->source=source;
     }
   }
   void AudioEngine::update(std::vector<msg> msgs)
   {
     for(u32 i=0;i<queue.size();i++){
-      AudioQueue q=queue[i];
-      OpenALBuffer*buffer=(OpenALBuffer*)q.buffer;
-      alSourcef(buffer->source, AL_GAIN, q.volume);
-      if (q.loop)
+      AudioQueue*q=queue[i];
+      OpenALBuffer*buffer=(OpenALBuffer*)q->buffer;
+      alSourcef(buffer->source, AL_GAIN, q->volume);
+      if (q->loop)
       {
         alSourcei(buffer->source, AL_LOOPING, AL_TRUE);
       }
@@ -301,20 +300,19 @@ namespace kNgine
       }
       ALint state = AL_PLAYING;
       alGetSourcei(buffer->source, AL_SOURCE_STATE, &state);
-      if(q.isPlaying&&state==AL_STOPPED){
+      if(q->isPlaying&&state==AL_STOPPED){
         alSourcePlay(buffer->source);
         state = AL_PLAYING;
       }
-      if(q.stop&&q.isPlaying){
+      if(q->stop&&q->isPlaying){
         alSourceStop(buffer->source);
         alSourceRewind(buffer->source);
-        q.isPlaying=false;
-      }
-      if(q.isPlaying){
+        q->isPlaying=false;
+      }else{
         alGetSourcei(buffer->source, AL_SOURCE_STATE, &state);
-        q.isPlaying=state==AL_PLAYING;
+        q->isPlaying=state==AL_PLAYING;
       }
-      if (q.discard&&!q.isPlaying)
+      if (q->discard&&!q->isPlaying)
       {
         alDeleteSources(1, &buffer->source);
         buffer->source = 0;
@@ -325,8 +323,8 @@ namespace kNgine
   }
   void AudioEngine::unload(std::vector<EngineObject *> objects)
   {
-    for(AudioQueue q:queue){
-      OpenALBuffer *buffer = (OpenALBuffer *)q.buffer;
+    for(AudioQueue*q:queue){
+      OpenALBuffer *buffer = (OpenALBuffer *)q->buffer;
       alDeleteSources(1, &buffer->source);
       buffer->source=0;
     }

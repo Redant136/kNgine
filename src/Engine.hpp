@@ -12,6 +12,7 @@
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
 
+#include <iostream>
 namespace kNgine
 {
   class engine
@@ -52,11 +53,12 @@ namespace kNgine
       }
     }
   public:
-    u64 maxWorkingObjectsSize=64;
-    u64 workingObjectsSize=0;
+    u64 maxWorkingObjectsLength=64;
+    u64 workingObjectsLength=0;
     EngineObject**workingObjects;
     std::string window_name="Game";
     v2 window_size={1920.0f,1080.0f};
+    LayerOrder renderingLayerOrder;// layer order must have camera layer
 
     void frameUpdate()
     {
@@ -92,42 +94,20 @@ namespace kNgine
         }
       }
       renderer::clear(0, 0, 0, 0);
-      for (u32 i=0;i<workingObjectsSize;i++)
+      for (u32 i=0;i<workingObjectsLength;i++)
       {
         workingObjects[i]->update(msgs);
       }
-      if (workingObjectsSize > 0)
+      if (workingObjectsLength > 0)
       {
-        std::vector<LayerRenderer *> background = findObject<LayerRenderer>(workingObjects,workingObjectsSize, ObjectFlags::BACKGROUND);
-        for (u32 i = 0; i < background.size(); i++)
-        {
-          if (background[i]->isEnabled())
-            background[i]->render();
-        }
-        std::vector<Camera *> cameras = findObject<Camera>(workingObjects,workingObjectsSize, ObjectFlags::CAMERA);
-        std::vector<ComponentGameObject *> sprites =
-            findObject<ComponentGameObject>(workingObjects, workingObjectsSize, ObjectFlags::SPRITE);
-        cameras = orderObjectsByZ<Camera>(
-            std::vector<GameObject *>(cameras.begin(), cameras.end()));
-        sprites = orderObjectsByZ<ComponentGameObject>(
-            std::vector<GameObject *>(sprites.begin(), sprites.end()));
-        for (u32 i = 0; i < cameras.size(); i++)
-        {
-          v2 windowSize = renderer::getWindowSize();
-          cameras[i]->updateWindowSize(windowSize.x,
-                                       windowSize.y);
-          for (u32 j = 0; j < sprites.size(); j++)
-          {
-            if (cameras[i]->position.z <= sprites[j]->position.z)
-            {
-              break;
-            }
-            cameras[i]->renderObject(sprites[j]);
+        iv2 windowSize=renderer::getWindowSize();
+        std::vector<LayerRenderer*>renderers=findObject<LayerRenderer>(workingObjects,workingObjectsLength,ObjectFlags::RENDERER_LAYER);
+        for(u32 i=0;i<renderingLayerOrder.orderLength;i++){
+          std::vector<LayerRenderer *> layer = orderObjectsByZ<LayerRenderer>(getRenderersAtLayer(renderers, renderingLayerOrder.order[i]));
+          for(LayerRenderer*r:layer){
+            r->updateWindowSize(windowSize.x, windowSize.y);
+            r->render();
           }
-        }
-        std::vector<LayerRenderer *> UI = findObject<LayerRenderer>(workingObjects, workingObjectsSize, ObjectFlags::UI);
-        for(i32 i=0;i<UI.size();i++){
-          if(UI[i]->isEnabled())UI[i]->render();
         }
         // 60fps ~= 0.016
         // 1e-05 =  0.00001
@@ -147,7 +127,24 @@ namespace kNgine
       sleepMillis(10);
       renderer::setupWindow(std::bind(&engine::frameUpdate,this));
       renderer::setDrawFunction(std::bind(&engine::frameUpdate, this));
-      workingObjects = new EngineObject *[maxWorkingObjectsSize];
+      // std::cout<<renderingLayerOrder.maxOrderLength<<std::endl;
+      if(renderingLayerOrder.maxOrderLength<=0){
+        renderingLayerOrder = LayerOrder(32);
+        addLayerOrderDef(renderingLayerOrder, BACKGROUND);
+        addLayerOrderDef(renderingLayerOrder, CAMERA);
+        addLayerOrderDef(renderingLayerOrder, UI);
+        renderingLayerOrder.order = (u32[]){layerO(renderingLayerOrder, BACKGROUND), layerO(renderingLayerOrder, CAMERA), layerO(renderingLayerOrder, CAMERA)};
+      }
+      workingObjects = new EngineObject *[maxWorkingObjectsLength];
+      addEvent({"getEngineObjects",[this](void*arg)->void*{
+        return workingObjects;
+      }});
+      addEvent({"getEngineObjectsSize", [this](void *arg) -> void * {
+        return &workingObjectsLength;
+      }});
+      addEvent({"getEngineRendererLayers", [this](void *arg) -> void * {
+        return &renderingLayerOrder;
+      }});
       for (EngineObject *obj : objects)
       {
         obj->init(objects);
@@ -155,6 +152,10 @@ namespace kNgine
       reloadObjects();
       currentTime = std::chrono::high_resolution_clock::now();
       renderer::launch();
+      for(u32 i=0;i<workingObjectsLength;i++)
+      {
+        workingObjects[i]->unload(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
+      }
       for (EngineObject *obj : objects)
       {
         obj->end(objects);
@@ -172,23 +173,23 @@ namespace kNgine
     // runtime execution functions
     void reloadObjects() // slower, called during screen transition or stuff
     {
-      for (u32 i = 0; i < workingObjectsSize; i++)
+      for (u32 i = 0; i < workingObjectsLength; i++)
       {
-        workingObjects[i]->unload(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsSize));
+        workingObjects[i]->unload(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
       }
-      workingObjectsSize = 0;
+      workingObjectsLength = 0;
       for (EngineObject *obj : objects)
       {
         if (obj->isEnabled())
         {
-          assert(workingObjectsSize + 1 < maxWorkingObjectsSize);
-          workingObjects[workingObjectsSize] = obj;
-          workingObjectsSize++;
+          assert(workingObjectsLength + 1 < maxWorkingObjectsLength);
+          workingObjects[workingObjectsLength] = obj;
+          workingObjectsLength++;
         }
       }
-      for (u32 i = 0; i < workingObjectsSize; i++)
+      for (u32 i = 0; i < workingObjectsLength; i++)
       {
-        workingObjects[i]->load(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsSize));
+        workingObjects[i]->load(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
       }
     }
     void addObject(EngineObject *object)
@@ -203,24 +204,24 @@ namespace kNgine
     {
       if(!object->isEnabled()){
         object->enable();
-        object->load(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsSize));
-        workingObjects[workingObjectsSize]=object;
-        workingObjectsSize++;
+        object->load(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
+        workingObjects[workingObjectsLength]=object;
+        workingObjectsLength++;
       }
     }
     void disableObject(EngineObject* object)
     {
       if(object->isEnabled()){
         object->disable();
-        object->unload(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsSize));
+        object->unload(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
         bool wasInList=false;
-        for(u32 i=0;i<workingObjectsSize;i++){
+        for(u32 i=0;i<workingObjectsLength;i++){
           if(workingObjects[i]==object){
-            workingObjects[i]=workingObjects[workingObjectsSize-1];
+            workingObjects[i]=workingObjects[workingObjectsLength-1];
             wasInList=true;
           }
         }
-        if(wasInList)workingObjectsSize--;
+        if(wasInList)workingObjectsLength--;
       }
     }
     void bindOnPress(std::function<void(void)>func,Key e){
