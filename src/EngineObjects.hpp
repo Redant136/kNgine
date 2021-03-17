@@ -38,22 +38,27 @@ namespace kNgine
   };
 
   struct LayerOrder{
-     u32 maxOrderLength;
-     u32 orderLength;
+     size_t maxOrderLength;
+     size_t orderLength;
      struct {u32 layerId;const char*name;}*ids;
      u32*order;
   };
-  static LayerOrder layerOrderInit(u32 maxSize)// have to allocate array
+  static LayerOrder layerOrderInit(size_t maxSize)// have to allocate array
   {
-    LayerOrder lo = {maxSize, 0, NULL, NULL};
+    LayerOrder lo = {maxSize, 0, NULL, new u32[maxSize]};
     lo.ids = (typeof(lo.ids))malloc(sizeof(*lo.ids) * maxSize);
     return lo;
   }
   static void addLayerOrderDef(LayerOrder*order, const char *layer)
   {
     assert(order->orderLength < order->maxOrderLength);
-    order->ids[order->orderLength] = {order->orderLength, layer};
+    order->ids[order->orderLength] = {(u32)order->orderLength, layer};
     order->orderLength++;
+  }
+  static void setLayerOrder(LayerOrder*order,u32*o){
+    for(u32 i=0;i<order->orderLength;i++){
+      order->order[i]=o[i];
+    }
   }
   static u32 layerO(LayerOrder order,const char*name)
   {
@@ -66,6 +71,7 @@ namespace kNgine
   }
 #define LayerOrder(maxSize) layerOrderInit(maxSize)
 #define addLayerOrderDef(order, layer) addLayerOrderDef(&order, #layer)
+#define setLayerOrder(order, o) setLayerOrder(&order, o)
 #define layerO(order, layer) layerO(order, #layer)
 
   typedef struct
@@ -317,7 +323,7 @@ namespace kNgine
     return res;
   }
 
-  // do not implement, is automatically generated when starting engine for the
+  // do not implement, is automatically generated when starting engine
   // parent object
   class ChildrenObject final : public GameObject
   {

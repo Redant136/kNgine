@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdint>
 #include "utils.h"
-#include "Renderer.hpp"
+#include "oldRenderer.hpp"
 #include <glad/glad.h>
 #ifdef __unix__
 #define GLFW_INCLUDE_GLCOREARB
@@ -16,95 +16,95 @@
 static i32 KeyToGLFW(Key k){
   switch (k)
   {
-  case Key::SPACE : return GLFW_KEY_SPACE;break;
-  case Key::APOSTROPHE :return GLFW_KEY_APOSTROPHE /* ' */; break;
-  case Key::COMMA :return GLFW_KEY_COMMA /* , */; break;
-  case Key::MINUS :return GLFW_KEY_MINUS /* - */; break;
-  case Key::PERIOD :return GLFW_KEY_PERIOD /* . */; break;
-  case Key::SLASH :return GLFW_KEY_SLASH /* / */; break;
-  case Key::KEY_0 :return GLFW_KEY_0; break;
-  case Key::KEY_1 :return GLFW_KEY_1; break;
-  case Key::KEY_2 :return GLFW_KEY_2; break;
-  case Key::KEY_3 :return GLFW_KEY_3; break;
-  case Key::KEY_4 :return GLFW_KEY_4; break;
-  case Key::KEY_5 :return GLFW_KEY_5; break;
-  case Key::KEY_6 :return GLFW_KEY_6; break;
-  case Key::KEY_7 :return GLFW_KEY_7; break;
-  case Key::KEY_8 :return GLFW_KEY_8; break;
-  case Key::KEY_9 :return GLFW_KEY_9; break;
-  case Key::SEMICOLON :return GLFW_KEY_SEMICOLON /* ; */; break;
-  case Key::EQUAL :return GLFW_KEY_EQUAL /* = */; break;
-  case Key::KEY_A :return GLFW_KEY_A; break;
-  case Key::KEY_B :return GLFW_KEY_B; break;
-  case Key::KEY_C :return GLFW_KEY_C; break;
-  case Key::KEY_D :return GLFW_KEY_D; break;
-  case Key::KEY_E :return GLFW_KEY_E; break;
-  case Key::KEY_F :return GLFW_KEY_F; break;
-  case Key::KEY_G :return GLFW_KEY_G; break;
-  case Key::KEY_H :return GLFW_KEY_H; break;
-  case Key::KEY_I :return GLFW_KEY_I; break;
-  case Key::KEY_J :return GLFW_KEY_J; break;
-  case Key::KEY_K :return GLFW_KEY_K; break;
-  case Key::KEY_L :return GLFW_KEY_L; break;
-  case Key::KEY_M :return GLFW_KEY_M; break;
-  case Key::KEY_N :return GLFW_KEY_N; break;
-  case Key::KEY_O :return GLFW_KEY_O; break;
-  case Key::KEY_P :return GLFW_KEY_P; break;
-  case Key::KEY_Q :return GLFW_KEY_Q; break;
-  case Key::KEY_R :return GLFW_KEY_R; break;
-  case Key::KEY_S :return GLFW_KEY_S; break;
-  case Key::KEY_T :return GLFW_KEY_T; break;
-  case Key::KEY_U :return GLFW_KEY_U; break;
-  case Key::KEY_V :return GLFW_KEY_V; break;
-  case Key::KEY_W :return GLFW_KEY_W; break;
-  case Key::KEY_X :return GLFW_KEY_X; break;
-  case Key::KEY_Y :return GLFW_KEY_Y; break;
-  case Key::KEY_Z :return GLFW_KEY_Z; break;
-  case Key::LEFT_BRACKET :return GLFW_KEY_LEFT_BRACKET /* [ */; break;
-  case Key::BACKSLASH :return GLFW_KEY_BACKSLASH /* \ */; break;
-  case Key::RIGHT_BRACKET :return GLFW_KEY_RIGHT_BRACKET /* ] */; break;
-  case Key::GRAVE_ACCENT :return GLFW_KEY_GRAVE_ACCENT /* ` */; break;
-  case Key::ESCAPE :return GLFW_KEY_ESCAPE; break;
-  case Key::ENTER :return GLFW_KEY_ENTER; break;
-  case Key::TAB :return GLFW_KEY_TAB; break;
-  case Key::BACKSPACE :return GLFW_KEY_BACKSPACE; break;
-  case Key::KEY_RIGHT :return GLFW_KEY_RIGHT; break;
-  case Key::KEY_LEFT :return GLFW_KEY_LEFT; break;
-  case Key::KEY_DOWN :return GLFW_KEY_DOWN; break;
-  case Key::KEY_UP :return GLFW_KEY_UP; break;
-  case Key::F1 :return GLFW_KEY_F1; break;
-  case Key::F2 :return GLFW_KEY_F2; break;
-  case Key::F3 :return GLFW_KEY_F3; break;
-  case Key::F4 :return GLFW_KEY_F4; break;
-  case Key::F5 :return GLFW_KEY_F5; break;
-  case Key::F6 :return GLFW_KEY_F6; break;
-  case Key::F7 :return GLFW_KEY_F7; break;
-  case Key::F8 :return GLFW_KEY_F8; break;
-  case Key::F9 :return GLFW_KEY_F9; break;
-  case Key::F10 :return GLFW_KEY_F10; break;
-  case Key::F11 :return GLFW_KEY_F11; break;
-  case Key::F12 :return GLFW_KEY_F12; break;
-  case Key::F13 :return GLFW_KEY_F13; break;
-  case Key::F14 :return GLFW_KEY_F14; break;
-  case Key::F15 :return GLFW_KEY_F15; break;
-  case Key::F16 :return GLFW_KEY_F16; break;
-  case Key::F17 :return GLFW_KEY_F17; break;
-  case Key::F18 :return GLFW_KEY_F18; break;
-  case Key::F19 :return GLFW_KEY_F19; break;
-  case Key::F20 :return GLFW_KEY_F20; break;
-  case Key::F21 :return GLFW_KEY_F21; break;
-  case Key::F22 :return GLFW_KEY_F22; break;
-  case Key::F23 :return GLFW_KEY_F23; break;
-  case Key::F24 :return GLFW_KEY_F24; break;
-  case Key::F25 :return GLFW_KEY_F25; break;
-  case Key::LEFT_SHIFT :return GLFW_KEY_LEFT_SHIFT; break;
-  case Key::LEFT_CONTROL :return GLFW_KEY_LEFT_CONTROL; break;
-  case Key::LEFT_ALT :return GLFW_KEY_LEFT_ALT; break;
-  case Key::LEFT_SUPER :return GLFW_KEY_LEFT_SUPER; break;
-  case Key::RIGHT_SHIFT :return GLFW_KEY_RIGHT_SHIFT; break;
-  case Key::RIGHT_CONTROL :return GLFW_KEY_RIGHT_CONTROL; break;
-  case Key::RIGHT_ALT :return GLFW_KEY_RIGHT_ALT; break;
-    default : return GLFW_KEY_UNKNOWN; break;
+  case Key::SPACE : return GLFW_KEY_SPACE;
+  case Key::APOSTROPHE :return GLFW_KEY_APOSTROPHE /* ' */;
+  case Key::COMMA :return GLFW_KEY_COMMA /* , */;
+  case Key::MINUS :return GLFW_KEY_MINUS /* - */;
+  case Key::PERIOD :return GLFW_KEY_PERIOD /* . */;
+  case Key::SLASH :return GLFW_KEY_SLASH /* / */;
+  case Key::KEY_0 :return GLFW_KEY_0;
+  case Key::KEY_1 :return GLFW_KEY_1;
+  case Key::KEY_2 :return GLFW_KEY_2;
+  case Key::KEY_3 :return GLFW_KEY_3;
+  case Key::KEY_4 :return GLFW_KEY_4;
+  case Key::KEY_5 :return GLFW_KEY_5;
+  case Key::KEY_6 :return GLFW_KEY_6;
+  case Key::KEY_7 :return GLFW_KEY_7;
+  case Key::KEY_8 :return GLFW_KEY_8;
+  case Key::KEY_9 :return GLFW_KEY_9;
+  case Key::SEMICOLON :return GLFW_KEY_SEMICOLON /* ; */;
+  case Key::EQUAL :return GLFW_KEY_EQUAL /* = */;
+  case Key::KEY_A :return GLFW_KEY_A;
+  case Key::KEY_B :return GLFW_KEY_B;
+  case Key::KEY_C :return GLFW_KEY_C;
+  case Key::KEY_D :return GLFW_KEY_D;
+  case Key::KEY_E :return GLFW_KEY_E;
+  case Key::KEY_F :return GLFW_KEY_F;
+  case Key::KEY_G :return GLFW_KEY_G;
+  case Key::KEY_H :return GLFW_KEY_H;
+  case Key::KEY_I :return GLFW_KEY_I;
+  case Key::KEY_J :return GLFW_KEY_J;
+  case Key::KEY_K :return GLFW_KEY_K;
+  case Key::KEY_L :return GLFW_KEY_L;
+  case Key::KEY_M :return GLFW_KEY_M;
+  case Key::KEY_N :return GLFW_KEY_N;
+  case Key::KEY_O :return GLFW_KEY_O;
+  case Key::KEY_P :return GLFW_KEY_P;
+  case Key::KEY_Q :return GLFW_KEY_Q;
+  case Key::KEY_R :return GLFW_KEY_R;
+  case Key::KEY_S :return GLFW_KEY_S;
+  case Key::KEY_T :return GLFW_KEY_T;
+  case Key::KEY_U :return GLFW_KEY_U;
+  case Key::KEY_V :return GLFW_KEY_V;
+  case Key::KEY_W :return GLFW_KEY_W;
+  case Key::KEY_X :return GLFW_KEY_X;
+  case Key::KEY_Y :return GLFW_KEY_Y;
+  case Key::KEY_Z :return GLFW_KEY_Z;
+  case Key::LEFT_BRACKET :return GLFW_KEY_LEFT_BRACKET /* [ */;
+  case Key::BACKSLASH :return GLFW_KEY_BACKSLASH /* \ */;
+  case Key::RIGHT_BRACKET :return GLFW_KEY_RIGHT_BRACKET /* ] */;
+  case Key::GRAVE_ACCENT :return GLFW_KEY_GRAVE_ACCENT /* ` */;
+  case Key::ESCAPE :return GLFW_KEY_ESCAPE;
+  case Key::ENTER :return GLFW_KEY_ENTER;
+  case Key::TAB :return GLFW_KEY_TAB;
+  case Key::BACKSPACE :return GLFW_KEY_BACKSPACE;
+  case Key::KEY_RIGHT :return GLFW_KEY_RIGHT;
+  case Key::KEY_LEFT :return GLFW_KEY_LEFT;
+  case Key::KEY_DOWN :return GLFW_KEY_DOWN;
+  case Key::KEY_UP :return GLFW_KEY_UP;
+  case Key::F1 :return GLFW_KEY_F1;
+  case Key::F2 :return GLFW_KEY_F2;
+  case Key::F3 :return GLFW_KEY_F3;
+  case Key::F4 :return GLFW_KEY_F4;
+  case Key::F5 :return GLFW_KEY_F5;
+  case Key::F6 :return GLFW_KEY_F6;
+  case Key::F7 :return GLFW_KEY_F7;
+  case Key::F8 :return GLFW_KEY_F8;
+  case Key::F9 :return GLFW_KEY_F9;
+  case Key::F10 :return GLFW_KEY_F10;
+  case Key::F11 :return GLFW_KEY_F11;
+  case Key::F12 :return GLFW_KEY_F12;
+  case Key::F13 :return GLFW_KEY_F13;
+  case Key::F14 :return GLFW_KEY_F14;
+  case Key::F15 :return GLFW_KEY_F15;
+  case Key::F16 :return GLFW_KEY_F16;
+  case Key::F17 :return GLFW_KEY_F17;
+  case Key::F18 :return GLFW_KEY_F18;
+  case Key::F19 :return GLFW_KEY_F19;
+  case Key::F20 :return GLFW_KEY_F20;
+  case Key::F21 :return GLFW_KEY_F21;
+  case Key::F22 :return GLFW_KEY_F22;
+  case Key::F23 :return GLFW_KEY_F23;
+  case Key::F24 :return GLFW_KEY_F24;
+  case Key::F25 :return GLFW_KEY_F25;
+  case Key::LEFT_SHIFT :return GLFW_KEY_LEFT_SHIFT;
+  case Key::LEFT_CONTROL :return GLFW_KEY_LEFT_CONTROL;
+  case Key::LEFT_ALT :return GLFW_KEY_LEFT_ALT;
+  case Key::LEFT_SUPER :return GLFW_KEY_LEFT_SUPER;
+  case Key::RIGHT_SHIFT :return GLFW_KEY_RIGHT_SHIFT;
+  case Key::RIGHT_CONTROL :return GLFW_KEY_RIGHT_CONTROL;
+  case Key::RIGHT_ALT :return GLFW_KEY_RIGHT_ALT;
+    default : return GLFW_KEY_UNKNOWN;
   }
 }
 static std::vector<std::function<void(void)>> boundFunctions = std::vector<std::function<void(void)>>(Key::KEY_LAST);
@@ -119,36 +119,36 @@ static u32 storedVAO = 0;
 static u32 storedEBO = 0;
 static i32 shaderProgram;
 // can only draw triangle
-static const char* vertexShaderSource =
+static const char *vertexShaderSource =
     "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec4 aColor;\n"
     "layout (location = 2) in vec2 aTexCoord;\n"
     "uniform mat4 transform;\n"
-    "out vec2 TexCoord;\n"
     "out vec4 color;\n"
+    "out vec2 TexCoord;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = transform * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "   color = aColor;\n"
     "   TexCoord = aTexCoord;\n"
     "}\0";
-static const char* fragmentShaderSource =
+
+static const char *fragmentShaderSource =
     "#version 330 core\n"
-    "out vec4 FragColor;\n"
     "in vec4 color;\n"
     "in vec2 TexCoord;\n"
-    "uniform sampler2D textureMap;"
+    "out vec4 FragColor;\n"
+    "uniform sampler2D textureMap;\n"
     "void main()\n"
     "{\n"
-    "   "
-    "    if(TexCoord.x>1.0f||TexCoord.y>1.0f||TexCoord.x<-1.0f||TexCoord.y<-1.0f){"
-    "\n"
+    "   if(TexCoord.x>1.0f||TexCoord.y>1.0f||TexCoord.x<-1.0f||TexCoord.y<-1.0f){\n"
     "       FragColor = color;\n"
     "   }else{\n"
     "       FragColor = texture(textureMap, TexCoord)*color;\n"
     "   }"
     "}\0";
+
 void framebuffer_size_callback(GLFWwindow* window, i32 width, i32 height) {
   glViewport(0, 0, width, height);
 }
@@ -205,6 +205,7 @@ void compileShaders() {
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    assert(0);
     throw "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n";
   }
   // fragment shader
@@ -220,7 +221,9 @@ void compileShaders() {
   // link shaders
   shaderProgram = glCreateProgram();
   glAttachShader(shaderProgram, vertexShader);
+  glDeleteShader(vertexShader);
   glAttachShader(shaderProgram, fragmentShader);
+  glDeleteShader(fragmentShader);
   glLinkProgram(shaderProgram);
   // check for linking errors
   glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
@@ -228,8 +231,6 @@ void compileShaders() {
     glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
     throw "ERROR::SHADER::PROGRAM::LINKING_FAILED\n";
   }
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
 }
 
 void init(i32 argc, const char** argv) {

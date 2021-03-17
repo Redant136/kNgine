@@ -32,6 +32,8 @@
 #define fast_calc_precision 9
 #endif
 
+#define max_arg_def_length 8
+
 typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -361,8 +363,8 @@ struct iv2
   }
   iv2(const v2 &base)
   {
-    this->x = (i32 )floor(base.x);
-    this->y = (i32 )floor(base.y);
+    this->x = (i32)floor(base.x);
+    this->y = (i32)floor(base.y);
   }
   bool operator==(const iv2 &a) { return x == a.x && y == a.y; }
   bool operator!=(const iv2 &a) { return x != a.x || y != a.y; }
@@ -432,9 +434,9 @@ struct iv3
   }
   iv3(const v3 &base)
   {
-    this->x = (i32 )floor(base.x);
-    this->y = (i32 )floor(base.y);
-    this->z = (i32 )floor(base.z);
+    this->x = (i32)floor(base.x);
+    this->y = (i32)floor(base.y);
+    this->z = (i32)floor(base.z);
   }
   bool operator==(const iv3 &a) { return x == a.x && y == a.y && z == a.z; }
   bool operator!=(const iv3 &a) { return x != a.x || y != a.y || z != a.z; }
@@ -528,10 +530,10 @@ struct iv4
   }
   iv4(const v4 &base)
   {
-    this->x = (i32 )floor(base.x);
-    this->y = (i32 )floor(base.y);
-    this->z = (i32 )floor(base.z);
-    this->w = (i32 )floor(base.w);
+    this->x = (i32)floor(base.x);
+    this->y = (i32)floor(base.y);
+    this->z = (i32)floor(base.z);
+    this->w = (i32)floor(base.w);
   }
   bool operator==(const iv4 &a)
   {
@@ -653,12 +655,12 @@ inline v4::v4(const iv4 &base)
   }
 
 #else
-typedef struct
+typedef struct v2
 {
   f32 x;
   f32 y;
 } v2;
-typedef union
+typedef union v3
 {
   struct
   {
@@ -676,7 +678,7 @@ typedef union
 
   f32 elements[3];
 } v3;
-typedef union
+typedef union v4
 {
   struct
   {
@@ -802,9 +804,8 @@ static iv4 IV4Init(i32 x, i32 y, i32 z, i32 w)
 #define iv4(x, y, z, w) IV4Init(x, y, z, w)
 
 #endif
-#define toV2(v) v2(v.x,v.y)
-#define toV3(v) v2(v.x,v.y,v.y)
-#define toV4(v) v2(v.x, v.y)
+#define toV2(v) v2(v.x, v.y)
+#define toV3(v) v3(v.x, v.y, v.z)
 
 static f32 V2Dot(v2 a, v2 b)
 {
@@ -821,9 +822,9 @@ static v2 V2Normalize(v2 v)
   v.y /= length;
   return v;
 }
-static v2 V2AddV2(v2 a,v2 b)
+static v2 V2AddV2(v2 a, v2 b)
 {
-  v2 v=v2(a.x+b.x,a.y+b.y);
+  v2 v = v2(a.x + b.x, a.y + b.y);
   return v;
 }
 static v2 V2MinusV2(v2 a, v2 b)
@@ -923,7 +924,18 @@ typedef struct m4
 {
   f32 elements[4][4];
 } m4;
-static m4 M4InitD(f32 diagonal)
+static m4 M4InitFill(f32 val)
+{
+  m4 m = {
+      {
+          {val, val, val, val},
+          {val, val, val, val},
+          {val, val, val, val},
+          {val, val, val, val},
+      }};
+  return m;
+}
+static m4 M4InitDiagonal(f32 diagonal)
 {
   m4 m = {
       {
@@ -990,7 +1002,6 @@ static v4 V4MultiplyV4(v4 a, v4 b)
 static v4 V4MultiplyM4(v4 v, m4 m)
 {
   v4 result = v4(0, 0, 0, 0);
-
   for (i32 i = 0; i < 4; ++i)
   {
     result.elements[i] = (v.elements[0] * m.elements[0][i] +
@@ -998,12 +1009,11 @@ static v4 V4MultiplyM4(v4 v, m4 m)
                           v.elements[2] * m.elements[2][i] +
                           v.elements[3] * m.elements[3][i]);
   }
-
   return result;
 }
 static m4 M4TranslateV3(v3 translation)
 {
-  m4 result = M4InitD(1.f);
+  m4 result = M4InitDiagonal(1.f);
   result.elements[3][0] = translation.x;
   result.elements[3][1] = translation.y;
   result.elements[3][2] = translation.z;
@@ -1011,7 +1021,7 @@ static m4 M4TranslateV3(v3 translation)
 }
 static m4 M4ScaleV3(v3 scale)
 {
-  m4 result = M4InitD(1.f);
+  m4 result = M4InitDiagonal(1.f);
   result.elements[0][0] = scale.x;
   result.elements[1][1] = scale.y;
   result.elements[2][2] = scale.z;
@@ -1155,7 +1165,7 @@ static m4 M4RemoveRotation(m4 mat)
 }
 static m4 M4Rotate(f32 angle, v3 axis)
 {
-  m4 result = M4InitD(1.f);
+  m4 result = M4InitDiagonal(1.f);
 
   axis = V3Normalize(axis);
 
@@ -1191,6 +1201,9 @@ static v3 calculateTriangleNormalNormalized(v3 p1, v3 p2, v3 p3)
   normal = V3Normalize(normal);
   return normal;
 }
+
+#define fCompare(a,b) (fabsf(a-b)<0.0001)
+#define fCompareN(a,b,n) (fabsf(a - b) < n)
 
 #ifdef strManipulation
 #define StringCopy strcpy
@@ -1784,7 +1797,7 @@ typedef enum Key
   RIGHT_CONTROL,
   RIGHT_ALT,
   UNREGISTERED_KEY,
-  KEY_LAST = UNREGISTERED_KEY,
+  KEY_LAST,
   MOUSE1,
   MOUSE_LEFT = MOUSE1,
   MOUSE2,
@@ -1796,7 +1809,7 @@ typedef enum Key
   MOUSE6,
   MOUSE7,
   MOUSE8,
-  MOUSE_LAST = MOUSE8
+  MOUSE_LAST
 } Key;
 
 typedef enum cardinal8dir
@@ -1812,9 +1825,45 @@ typedef enum cardinal8dir
   CENTER
 } cardinal8dir;
 
+typedef enum kTypes
+{
+  kTYPE_BOOL=1<<0,
+  kTYPE_CHAR=1<<0,
+  kTYPE_INT8=1<<0,
+  kTYPE_UINT8=1<<0,
+  kTYPE_INT16=1<<1,
+  kTYPE_UINT16=1<<1,
+  kTYPE_INT32=1<<2,
+  kTYPE_UINT32=1<<2,
+  kTYPE_FLOAT32=1<<2,
+  kTYPE_INT64=1<<3,
+  kTYPE_UINT64=1<<3,
+  kTYPE_FLOAT64=1<<3,
+  kTYPE_PTR=1<<3,
+  kTYPE_v2=(1<<2)*2,
+  kTYPE_v3=(1<<2)*3,
+  kTYPE_v4=(1<<2)*4,
+  kTYPE_iv2=(1<<2)*2,
+  kTYPE_iv3=(1<<2)*3,
+  kTYPE_iv4=(1<<2)*4,
+} kTypes;
+typedef struct kArgument_ArgDef{
+  size_t length;
+  kTypes args[max_arg_def_length];
+} kArgument_ArgDef;
+static void *getElementOfObjectAtIndex(u32 index,kArgument_ArgDef def,void*obj)
+{
+  u8*ptr=(u8*)obj;
+  u32 distance;
+  for(u32 i=0;i<index;i++){
+    distance+=def.args[i];
+  }
+  return ptr+distance;
+}
+
 static void seedRandomNumberGenerator(void)
 {
-  srand((u32 )time(0));
+  srand((u32)time(0));
 }
 static f32 randf()
 {
@@ -1851,8 +1900,8 @@ static f32 PerlinSmoothlyInterpolate(f32 x, f32 y, f32 s)
 }
 static f32 PerlinNoise2D(f32 x, f32 y)
 {
-  i32 x_int = (i32 )x;
-  i32 y_int = (i32 )y;
+  i32 x_int = (i32)x;
+  i32 y_int = (i32)y;
   f32 x_frac = x - x_int;
   f32 y_frac = y - y_int;
   i32 s = PerlinNoise2(x_int, y_int);
@@ -2070,31 +2119,31 @@ public:
   v4 min, max, targetMin, targetMax;
   mapper()
   {
-    this->min = v4(0,0,0,0);
-    this->max = v4(0,0,0,0);
+    this->min = v4(0, 0, 0, 0);
+    this->max = v4(0, 0, 0, 0);
     this->targetMin = v4(0, 0, 0, 0);
     this->targetMax = v4(0, 0, 0, 0);
   }
   mapper(f32 min, f32 max, f32 targetMin, f32 targetMax)
   {
-    this->min = v4(min,0,0,0);
-    this->max = v4(max,0,0,0);
-    this->targetMin = v4(targetMin,0,0,0);
-    this->targetMax = v4(targetMax,0,0,0);
+    this->min = v4(min, 0, 0, 0);
+    this->max = v4(max, 0, 0, 0);
+    this->targetMin = v4(targetMin, 0, 0, 0);
+    this->targetMax = v4(targetMax, 0, 0, 0);
   }
   mapper(v2 min, v2 max, v2 targetMin, v2 targetMax)
   {
-    this->min = v4(min.x,min.y,0,0);
-    this->max = v4(max.x,max.y,0,0);
-    this->targetMin = v4(targetMin.x,targetMin.y,0,0);
-    this->targetMax = v4(targetMax.x,targetMax.y,0,0);
+    this->min = v4(min.x, min.y, 0, 0);
+    this->max = v4(max.x, max.y, 0, 0);
+    this->targetMin = v4(targetMin.x, targetMin.y, 0, 0);
+    this->targetMax = v4(targetMax.x, targetMax.y, 0, 0);
   }
   mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
   {
-    this->min = v4(min.x,min.y,min.z,0);
-    this->max = v4(max.x,max.y,max.z,0);
-    this->targetMin = v4(targetMin.x,targetMin.y,targetMin.z,0);
-    this->targetMax = v4(targetMax.x, targetMax.y, targetMax.z,0);
+    this->min = v4(min.x, min.y, min.z, 0);
+    this->max = v4(max.x, max.y, max.z, 0);
+    this->targetMin = v4(targetMin.x, targetMin.y, targetMin.z, 0);
+    this->targetMax = v4(targetMax.x, targetMax.y, targetMax.z, 0);
   }
   mapper(v4 min, v4 max, v4 targetMin, v4 targetMax)
   {
@@ -2110,7 +2159,7 @@ public:
   }
   v2 map(v2 n)
   {
-    f32 xScale = V4MinusV4(v4(n.x,n.y,0,0),min).x/(V4MinusV4(max, min)).x;
+    f32 xScale = V4MinusV4(v4(n.x, n.y, 0, 0), min).x / (V4MinusV4(max, min)).x;
     f32 yScale = V4MinusV4(v4(n.x, n.y, 0, 0), min).y / (V4MinusV4(max, min)).y;
     return v2(xScale * V4MinusV4(targetMax, targetMin).x + targetMin.x,
               yScale * V4MinusV4(targetMax, targetMin).y + targetMin.y);
@@ -2137,3 +2186,14 @@ public:
   }
 };
 #endif
+#include <stdio.h>
+static m4 M4Mapper(v3 min,v3 max,v3 targetMin, v3 targetMax)
+{
+  // f32 scale = (n - min.x) / (max.x - min.x) * (targetMax.x - targetMin.x) + targetMin.x;
+
+  m4 transform = M4TranslateV3(V3MultiplyF32(min,-1.0f));
+  transform = M4MultiplyM4(M4ScaleV3(v3(1.0f / (max.x - min.x), 1.0f / (max.y - min.y), 1.0f / (max.z - min.z))), transform);
+  transform = M4MultiplyM4(M4ScaleV3(v3(targetMax.x - targetMin.x, targetMax.y - targetMin.y, targetMax.z - targetMin.z)), transform);
+  transform = M4MultiplyM4(M4TranslateV3(V3MultiplyF32(targetMin, 1.0f)),transform);
+  return transform;
+}

@@ -3,7 +3,7 @@
 // can be used seperate from engine
 #include "../../src/utils.h"
 #include "../../src/kThread.h"
-#include "../../src/Renderer.hpp"
+#include "../../src/kRenderer.h"
 // basics of all objects
 #include "../../src/EngineObjects.hpp"
 // specific objects

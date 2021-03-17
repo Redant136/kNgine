@@ -53,7 +53,7 @@ namespace kNgine{
   AudioEngine::~AudioEngine()
   {
     for(u32 i=0;i<queue.size();i++){
-      delete queue[i];
+      delete queue[i].buffer;
     }
   }
 
@@ -67,7 +67,7 @@ namespace kNgine{
   }
   void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop)
   {
-    queue.push_back(new AudioQueue(name,buffer));
+    queue.push_back(AudioQueue(name,buffer));
   }
   void AudioEngine::load(std::vector<EngineObject *> objects)
   {
@@ -75,7 +75,7 @@ namespace kNgine{
   void AudioEngine::update(std::vector<msg> msgs)
   {
     for(u32 i=0;i<queue.size();i++){
-      AudioQueue*q=queue[i];
+      AudioQueue*q=&queue[i];
       NSSoundBuffer*buffer=(NSSoundBuffer*)q->buffer;
       buffer->sound.loops=q->loop;
       buffer->sound.volume=q->volume;

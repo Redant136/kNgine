@@ -10,22 +10,20 @@
 namespace renderer {
 
 // page creation methods
-// call in order init>size>setup>draw>launch
+// call in order init>createwindow>draw>launch
 void init(i32 argc, const char** argv);
 void setWindowSize(i32 width, i32 height);
 void setWindowName(const char* windowName);
 void createWindow(i32 width, i32 height, const char* windowName);
 void setupWindow(std::function<void(void)> startDisplayFunc);
 void setDrawFunction(std::function<void(void)> refreshFunction);
-// only call at the end of draw function
 void launch();
 
 // drawing methods
 // set color of drawing tool
 void setDrawColor(u8 r, u8 g, u8 b, u8 a=255);
 void clear(u8 r, u8 g, u8 b, u8 a=255);
-// clear the window, if no color specified, set to black with alpha = 255
-inline void clear(u8 rgb=0){clear(rgb,rgb,rgb,255);}
+inline void clear(u8 rgb = 0) { clear(rgb, rgb, rgb, 255); } //clear the window, if no color specified, set to black with alpha = 255
 
 void drawRect(v2 points[4]);
 void drawRect(v2 startPos, double width, double height);

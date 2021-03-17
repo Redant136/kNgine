@@ -1,7 +1,7 @@
 #include <vector>
 #include "utils.h"
 #include "EngineObjects.hpp"
-#include "Renderer.hpp"
+#include "kRenderer.h"
 #include "SpriteUtils.hpp"
 #include "../extern/stb/stb_image.h"
 
@@ -27,7 +27,7 @@ namespace kNgine
     for (i32 i = 0; i < list.size(); i++)
     {
       u32 texture, VBO;
-      renderer::bindTexture(&texture, list[i].buffer, v2(0, 0), 1, 1,
+      kRenderer_bindTexture(&texture, list[i].buffer, v2(0, 0), 1, 1,
                             list[i].width, list[i].height, list[i].numChannels);
       texIndex.push_back(texture);
     }
@@ -36,7 +36,7 @@ namespace kNgine
   {
     for (i32 i = 0; i < list.size(); i++)
     {
-      renderer::unbindTexture(texIndex[i]);
+      kRenderer_unbindTexture(texIndex[i]);
     }
   }
   void SpriteMap::offsetPixelsInSprites(cardinal8dir dir, u32 offset)

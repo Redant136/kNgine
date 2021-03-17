@@ -125,6 +125,7 @@ namespace kNgine{
 
   Sprite importSprite(const char *filename) {
     i32 width, height, numChannels;
+    // stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load(filename, &width, &height, &numChannels, 0);
     Sprite res;
     if (numChannels == 3) {

@@ -15,8 +15,6 @@
 #include <wave/file.h>
 #endif
 
-#include <iostream>
-
 bool check_alc_errors(const std::string &filename, const std::uint_fast32_t line, ALCdevice *device)
 {
   ALCenum error = alcGetError(device);
@@ -232,7 +230,7 @@ namespace kNgine
   AudioEngine::~AudioEngine(){
     for (u32 i = 0; i < queue.size(); i++)
     {
-      delete queue[i];
+      delete queue[i].buffer;
     }
     if (!(openALDevice))
     {
@@ -261,12 +259,12 @@ namespace kNgine
     play(queue.size()-1);
   }
   void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop){
-    this->queue.push_back(new AudioQueue(name,buffer));
+    this->queue.push_back(AudioQueue(name,buffer));
   }
   void AudioEngine::load(std::vector<EngineObject *> objects)
   {
-    for(AudioQueue*q:queue){
-      ALuint albuffer = ((OpenALBuffer *)q->buffer)->buffer;
+    for(AudioQueue q:queue){
+      ALuint albuffer = ((OpenALBuffer *)q.buffer)->buffer;
       ALuint source;
       alGenSources(1, &source);
       alSourcef(source, AL_PITCH, 1);
@@ -277,13 +275,13 @@ namespace kNgine
       {
         std::cerr << "gen source" << std::endl;
       }
-      ((OpenALBuffer *)q->buffer)->source=source;
+      ((OpenALBuffer *)q.buffer)->source=source;
     }
   }
   void AudioEngine::update(std::vector<msg> msgs)
   {
     for(u32 i=0;i<queue.size();i++){
-      AudioQueue*q=queue[i];
+      AudioQueue*q=&queue[i];
       OpenALBuffer*buffer=(OpenALBuffer*)q->buffer;
       alSourcef(buffer->source, AL_GAIN, q->volume);
       if (q->loop)
@@ -323,8 +321,8 @@ namespace kNgine
   }
   void AudioEngine::unload(std::vector<EngineObject *> objects)
   {
-    for(AudioQueue*q:queue){
-      OpenALBuffer *buffer = (OpenALBuffer *)q->buffer;
+    for(AudioQueue q:queue){
+      OpenALBuffer *buffer = (OpenALBuffer *)q.buffer;
       alDeleteSources(1, &buffer->source);
       buffer->source=0;
     }

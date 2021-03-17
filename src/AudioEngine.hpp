@@ -78,11 +78,9 @@ namespace kNgine
       }
       ~AudioQueue()
       {
-        if (discard)
-          delete buffer;
       }
     };
-    std::vector<AudioQueue*> queue;
+    std::vector<AudioQueue> queue;
   public:
     AudioEngine();
     virtual ~AudioEngine();
@@ -90,12 +88,12 @@ namespace kNgine
     void play(BaseAudioBuffer *buffer);
     void queueBuffer(const char *name, BaseAudioBuffer *buffer, bool loop = false);
 
-    void play(u32 index = 0) { queue[index]->isPlaying=true; }
+    void play(u32 index = 0) { queue[index].isPlaying=true; }
     void play(const char*name);// TODO(AC) implement this
-    bool isPlaying(u32 index = 0) { return queue[index]->isPlaying; }
-    void setLoop(bool loop, u32 index = 0) { queue[index]->loop = loop; }
-    void setVolume(f32 volume, u32 index = 0) { queue[index]->volume = volume; }
-    void terminate(u32 index = 0) { queue[index]->stop = true; }
+    bool isPlaying(u32 index = 0) { return queue[index].isPlaying; }
+    void setLoop(bool loop, u32 index = 0) { queue[index].loop = loop; }
+    void setVolume(f32 volume, u32 index = 0) { queue[index].volume = volume; }
+    void terminate(u32 index = 0) { queue[index].stop = true; }
     virtual void load(std::vector<EngineObject *> objects);
     virtual void update(std::vector<msg>msgs);
     virtual void unload(std::vector<EngineObject *> objects);

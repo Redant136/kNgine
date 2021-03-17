@@ -6,7 +6,6 @@ if(APPLE)
   link_directories( /usr/local/lib)
   set(OSSpecificFiles
     src/AudioEngineNSSound.mm
-    src/RendererGLFW.cpp
   )
 else()
   if(WIN32)
@@ -14,29 +13,34 @@ else()
   endif()
   set(OSSpecificFiles
     src/AudioEngineOpenAL.cpp
-    src/RendererGLFW.cpp
   )
 endif()
-
-set(KNGINE_SOURCE_FILES
-src/EngineObjects.cpp 
-src/Camera_2D.cpp
-src/TextBox.cpp
-src/SpriteUtils.cpp
-src/Tilemap.cpp 
-${OSSpecificFiles}
-)
 
 set(KNGINE_HEADER_FILES
 src/utils.h
 src/kThread.h
+src/kRenderer.h
+
 src/EngineObjects.hpp
 src/Camera.hpp
-src/TextBox.hpp
 src/SpriteUtils.hpp
-src/Tilemap.hpp 
 src/AudioEngine.hpp
-src/Renderer.hpp
+src/Engine.hpp
+
+# src/oldRenderer.hpp
+)
+
+set(KNGINE_SOURCE_FILES
+src/kRendererGLFW.c
+
+src/EngineObjects.cpp 
+src/Camera_2D.cpp
+src/SpriteUtils.cpp
+src/Tilemap.cpp
+src/Engine.cpp
+${OSSpecificFiles}
+
+# src/oldRendererGLFW.cpp
 )
 
 set(KNGINE_SOURCE_FILES
@@ -59,10 +63,10 @@ add_subdirectory(extern/box2d)
 target_link_libraries(kNgine PRIVATE box2d)
 
 add_subdirectory(extern/glfw)
-target_link_libraries(kNgine PRIVATE glfw)
+target_link_libraries(kNgine PUBLIC glfw)
 
 add_subdirectory(extern/glad/)
-target_link_libraries(kNgine PRIVATE glad)
+target_link_libraries(kNgine PUBLIC glad)
 
 add_subdirectory(extern/glm)
 target_link_libraries(kNgine PRIVATE glm)

@@ -3,14 +3,21 @@
 # main branch
 
 ## currently working on
-- [ ] audio engine audioqueue obj not pointer
-- [ ] text in renderer
-- [ ] display debug info such as fps
+- [x] audio engine audioqueue obj not pointer
+- [ ] c renderer, make it more customizable
+- [ ] stored texture
+- [ ] stored default VBO
+- [ ] ~m4 instead of mapper in cam
+- [ ] custom shader in renderer
 ## testing
 - [ ] test openal audio engine
 ## next step
+- [ ] text in renderer
+- [ ] child is component entity instead of parent object
+- [ ] display debug info such as fps
+- [ ] make key message bit manipulation
 ## research
-- [ ] improve glfw renderer
+- [x] improve glfw renderer
 ## procrastinating
 - [ ] object info tool
 - [ ] map editor tool
@@ -22,6 +29,9 @@
 ## someday... maybe
 - [ ] select audio out openAL
 - [ ] support for ps4/5, xbox, ios or android
+- [ ] direct x
+- [ ] vulkan
+- [ ] 3d engine (https://www.youtube.com/watch?v=whyJzrVEgVc)
 ---
 
 # Mac Engine Branch
