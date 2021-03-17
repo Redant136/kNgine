@@ -63,10 +63,10 @@ add_subdirectory(extern/box2d)
 target_link_libraries(kNgine PRIVATE box2d)
 
 add_subdirectory(extern/glfw)
-target_link_libraries(kNgine PUBLIC glfw)
+target_link_libraries(kNgine PRIVATE glfw)
 
 add_subdirectory(extern/glad/)
-target_link_libraries(kNgine PUBLIC glad)
+target_link_libraries(kNgine PRIVATE glad)
 
 add_subdirectory(extern/glm)
 target_link_libraries(kNgine PRIVATE glm)

@@ -1,5 +1,4 @@
-#ifndef kRenderer_
-#define kRenderer_
+#pragma once
 
 #include "utils.h"
 
@@ -87,6 +86,4 @@ iv2 kRenderer_getWindowSize();
 f64 kRenderer_getTimeSinceLastFrame();
 #ifdef __cplusplus
 }
-#endif
-
 #endif

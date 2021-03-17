@@ -10,9 +10,9 @@ https://github.com/Redant136/kNgine.git
 
 # Usage
 
-- Create engine object and add pointer to objects to it
+- add objects using kNgine::addObject()
 - add a camera
-- use engine start
+- call kNgine::start()
 - call cleanup
 
 ## object types

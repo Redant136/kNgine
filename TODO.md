@@ -3,22 +3,23 @@
 # main branch
 
 ## currently working on
-- [x] audio engine audioqueue obj not pointer
 - [ ] c renderer, make it more customizable
-- [ ] stored texture
+
 - [ ] stored default VBO
+- [ ] stored texture
 - [ ] ~m4 instead of mapper in cam
 - [ ] custom shader in renderer
 ## testing
 - [ ] test openal audio engine
 ## next step
+- [ ] seperate engine from framework
 - [ ] text in renderer
 - [ ] child is component entity instead of parent object
 - [ ] display debug info such as fps
 - [ ] make key message bit manipulation
 ## research
-- [x] improve glfw renderer
 ## procrastinating
+- [ ] header only kRenderer
 - [ ] object info tool
 - [ ] map editor tool
 - [ ] tileset auto mapping

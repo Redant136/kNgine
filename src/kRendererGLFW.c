@@ -23,8 +23,11 @@ static u32 currentContext=0;
 
 static i32 defaultShader;
 static u32 defaultVAO = 0;
+static u32 defaultVBO = 0;
+static bool defaultVBOIsTex = false;
+static v4 defaultVBOColor = {0,0,0,0};
 
-static double lastTime=0;
+static f64 lastTime = 0;
 
 static const char *vertexShaderSource =
     "#version 330 core\n"
@@ -375,6 +378,9 @@ static void compileShaders()
 }
 static m4 getMapper(){
   return M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max, v3(-1, -1, -1), v3(1, 1, 1)); // TODO fix this
+}
+static void updateDefaultVBO(v3 newPos,bool isTexture,v4 colorTexCoord){
+
 }
 
 i32 kRenderer_init(i32 argc, const char **argv, kRenderer_WindowContext *context)
