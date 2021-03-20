@@ -25,16 +25,15 @@ namespace kNgine
   };
   enum ObjectFlags
   {
-    NONE        = 0 << 0,
-    GAME_OBJECT = 1 << 0,
-    COMPONENT   = 1 << 1,
-    PARENT      = 1 << 2,
-    CHILD       = 1 << 3,
-    SPRITE      = 1 << 4,
-    Sprite_List = 1 << 5,
-    RENDERER_LAYER    = 1 << 6,
-    Physics     = 1 << 7,
-    AUDIO       = 1 << 8
+    NONE            = 0 << 0,
+    GAME_OBJECT     = 1 << 0,
+    COMPONENT       = 1 << 1,
+    PARENT          = 1 << 2,
+    SPRITE          = 1 << 3,
+    Sprite_List     = 1 << 4,
+    RENDERER_LAYER  = 1 << 5,
+    Physics         = 1 << 6,
+    AUDIO           = 1 << 7
   };
 
   struct LayerOrder{
@@ -219,10 +218,8 @@ namespace kNgine
   class ObjectComponent;
   class ComponentGameObject : public GameObject
   {
-  protected:
-    std::vector<ObjectComponent *> components;
-
   public:
+    std::vector<ObjectComponent *> components;
     ComponentGameObject();
     ComponentGameObject(const ComponentGameObject &base);
     virtual ~ComponentGameObject();
@@ -323,28 +320,14 @@ namespace kNgine
     return res;
   }
 
-  // do not implement, is automatically generated when starting engine
-  // parent object
-  class ChildrenObject final : public GameObject
+  class NodeObjectComponent final: public ObjectComponent
   {
+  private:
+    v3 previousParentPos;
   public:
-    GameObject *object;
-    v3 &parentPosition;
-    v3 previousParentPosition;
-    ChildrenObject(GameObject *object, v3 &parentPosition);
-    ~ChildrenObject(){delete object;}
-    void init(std::vector<EngineObject*>obj){object->init(obj);}
-    void load(std::vector<EngineObject*>obj){object->load(obj);}
+    GameObject* child;
+    NodeObjectComponent(ComponentGameObject *parent, GameObject *child);
     void update(std::vector<msg> msgs);
-    void unload(std::vector<EngineObject *> obj) { object->unload(obj); }
-    void end(std::vector<EngineObject *> obj) { object->end(obj); }
-  };
-  class ParentObject : public ComponentGameObject
-  {
-  public:
-    std::vector<GameObject *> children;
-    ParentObject();
-    ParentObject(const ParentObject &base);
   };
 
   struct EngineEvent
@@ -370,16 +353,6 @@ namespace kNgine
       {
         for (std::string s : obj->labels)
         {
-          if (s == "_CHILDREN_")
-          {
-            for (std::string schild : ((ChildrenObject *)obj)->object->labels)
-            {
-              if (schild == "ALL" || schild == label)
-              {
-                valid.push_back(((ChildrenObject *)obj)->object);
-              }
-            }
-          }
           if (s == "ALL" || s == label)
           {
             valid.push_back(obj);
@@ -409,16 +382,6 @@ namespace kNgine
       {
         for (std::string s : obj->labels)
         {
-          if (s == "_CHILDREN_")
-          {
-            for (std::string schild : ((ChildrenObject *)obj)->object->labels)
-            {
-              if (!(schild == "ALL" || schild == label))
-              {
-                valid.push_back(((ChildrenObject *)obj)->object);
-              }
-            }
-          }
           if (!(s == "ALL" || s == label))
           {
             valid.push_back(obj);
@@ -446,13 +409,6 @@ namespace kNgine
     {
       for (u32 i = 0; i < objectsSize; i++)
       {
-        if (objects[i]->flags & ObjectFlags::CHILD)
-        {
-          if (((ChildrenObject *)objects[i])->object->flags & flags)
-          {
-            valid.push_back(((ChildrenObject *)objects[i])->object);
-          }
-        }
         if (objects[i]->flags & flags)
         {
           valid.push_back(objects[i]);

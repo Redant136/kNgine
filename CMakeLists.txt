@@ -16,12 +16,18 @@ else()
   )
 endif()
 
-set(KNGINE_HEADER_FILES
+set(KNGINEFRAMEWORK_HEADER_FILES 
 src/utils.h
 src/kThread.h
 src/kStruct_def.h
 src/kRenderer.h
+)
 
+set(KNGINEFRAMEWORK_SOURCE_FILES
+src/kRendererGLFW.c
+)
+
+set(KNGINE_HEADER_FILES
 src/EngineObjects.hpp
 src/Camera.hpp
 src/SpriteUtils.hpp
@@ -32,8 +38,6 @@ src/Engine.hpp
 )
 
 set(KNGINE_SOURCE_FILES
-src/kRendererGLFW.c
-
 src/EngineObjects.cpp 
 src/Camera_2D.cpp
 src/SpriteUtils.cpp
@@ -43,21 +47,31 @@ src/Engine.cpp
 ${OSSpecificFiles}
 )
 
+add_library(kNgineFramework
+  ${KNGINEFRAMEWORK_SOURCE_FILES}
+  ${KNGINEFRAMEWORK_HEADER_FILES}
+)
+
+add_subdirectory(extern/glad/)
+target_link_libraries(kNgineFramework PRIVATE glad)
+
+add_subdirectory(extern/glfw)
+target_link_libraries(kNgineFramework PRIVATE glfw)
+
+
+
 add_library(kNgine
   ${KNGINE_SOURCE_FILES}
   ${KNGINE_HEADER_FILES}
 )
 
+target_link_libraries(kNgine PUBLIC kNgineFramework)
+
+
 set(BOX2D_BUILD_UNIT_TESTS OFF)
 set(BOX2D_BUILD_TESTBED OFF)
 add_subdirectory(extern/box2d)
 target_link_libraries(kNgine PRIVATE box2d)
-
-add_subdirectory(extern/glfw)
-target_link_libraries(kNgine PRIVATE glfw)
-
-add_subdirectory(extern/glad/)
-target_link_libraries(kNgine PRIVATE glad)
 
 set(wave_enable_tests OFF)
 add_subdirectory(extern/wave)
@@ -77,6 +91,9 @@ elseif(UNIX)
 
   target_link_libraries(kNgine PRIVATE "-lGL -ldl")
 endif()
+
+target_include_directories(kNgineFramework PUBLIC include/)
+target_include_directories(kNgineFramework PUBLIC src/)
 
 target_include_directories(kNgine PUBLIC include/)
 target_include_directories(kNgine PUBLIC src/)

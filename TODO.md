@@ -3,17 +3,11 @@
 # main branch
 
 ## currently working on
-- [x] c renderer, make it more customizable
-- [x] stored default VBO [not feasible]
-- [x] rotation is around 0,0 and not center
-- [x] stored texture
-- [x] seperate engine from framework (include kNgineFramework)
-- [x] m4 instead of mapper in cam (not worth it, will more complexity and more processing time to multiply matrices)
+- [ ] text in renderer
+- [x] child is component entity instead of parent object (pog no bugs... maybe)
 ## testing
 - [ ] test openal audio engine
 ## next step
-- [ ] text in renderer
-- [ ] child is component entity instead of parent object
 - [ ] display debug info such as fps
 - [ ] make key message bit manipulation
 ## research

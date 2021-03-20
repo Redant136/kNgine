@@ -19,8 +19,8 @@ https://github.com/Redant136/kNgine.git
 - EngineObject: the basis of all objects
 - GameObject: object with position
 - ComponentGameObject: game object able to hold components or modules
-- ObjectComponent: object able to be attached to a CompGameObj
-- ParentObject: Object to which you can attach others, this binds many objects to one location
+- ObjectComponent: object able to be attached to a CompGameObject
+- NodeComponentObject: Component to add children to object
 ## Rendering
 - Camera: renders sprites
 - SpriteComponent: to bind image to object

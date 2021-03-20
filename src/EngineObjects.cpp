@@ -98,29 +98,17 @@ namespace kNgine{
   Sprite *SpriteComponent::getSprite() { return &sprite; }
   v2 SpriteComponent::getSpriteDimensions() { return spriteDimension; }
 
-  ChildrenObject::ChildrenObject(GameObject *object, v3 &parentPosition)
-      : parentPosition(parentPosition) {
-    this->object = object;
-    this->position = V3MinusV3(object->position,parentPosition);
-    this->previousParentPosition = parentPosition;
-    flags|=ObjectFlags::CHILD;
-    labels.push_back("_CHILDREN_");
-  }
-  void ChildrenObject::update(std::vector<msg> msgs) {
-    object->position = V3AddV3(V3MinusV3(parentPosition, previousParentPosition),object->position);
-    this->position = V3MinusV3(object->position, parentPosition);
-    this->previousParentPosition = parentPosition;
-    object->update(msgs);
-  }
-
-  ParentObject::ParentObject() {
-    children = std::vector<GameObject *>();
-    flags|=ObjectFlags::PARENT;
-    labels.push_back("_PARENT_");
-  }
-  ParentObject::ParentObject(const ParentObject &base) : ComponentGameObject(base)
+  NodeObjectComponent::NodeObjectComponent(ComponentGameObject *parent, GameObject *child) : ObjectComponent(parent)
   {
-    this->children=base.children;
+    this->previousParentPos=parent->position;
+    this->child=child;
+    this->label = "[child]";
+    this->flags |= ObjectFlags::PARENT;
+  }
+  void NodeObjectComponent::update(std::vector<msg> msgs)
+  {
+    child->position = V3AddV3(V3MinusV3(this->object->position, previousParentPos), child->position);
+    this->previousParentPos = this->object->position;
   }
 
   Sprite importSprite(const char *filename) {

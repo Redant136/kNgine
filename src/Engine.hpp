@@ -26,26 +26,19 @@ namespace kNgine
     static void includeChildren()
     {
       bool addedParent = false;
-      for (ParentObject *parent : findObject<ParentObject>(objects, ObjectFlags::PARENT))
+      for (ComponentGameObject *parent : findObject<ComponentGameObject>(objects, ObjectFlags::PARENT))
       {
-        for (GameObject *child : parent->children)
+        for (ObjectComponent*compn:parent->components)
         {
-          bool included = false;
-          for (ChildrenObject *current :
-               findObject<ChildrenObject>(objects, ObjectFlags::CHILD))
-          {
-            included = included || child == current->object;
-          }
-          if (!included)
-          {
-            objects.insert(objects.begin(),
-                           new ChildrenObject(child, parent->position));
-            for (std::string label : child->labels)
-            {
-              if (label == "_PARENT_")
-              {
-                addedParent = true;
-              }
+          if(compn->flags&ObjectFlags::PARENT){
+            GameObject *child = ((NodeObjectComponent*)compn)->child;
+            bool included=false;
+            for(EngineObject*obj:objects){
+              included|=child==obj;
+            }
+            if(!included){
+              objects.push_back(child);
+              addedParent|=child->flags&ObjectFlags::PARENT;
             }
           }
         }
