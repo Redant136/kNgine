@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils.h"
+#include "kStruct_def.h"
 
 #define kRenderer_maxWindows 8
 #define kRenderer_maxShaderPrograms 16
@@ -25,7 +26,7 @@ typedef struct kRenderer_WindowContext{
   struct { 
     size_t length;
     struct {
-      kArgument_ArgDef argsDef;
+      kStruct_StructDef argsDef;
       size_t length;
       struct {
         enum {kRenderer_SHADER_Vertex,kRenderer_SHADER_Fragment,kRenderer_SHADER_Geometry} shaderType;
@@ -69,9 +70,9 @@ void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferH
                                         v3 position, i32 width, i32 height, v3 rotation);
 void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
                i32 width, i32 height, void *args[kRenderer_maxShaderPrograms]);
-void kRenderer_bindTexture(u32 *textureIndex, u8 *colors, v2 position, i32 width,
-                           i32 height, i32 realWidth, i32 realHeight, i32 numChannels);
-void kRenderer_drawTexture(u32 textureIndex, v2 position, i32 width, i32 height, v3 rotation);
+void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer, i32 bufferWidth, i32 bufferHeight, i32 numChannels);
+void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation);
+void kRenderer_drawStoredTexture(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation);
 void kRenderer_unbindTexture(u32 textureIndex);
 
 //key events methods
@@ -84,6 +85,13 @@ i32 kRenderer_getWindowWidth();
 i32 kRenderer_getWindowHeight();
 iv2 kRenderer_getWindowSize();
 f64 kRenderer_getTimeSinceLastFrame();
+
+#ifdef kRenderer_HEADER_ONLY
+
+
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif

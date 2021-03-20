@@ -146,54 +146,37 @@ namespace kNgine
     bool isSpriteList = false;
     if (!(compn))
     {
-      numSprite = object->findComponent<SpriteList>("[sprite_list]")->getSpriteListLength();
+      compn = object->findComponent<SpriteList>("[sprite_list]");
+      numSprite = ((SpriteList*)compn)->getSpriteListLength();
       isSpriteList = true;
     }
     for (i32 i = 0; i < numSprite; i++)
     {
+      SpriteAccessor*accessor=compn;
       if (isSpriteList)
       {
-        compn = object->findComponent<SpriteList>("[sprite_list]")->getSpriteList()[i];
+        accessor = ((SpriteList*)compn)->getSpriteList()[i];
       }
       v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(object->position),
-                                                            compn->getSpriteDimensions())),
+                                                            accessor->getSpriteDimensions())),
                                       posMapper.map(toV2(object->position)));
-      spriteDimensions.y *= -1;
-      u8 *colorMap = compn->getSprite()->buffer;
-      v2 spriteOffset = compn->getSpriteLocation();
+      u8 *buffer = accessor->getSprite()->buffer;
+      v2 spriteOffset = accessor->getSpriteLocation();
       spriteOffset.x *= spriteDimensions.x;
       spriteOffset.y *= spriteDimensions.y;
-      v3 rotation = object->rotation;
-      rotation.z *= std::abs(spriteDimensions.x) / spriteDimensions.x;
-      rotation.z *= std::abs(spriteDimensions.y) / spriteDimensions.y;
 
-
-      if (compn->hasToSave())
+      if (accessor->hasToSave())
       {
-        v2 pos = V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),spriteOffset);
-        kRenderer_setDrawColor(v4(1,1,0,1));
-        // kRenderer_drawRectV4(v4(pos.x, pos.y, spriteDimensions.x, spriteDimensions.y));
-        kRenderer_drawBuffer_defaultShader(colorMap, compn->getSprite()->width, compn->getSprite()->height, compn->getSprite()->numChannels,
-                                               v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, rotation);
-        // kRenderer_drawBuffer_defaultShader(
-        //     colorMap,
-        //     V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
-        //             spriteOffset),
-        //     spriteDimensions.x, spriteDimensions.y, compn->getSprite()->width,
-        //     compn->getSprite()->height, compn->getSprite()->numChannels, rotation);
+        v2 pos = V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), accessor->offset), toV2(position))),spriteOffset);
+        kRenderer_drawBuffer_defaultShader(buffer, accessor->getSprite()->width, accessor->getSprite()->height, accessor->getSprite()->numChannels,
+                                           v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, object->rotation);
       }
       else
       {
-        v2 pos = V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))), spriteOffset);
-        kRenderer_drawBuffer_defaultShader(colorMap, compn->getSprite()->width, compn->getSprite()->height, compn->getSprite()->numChannels,
-                                           v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, rotation);
-        
-        // SpriteMapAccessor *ref = (SpriteMapAccessor *)compn;
-        // renderer::drawTexture(
-        //     ref->spriteList->texIndex[ref->getMapIndex()],
-        //     V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), compn->offset), toV2(position))),
-        //             spriteOffset),
-        //     spriteDimensions.x, spriteDimensions.y, rotation);
+        v2 pos = V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), accessor->offset), toV2(position))), spriteOffset);
+        SpriteMapAccessor *ref = (SpriteMapAccessor *)accessor;
+        kRenderer_drawStoredTexture_defaultShader(ref->spriteList->texIndex[ref->getMapIndex()],
+                                                  v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, object->rotation);
       }
     }
     if (showDebugHitBox)

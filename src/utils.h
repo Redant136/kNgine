@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdio.h>
 #include <assert.h>
 #include <math.h>
 #include <time.h>
@@ -32,8 +31,6 @@
 #define fast_calc_precision 9
 #endif
 
-#define max_arg_def_length 8
-
 typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -45,7 +42,7 @@ typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
 
-#if defined(vectorObjects) && defined(__cplusplus)
+#if defined(utils_VectorObjects) && defined(__cplusplus)
 struct v2;
 struct v3;
 struct v4;
@@ -641,15 +638,15 @@ inline v4::v4(const iv4 &base)
   this->z = (f32)base.z;
   this->w = (f32)base.w;
 }
-#define v2ToArray(v) \
+#define V2ToArray(v) \
   {                  \
     v.x, v.y         \
   }
-#define v3ToArray(v) \
+#define V3ToArray(v) \
   {                  \
     v.x, v.y, v.z    \
   }
-#define v4ToArray(v)   \
+#define V4ToArray(v)   \
   {                    \
     v.x, v.y, v.z, v.w \
   }
@@ -939,9 +936,9 @@ static m4 M4InitDiagonal(f32 diagonal)
 {
   m4 m = {
       {
-          {diagonal},
-          {0.f, diagonal},
-          {0.f, 0.f, diagonal},
+          {diagonal, 0.f, 0.f, 0.f},
+          {0.f, diagonal, 0.f, 0.f},
+          {0.f, 0.f, diagonal, 0.f},
           {0.f, 0.f, 0.f, diagonal},
       }};
   return m;
@@ -1201,6 +1198,19 @@ static v3 calculateTriangleNormalNormalized(v3 p1, v3 p2, v3 p3)
   normal = V3Normalize(normal);
   return normal;
 }
+static m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
+{
+  // f32 scale = (n - min.x) / (max.x - min.x) * (targetMax.x - targetMin.x) + targetMin.x;
+
+  m4 transform = M4InitDiagonal(1.0f);
+  transform = M4MultiplyM4(transform, M4TranslateV3(V3MultiplyF32(targetMin, 1.0f)));
+  transform = M4MultiplyM4(transform, M4ScaleV3(v3(targetMax.x - targetMin.x, targetMax.y - targetMin.y, targetMax.z - targetMin.z)));
+  transform = M4MultiplyM4(transform, M4ScaleV3(v3(1.0f / (max.x - min.x), 1.0f / (max.y - min.y), 1.0f / (max.z - min.z))));
+  transform = M4MultiplyM4(transform, M4TranslateV3(V3MultiplyF32(min, -1.0f)));
+
+  return transform;
+}
+
 
 #define fCompare(a,b) (fabsf(a-b)<0.0001)
 #define fCompareN(a,b,n) (fabsf(a - b) < n)
@@ -1825,42 +1835,6 @@ typedef enum cardinal8dir
   CENTER
 } cardinal8dir;
 
-typedef enum kTypes
-{
-  kTYPE_BOOL=1<<0,
-  kTYPE_CHAR=1<<0,
-  kTYPE_INT8=1<<0,
-  kTYPE_UINT8=1<<0,
-  kTYPE_INT16=1<<1,
-  kTYPE_UINT16=1<<1,
-  kTYPE_INT32=1<<2,
-  kTYPE_UINT32=1<<2,
-  kTYPE_FLOAT32=1<<2,
-  kTYPE_INT64=1<<3,
-  kTYPE_UINT64=1<<3,
-  kTYPE_FLOAT64=1<<3,
-  kTYPE_PTR=1<<3,
-  kTYPE_v2=(1<<2)*2,
-  kTYPE_v3=(1<<2)*3,
-  kTYPE_v4=(1<<2)*4,
-  kTYPE_iv2=(1<<2)*2,
-  kTYPE_iv3=(1<<2)*3,
-  kTYPE_iv4=(1<<2)*4,
-} kTypes;
-typedef struct kArgument_ArgDef{
-  size_t length;
-  kTypes args[max_arg_def_length];
-} kArgument_ArgDef;
-static void *getElementOfObjectAtIndex(u32 index,kArgument_ArgDef def,void*obj)
-{
-  u8*ptr=(u8*)obj;
-  u32 distance;
-  for(u32 i=0;i<index;i++){
-    distance+=def.args[i];
-  }
-  return ptr+distance;
-}
-
 static void seedRandomNumberGenerator(void)
 {
   srand((u32)time(0));
@@ -1933,7 +1907,7 @@ static f32 Perlin2D(f32 x, f32 y, f32 freq, i32 depth)
 }
 #endif
 
-static f32 InterpolateLinear(f32 t)
+static f32 interpolateLinear(f32 t)
 {
   f32 result = 0;
   if (t < 0)
@@ -1950,7 +1924,7 @@ static f32 InterpolateLinear(f32 t)
   }
   return result;
 }
-static f32 InterpolateSmooth(f32 t)
+static f32 interpolateSmooth(f32 t)
 {
   f32 result = 0;
   if (t < 0)
@@ -2186,14 +2160,4 @@ public:
   }
 };
 #endif
-#include <stdio.h>
-static m4 M4Mapper(v3 min,v3 max,v3 targetMin, v3 targetMax)
-{
-  // f32 scale = (n - min.x) / (max.x - min.x) * (targetMax.x - targetMin.x) + targetMin.x;
 
-  m4 transform = M4TranslateV3(V3MultiplyF32(min,-1.0f));
-  transform = M4MultiplyM4(M4ScaleV3(v3(1.0f / (max.x - min.x), 1.0f / (max.y - min.y), 1.0f / (max.z - min.z))), transform);
-  transform = M4MultiplyM4(M4ScaleV3(v3(targetMax.x - targetMin.x, targetMax.y - targetMin.y, targetMax.z - targetMin.z)), transform);
-  transform = M4MultiplyM4(M4TranslateV3(V3MultiplyF32(targetMin, 1.0f)),transform);
-  return transform;
-}

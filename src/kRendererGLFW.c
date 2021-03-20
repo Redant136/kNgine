@@ -23,9 +23,6 @@ static u32 currentContext=0;
 
 static i32 defaultShader;
 static u32 defaultVAO = 0;
-static u32 defaultVBO = 0;
-static bool defaultVBOIsTex = false;
-static v4 defaultVBOColor = {0,0,0,0};
 
 static f64 lastTime = 0;
 
@@ -377,10 +374,7 @@ static void compileShaders()
   }
 }
 static m4 getMapper(){
-  return M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max, v3(-1, -1, -1), v3(1, 1, 1)); // TODO fix this
-}
-static void updateDefaultVBO(v3 newPos,bool isTexture,v4 colorTexCoord){
-
+  return M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max, v3(-1, -1, -1), v3(1, 1, 1));
 }
 
 i32 kRenderer_init(i32 argc, const char **argv, kRenderer_WindowContext *context)
@@ -458,8 +452,11 @@ i32 kRenderer_createWindow(kRenderer_WindowContext *context)
   {
     glGenVertexArrays(1, &defaultVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
-    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8,(void *)(sizeof(f32) * 3));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8,(void *)(sizeof(f32) * 4));
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
+    glEnableVertexAttribArray(2);
   }
   return 0;
 }
@@ -543,56 +540,10 @@ void kRenderer_clearGray(f32 gray)
 
 void kRenderer_drawRect(v2 points[4])
 {
-  struct corner {v3 pos;f32 b;v4 color;};
-  struct corner corners[4];
-  m4 mapper=getMapper();
-  for(u32 i=0;i<4;i++){
-    v4 rP={points[i].x,points[i].y,0.0f,1.0f};
-
-    rP=V4MultiplyM4(rP, mapper);
-    struct corner a = {v3(rP.x, rP.y, rP.z),
-                0.0f,
-                kRenderer_WindowsContexts.windows[currentContext].context->currentColor};
-    corners[i] = a;
-  }
-
-  u32 VBO1,VBO2;
-  struct corner corners1[3] = {corners[0], corners[1], corners[3]};
-  struct corner corners2[3] = {corners[0], corners[2], corners[3]};
-
-  glGenBuffers(1, &VBO1);
-  glBindVertexArray(defaultVAO); // setup variables in gpu memory
-  glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(f32)*8*3, corners1, GL_STATIC_DRAW); // initialise value VBO
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
-  glEnableVertexAttribArray(2);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindVertexArray(defaultVAO);
-  glUseProgram(defaultShader);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
-  glDeleteBuffers(1, &VBO1);
-
-  glGenBuffers(1, &VBO2);
-  glBindVertexArray(defaultVAO); // setup variables in gpu memory
-  glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(f32)*8*3, corners2, GL_STATIC_DRAW); // initialise value VBO
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
-  glEnableVertexAttribArray(2);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindVertexArray(defaultVAO);
-  glUseProgram(defaultShader);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
-  glDeleteBuffers(1, &VBO2);
+  v2 p[3] = {points[0], points[1], points[3]};
+  kRenderer_drawTriangle(p);
+  p[1]=points[2];
+  kRenderer_drawTriangle(p);
 }
 void kRenderer_drawRectV4(v4 rect)
 {
@@ -617,15 +568,17 @@ void kRenderer_drawTriangle(v2 points[3])
 
   u32 VBO;
   glGenBuffers(1, &VBO);
-  glBindVertexArray(defaultVAO); // setup variables in gpu memory
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindVertexArray(defaultVAO); // setup variables in gpu memory
   glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners, GL_STATIC_DRAW); // initialise value VBO
+
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
   glEnableVertexAttribArray(2);
+
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glBindVertexArray(defaultVAO);
@@ -694,89 +647,13 @@ void kRenderer_drawCircle(v2 startPoint, f32 radius)
 void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
                                         v3 position, i32 width, i32 height,v3 rotation)
 {
-  struct corner {v3 pos;f32 b;v4 texCoord;};
-  v2 points[4]={v2(position.x,position.y),v2(position.x+width,position.y),v2(position.x,position.y+height),v2(position.x+width,position.y+height)};
-  struct corner corners[4];
-  for(u32 i=0;i<4;i++){
-    v4 rP={points[i].x,points[i].y,0.0f,1.0f};
-    m4 mat = getMapper();
-    mat = M4MultiplyM4(mat, M4Rotate(rotation.x, v3(1.0f, 0.0f, 0.0f)));
-    mat = M4MultiplyM4(mat, M4Rotate(rotation.y, v3(0.0f, 1.0f, 0.0f)));
-    mat = M4MultiplyM4(mat, M4Rotate(rotation.z, v3(0.0f, 0.0f, 1.0f)));
-    rP = V4MultiplyM4(rP, mat);
-    struct corner a = {v3(rP.x, rP.y, rP.z),
-                1.0f,
-                v4(1,1,1,1)};
-     corners[i] = a;
-  }
-
-  corners[0].texCoord=v4(0.0f,0.0f,0.0f,0.0f);
-  corners[1].texCoord=v4(1.0f,0.0f,1.0f,0.0f);
-  corners[2].texCoord=v4(0.0f,1.0f,0.0f,1.0f);
-  corners[3].texCoord=v4(1.0f,1.0f,1.0f,1.0f);
-
-  u32 VBO1,VBO2;
-  struct corner corners1[3] = {corners[0], corners[1], corners[3]};
-  struct corner corners2[3] = {corners[0], corners[2], corners[3]};
   u32 texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture);
-  if (numChannels == 3)
-  {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, bufferWidth, bufferHeight, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, buffer);
-  }
-  else
-  {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_RGBA,
-                 GL_UNSIGNED_BYTE, buffer);
-  }
-  glGenerateMipmap(GL_TEXTURE_2D);
-
-  glGenBuffers(1, &VBO1);
-  glBindVertexArray(defaultVAO); // setup variables in gpu memory
-  glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(f32)*8*3, corners1, GL_STATIC_DRAW); // initialise value VBO
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
-  glEnableVertexAttribArray(2);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindVertexArray(defaultVAO);
-  glUseProgram(defaultShader);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
-  glDeleteBuffers(1, &VBO1);
-
-  glGenBuffers(1, &VBO2);
-  glBindVertexArray(defaultVAO); // setup variables in gpu memory
-  glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(f32)*8*3, corners2, GL_STATIC_DRAW); // initialise value VBO
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
-  glEnableVertexAttribArray(2);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindVertexArray(defaultVAO);
-  glUseProgram(defaultShader);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
-  glDeleteBuffers(1, &VBO2);
-
-  glDeleteTextures(1, &texture);
+  kRenderer_bindTexture(&texture,buffer,bufferWidth,bufferHeight,numChannels);
+  kRenderer_drawStoredTexture_defaultShader(texture,position,width,height,rotation);
+  kRenderer_unbindTexture(texture);
 }
 void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-       i32 width, i32 height, void *args[kRenderer_maxShaderPrograms])
+       i32 width, i32 height, void *args[kRenderer_maxShaderPrograms])// TODO
 {
   struct corner {v3 pos;f32 b;v4 color;};
 
@@ -871,101 +748,105 @@ void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 num
   // glDeleteBuffers(1, &EBO);
 }
 
-void kRenderer_bindTexture(u32 *textureIndex, u8 *colors, v2 position, i32 width,
-                           i32 height, i32 realWidth, i32 realHeight, i32 numChannels){}
-void kRenderer_drawTexture(u32 textureIndex, v2 position, i32 width, i32 height, v3 rotation){}
-void kRenderer_unbindTexture(u32 textureIndex){}
+void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer,i32 realWidth, i32 realHeight, i32 numChannels)
+{
+  glGenTextures(1, textureIndex);
+  glBindTexture(GL_TEXTURE_2D, *textureIndex);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, realWidth, realHeight, 0, GL_RGBA,
+               GL_UNSIGNED_BYTE, buffer);
+  glGenerateMipmap(GL_TEXTURE_2D);
+}
+void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation)
+{
+  struct corner
+  {
+    v3 pos;
+    f32 b;
+    v4 texCoord;
+  };
+  v3 points[4] = {v3(-width/2.0, -height/2.0, 0), v3(width/2.0, -height/2.0, 0), v3(-width/2.0, height/2.0, 0), v3(width/2.0, height/2.0, 0)};
+  struct corner corners[4];
 
-// void kRenderer_bindTexture(u32 *textureIndex, u8 *colors, v2 position,
-//                            i32 width, i32 height, i32 realWidth, i32 realHeight,
-//                            i32 numChannels)
-// {
-  // if (storedVBO == 0)
-  // {
-  //   f32 vertices[] = {0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-  //                     0.5, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-  //                     -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-  //                     -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f};
-  //   u32 indices[] = {0, 1, 3, 0, 2, 3};
-  //   glGenBuffers(1, &storedVBO);
-  //   glBindBuffer(GL_ARRAY_BUFFER, storedVBO);
-  //   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
-  //                GL_STATIC_DRAW); // initialise value VBO
-  //   glGenVertexArrays(1, &storedVAO);
-  //   glBindVertexArray(storedVAO); // setup variables in gpu memory
-  //   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float),
-  //                         (void *)0); // 3 values xyz,size for one point
-  //   glEnableVertexAttribArray(0);
-  //   glVertexAttribPointer(
-  //       1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float),
-  //       (void *)(3 * sizeof(float))); // 4 values rgba,size for one point
-  //   glEnableVertexAttribArray(1);     // set values of VAO to pass to shader
-  //   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float),
-  //                         (void *)(7 * sizeof(float)));
-  //   glEnableVertexAttribArray(2);
-  //   glGenBuffers(1, &storedEBO);
-  //   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, storedEBO);
-  //   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-  //                GL_STATIC_DRAW);
-  // }
+  m4 mat = M4InitDiagonal(1.0f);
+  mat = M4MultiplyM4(mat, getMapper());
 
-  // glGenTextures(1, textureIndex);
-  // glBindTexture(GL_TEXTURE_2D, *textureIndex);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, realWidth, realHeight, 0, GL_RGBA,
-  //              GL_UNSIGNED_BYTE, colors);
-  // glGenerateMipmap(GL_TEXTURE_2D);
-// }
-// void kRenderer_drawTexture(u32 textureIndex, v2 position, i32 width, i32 height,
-//                            v3 rotation)
-// {
-//   glBindVertexArray(storedVAO); // setup variables in gpu memory
-//   glBindBuffer(GL_ARRAY_BUFFER, storedVBO);
-//   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, storedEBO);
+  mat = M4MultiplyM4(mat, M4TranslateV3(position));
+  mat = M4MultiplyM4(mat, M4TranslateV3(v3(width / 2.0, height / 2.0, 0)));
 
-//   // draw------
-//   glEnable(GL_BLEND);
-//   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//   iv2 windowSize = kRenderer_getWindowSize();
-//   glActiveTexture(GL_TEXTURE0);
-//   glBindTexture(GL_TEXTURE_2D, textureIndex);
-//   // glm::mat4 transform = glm::mat4(1.0f);
-//   // transform = glm::translate(
-//   //     transform,
-//   //     glm::vec3(
-//   //         (float)((position.x + width / 2) / kRenderer_getWindowWidth()) *
-//   //                 2.0f -
-//   //             1.0f,
-//   //         (float)-((position.y + height / 2) / kRenderer_getWindowHeight()) *
-//   //                 2.0f +
-//   //             1.0f,
-//   //         0.0f));
-//   // transform = glm::scale(
-//   //     transform,
-//   //     glm::vec3((float)(((float)width) / windowSize.x) * 2.0f,
-//   //               (float)-(((float)height) / windowSize.y) * 2.0f, 1.0f));
-//   // transform = glm::rotate(transform, -rotation.x,
-//   //                         glm::vec3(1.0f, 0.0f, 0.0f));
-//   // transform = glm::rotate(transform, -rotation.y,
-//   //                         glm::vec3(0.0f, 1.0f, 0.0f));
-//   // transform = glm::rotate(transform, -rotation.z,
-//   //                         glm::vec3(0.0f, 0.0f, 1.0f));
-//   glUseProgram(shaderProgram);
-//   u32 transformLoc = glGetUniformLocation(shaderProgram, "transform");
-//   // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-//   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, storedEBO);
-//   glBindVertexArray(storedVAO);
-//   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-//   // transform = glm::mat4(1.0f);
-//   // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-// }
-// void kRenderer_unbindTexture(u32 textureIndex)
-// {
-//   glDeleteTextures(1, &textureIndex);
-// }
+  mat = M4MultiplyM4(mat, M4Rotate(-rotation.x, v3(1.0f, 0.0f, 0.0f)));
+  mat = M4MultiplyM4(mat, M4Rotate(-rotation.y, v3(0.0f, 1.0f, 0.0f)));
+  mat = M4MultiplyM4(mat, M4Rotate(-rotation.z, v3(0.0f, 0.0f, 1.0f)));
+
+  mat = M4MultiplyM4(mat, M4ScaleV3(v3(1.0f,-1.0f,1.0f)));
+
+  for (u32 i = 0; i < 4; i++)
+  {
+    v4 rP = {points[i].x, points[i].y, points[i].z, 1.0f};
+    v4 translatedPoint = V4MultiplyM4(rP, mat);
+    rP = V4MultiplyM4(rP, mat);
+    struct corner a = {v3(rP.x, rP.y, rP.z),
+                       1.0f,
+                       v4(1, 1, 1, 1)};
+    corners[i] = a;
+  }
+
+  corners[0].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
+  corners[1].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);
+  corners[2].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);
+  corners[3].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
+
+  u32 VBO1, VBO2;
+  struct corner corners1[3] = {corners[0], corners[1], corners[3]};
+  struct corner corners2[3] = {corners[0], corners[2], corners[3]};
+ 
+  glBindTexture(GL_TEXTURE_2D, textureIndex);
+
+  glGenBuffers(1, &VBO1);
+  glBindVertexArray(defaultVAO); // setup variables in gpu memory
+  glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners1, GL_STATIC_DRAW); // initialise value VBO
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
+  glEnableVertexAttribArray(2);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBindVertexArray(defaultVAO);
+  glUseProgram(defaultShader);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDeleteBuffers(1, &VBO1);
+
+  glGenBuffers(1, &VBO2);
+  glBindVertexArray(defaultVAO); // setup variables in gpu memory
+  glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners2, GL_STATIC_DRAW); // initialise value VBO
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
+  glEnableVertexAttribArray(2);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBindVertexArray(defaultVAO);
+  glUseProgram(defaultShader);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDeleteBuffers(1, &VBO2);
+}
+void kRenderer_drawStoredTexture(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation)// TODO
+{
+  
+}
+void kRenderer_unbindTexture(u32 textureIndex)
+{
+  glDeleteTextures(1, &textureIndex);
+}
 
 // key input
 bool kRenderer_keyStatusPressed(Key e)

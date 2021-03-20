@@ -27,8 +27,7 @@ namespace kNgine
     for (i32 i = 0; i < list.size(); i++)
     {
       u32 texture, VBO;
-      kRenderer_bindTexture(&texture, list[i].buffer, v2(0, 0), 1, 1,
-                            list[i].width, list[i].height, list[i].numChannels);
+      kRenderer_bindTexture(&texture, list[i].buffer, list[i].width, list[i].height, list[i].numChannels);
       texIndex.push_back(texture);
     }
   }

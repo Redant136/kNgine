@@ -1,9 +1,7 @@
 #pragma once
 
-// can be used seperate from engine
-#include "../../src/utils.h"
-#include "../../src/kThread.h"
-#include "../../src/kRenderer.h"
+#include "kNgineFramework.h"
+
 // basics of all objects
 #include "../../src/EngineObjects.hpp"
 // specific objects

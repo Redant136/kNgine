@@ -19,15 +19,16 @@ endif()
 set(KNGINE_HEADER_FILES
 src/utils.h
 src/kThread.h
+src/kStruct_def.h
 src/kRenderer.h
 
 src/EngineObjects.hpp
 src/Camera.hpp
 src/SpriteUtils.hpp
+src/PhysicsB2.hpp
 src/AudioEngine.hpp
-src/Engine.hpp
 
-# src/oldRenderer.hpp
+src/Engine.hpp
 )
 
 set(KNGINE_SOURCE_FILES
@@ -36,20 +37,10 @@ src/kRendererGLFW.c
 src/EngineObjects.cpp 
 src/Camera_2D.cpp
 src/SpriteUtils.cpp
+src/PhysicsB2.cpp
 src/Tilemap.cpp
 src/Engine.cpp
 ${OSSpecificFiles}
-
-# src/oldRendererGLFW.cpp
-)
-
-set(KNGINE_SOURCE_FILES
-  ${KNGINE_SOURCE_FILES}
-  src/PhysicsB2.cpp
-)
-set(KNGINE_HEADER_FILES
-  ${KNGINE_HEADER_FILES}
-  src/PhysicsB2.hpp
 )
 
 add_library(kNgine
@@ -67,9 +58,6 @@ target_link_libraries(kNgine PRIVATE glfw)
 
 add_subdirectory(extern/glad/)
 target_link_libraries(kNgine PRIVATE glad)
-
-add_subdirectory(extern/glm)
-target_link_libraries(kNgine PRIVATE glm)
 
 set(wave_enable_tests OFF)
 add_subdirectory(extern/wave)
