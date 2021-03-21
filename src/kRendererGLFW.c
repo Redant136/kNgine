@@ -1,4 +1,5 @@
 #include <math.h>
+#define strManipulation
 #include "utils.h"
 #include "kRenderer.h"
 #include <glad/glad.h>
@@ -6,12 +7,39 @@
 #define GLFW_INCLUDE_GLCOREARB
 #endif
 #include <GLFW/glfw3.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include <stdio.h>
+
+FT_Library ft;
+
+static v3 rotation = {0, 0, 0};
+
+static struct
+{
+  u32 currentFont;
+  size_t length;
+  struct
+  {
+    const char *font_name;
+    struct
+    {
+      char character;
+      u32 textureId;
+      iv2 startPos;
+      u8 width;
+      u8 height;
+      u8 advance;
+    } character[256]; // (c+128)%256
+  } fonts[kRenderer_maxFonts];
+} fontMaps;
 
 static struct
 {
   size_t length;
-  struct{
+  struct
+  {
     i32 shaderPrograms[kRenderer_maxShaderPrograms];
     v3 min;
     v3 max;
@@ -19,7 +47,7 @@ static struct
     GLFWwindow *window;
   } windows[kRenderer_maxWindows];
 } kRenderer_WindowsContexts;
-static u32 currentContext=0;
+static u32 currentContext = 0;
 
 static i32 defaultShader;
 static u32 defaultVAO = 0;
@@ -45,20 +73,23 @@ static const char *fragmentShaderSource =
     "in float isTex;\n"
     "out vec4 FragColor;\n"
     "uniform sampler2D textureMap;\n"
+    "uniform vec4 colorScale = vec4(1.0f,1.0f,1.0f,1.0f);\n"
     "void main()\n"
     "{\n"
     "  if(isTex>0.5f){\n"
     "  \n"
-    "    FragColor = texture(textureMap, vec2(colorTexCoord.x,colorTexCoord.y));\n"
+    "    FragColor = texture(textureMap, vec2(colorTexCoord.x,colorTexCoord.y))*colorScale;\n"
     "  }else{\n"
-    "    FragColor = colorTexCoord;\n"
+    "    FragColor = colorTexCoord*colorScale;\n"
     "  }\n"
     "}\0";
 
 static void framebuffer_size_callback(GLFWwindow *window, i32 width, i32 height)
 {
-  for(u32 i=0;i<kRenderer_WindowsContexts.length;i++){
-    if(kRenderer_WindowsContexts.windows[i].window==window){
+  for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
+  {
+    if (kRenderer_WindowsContexts.windows[i].window == window)
+    {
       if (fCompare(kRenderer_WindowsContexts.windows[i].min.y, kRenderer_WindowsContexts.windows[i].context->height) &&
           fCompare(kRenderer_WindowsContexts.windows[i].max.x, kRenderer_WindowsContexts.windows[i].context->width))
       {
@@ -281,11 +312,11 @@ static i32 MouseToGLFW(Key k)
 }
 static void compileShaders()
 {
-  if(1)
+  if (1)
   {
     i32 success;
     char infoLog[512];
-    defaultShader=glCreateProgram();
+    defaultShader = glCreateProgram();
     i32 vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
@@ -324,40 +355,44 @@ static void compileShaders()
       assert(0 && "ERROR::SHADER::COMPILATION_FAILED\n");
     }
   }
-  for(u32 i=0;i<kRenderer_WindowsContexts.length;i++){
-    for(u32 j=0;j<kRenderer_WindowsContexts.windows[i].context->windowShaders.length;j++){
+  for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
+  {
+    for (u32 j = 0; j < kRenderer_WindowsContexts.windows[i].context->windowShaders.length; j++)
+    {
       i32 success;
       char infoLog[512];
       kRenderer_WindowsContexts.windows[i].shaderPrograms[j] = glCreateProgram();
-      for(u32 s=0;s<kRenderer_WindowsContexts.windows[i].context->windowShaders.programs[j].length;s++){
+      for (u32 s = 0; s < kRenderer_WindowsContexts.windows[i].context->windowShaders.programs[j].length; s++)
+      {
         i32 shader;
         GLenum shaderType;
         switch (kRenderer_WindowsContexts.windows[i].context->windowShaders.programs[j].shaders[s].shaderType)
         {
         case kRenderer_SHADER_Vertex:
-          shaderType=GL_VERTEX_SHADER;
+          shaderType = GL_VERTEX_SHADER;
           break;
         case kRenderer_SHADER_Fragment:
-          shaderType=GL_FRAGMENT_SHADER;
+          shaderType = GL_FRAGMENT_SHADER;
           break;
         case kRenderer_SHADER_Geometry:
-          shaderType=GL_GEOMETRY_SHADER;
+          shaderType = GL_GEOMETRY_SHADER;
           break;
         default:
           shaderType = GL_VERTEX_SHADER;
           break;
         }
-        shader=glCreateShader(shaderType);
-        glShaderSource(shader, 1, &kRenderer_WindowsContexts.windows[i].context->windowShaders.programs[j].shaders[s].shader,NULL);
+        shader = glCreateShader(shaderType);
+        glShaderSource(shader, 1, &kRenderer_WindowsContexts.windows[i].context->windowShaders.programs[j].shaders[s].shader, NULL);
         glCompileShader(shader);
         // error checks
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if(!success){
+        if (!success)
+        {
           glGetShaderInfoLog(shader, 512, NULL, infoLog);
-          printf("%s\n",infoLog);
+          printf("%s\n", infoLog);
           assert(0 && "ERROR::SHADER::COMPILATION_FAILED\n");
         }
-        glAttachShader(kRenderer_WindowsContexts.windows[i].shaderPrograms[j],shader);
+        glAttachShader(kRenderer_WindowsContexts.windows[i].shaderPrograms[j], shader);
         glDeleteShader(shader);
       }
 
@@ -373,13 +408,20 @@ static void compileShaders()
     }
   }
 }
-static m4 getMapper(){
-  return M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max, v3(-1, -1, -1), v3(1, 1, 1));
+static m4 getMapper()
+{
+  m4 mapper = M4InitDiagonal(1);
+  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.x, v3(1, 0, 0)));
+  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.y, v3(0, 1, 0)));
+  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.z, v3(0, 0, 1)));
+  mapper = M4MultiplyM4(mapper, M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max, v3(-1, -1, -1), v3(1, 1, 1)));
+  return mapper;
 }
 
-i32 kRenderer_init(i32 argc, const char **argv, kRenderer_WindowContext *context)
+i32 kRenderer_init(i32 argc, const char **argv)
 {
-  if(!glfwInit()){
+  if (!glfwInit())
+  {
     assert(0 && "could not create context");
     return -1;
   }
@@ -389,36 +431,28 @@ i32 kRenderer_init(i32 argc, const char **argv, kRenderer_WindowContext *context
 #ifdef __APPLE__
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
-  kRenderer_WindowContext c = {"kRenderer", v4(1, 1, 1, 1), iv2(1920, 1080), true,
-  {1,
-    {
-      {
-        {3,{kTYPE_v3,kTYPE_BOOL,kTYPE_v4}},
-        2,
-        {
-          {kRenderer_SHADER_Vertex,vertexShaderSource},
-          {kRenderer_SHADER_Fragment,fragmentShaderSource}
-        }
-      }
-    }
-  }, NULL, NULL};
-  *context=c;
+  return 0;
+}
+i32 kRenderer_createContext(kRenderer_WindowContext *context)
+{
+  kRenderer_WindowContext c = {"kRenderer", v4(1, 1, 1, 1), iv2(1920, 1080), true, {1, {{{3, {kTYPE_v3, kTYPE_BOOL, kTYPE_v4}}, 2, {{kRenderer_SHADER_Vertex, vertexShaderSource}, {kRenderer_SHADER_Fragment, fragmentShaderSource}}}}}, NULL, NULL};
+  *context = c;
   assert(kRenderer_WindowsContexts.length < kRenderer_maxWindows);
   currentContext = kRenderer_WindowsContexts.length;
   kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].context = context;
-  kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].min=v3(0,1080,0);
+  kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].min = v3(0, 1080, 0);
   kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].max = v3(1920, 0, 1);
 
   kRenderer_WindowsContexts.length++;
   return 0;
 }
-i32 kRenderer_makeCurrentContext(kRenderer_WindowContext *context){
+i32 kRenderer_makeCurrentContext(kRenderer_WindowContext *context)
+{
   for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
   {
     if (kRenderer_WindowsContexts.windows[i].context == context)
     {
-      currentContext=i;
+      currentContext = i;
       return 0;
     }
   }
@@ -426,7 +460,7 @@ i32 kRenderer_makeCurrentContext(kRenderer_WindowContext *context){
 }
 i32 kRenderer_createWindow(kRenderer_WindowContext *context)
 {
-  GLFWwindow*window = glfwCreateWindow(context->width, context->height, context->name, NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(context->width, context->height, context->name, NULL, NULL);
   if (window == NULL)
   {
     glfwTerminate();
@@ -440,12 +474,13 @@ i32 kRenderer_createWindow(kRenderer_WindowContext *context)
     assert(0 && "could not initialize GLAD");
     return -1;
   }
-  for(u32 i=0;i<kRenderer_WindowsContexts.length;i++)
+  for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
   {
-    if(kRenderer_WindowsContexts.windows[i].context==context){
-      kRenderer_WindowsContexts.windows[i].window=window;
+    if (kRenderer_WindowsContexts.windows[i].context == context)
+    {
+      kRenderer_WindowsContexts.windows[i].window = window;
       kRenderer_WindowsContexts.windows[i].min = v3(0, kRenderer_getWindowHeight(), 0);
-      kRenderer_WindowsContexts.windows[i].max = v3(kRenderer_getWindowWidth(),0,1);
+      kRenderer_WindowsContexts.windows[i].max = v3(kRenderer_getWindowWidth(), 0, 1);
     }
   }
   if (defaultVAO == 0)
@@ -461,21 +496,24 @@ i32 kRenderer_createWindow(kRenderer_WindowContext *context)
   return 0;
 }
 
-void kRenderer_setWindowSize(i32 width, i32 height) 
+void kRenderer_setWindowSize(i32 width, i32 height)
 {
   if (fCompare(kRenderer_WindowsContexts.windows[currentContext].min.y, kRenderer_WindowsContexts.windows[currentContext].context->height) &&
-      fCompare(kRenderer_WindowsContexts.windows[currentContext].max.x, kRenderer_WindowsContexts.windows[currentContext].context->width)){
-    kRenderer_WindowsContexts.windows[currentContext].min.y=height;
-    kRenderer_WindowsContexts.windows[currentContext].max.x=width;
+      fCompare(kRenderer_WindowsContexts.windows[currentContext].max.x, kRenderer_WindowsContexts.windows[currentContext].context->width))
+  {
+    kRenderer_WindowsContexts.windows[currentContext].min.y = height;
+    kRenderer_WindowsContexts.windows[currentContext].max.x = width;
   }
   kRenderer_WindowsContexts.windows[currentContext].context->windowSize = iv2(width, height);
-  if(kRenderer_WindowsContexts.windows[currentContext].window!=NULL){
+  if (kRenderer_WindowsContexts.windows[currentContext].window != NULL)
+  {
     glViewport(0, 0, width, height);
   }
 }
-void kRenderer_setWindowName(const char *windowName){
-  kRenderer_WindowsContexts.windows[currentContext].context->name=windowName;
-  if (kRenderer_WindowsContexts.windows[currentContext].window!=NULL)
+void kRenderer_setWindowName(const char *windowName)
+{
+  kRenderer_WindowsContexts.windows[currentContext].context->name = windowName;
+  if (kRenderer_WindowsContexts.windows[currentContext].window != NULL)
   {
     glfwSetWindowTitle(kRenderer_WindowsContexts.windows[currentContext].window, windowName);
   }
@@ -484,44 +522,114 @@ void kRenderer_setStartFunction(void (*startDisplayFunc)())
 {
   kRenderer_WindowsContexts.windows[currentContext].context->init = startDisplayFunc;
 }
-void kRenderer_setDrawFunction(void(*refreshFunction)())
+void kRenderer_setDrawFunction(void (*refreshFunction)())
 {
   kRenderer_WindowsContexts.windows[currentContext].context->draw = refreshFunction;
 }
 void kRenderer_setWindowBoundsScale(v3 min, v3 max)
 {
-  kRenderer_WindowsContexts.windows[currentContext].min=min;
-  kRenderer_WindowsContexts.windows[currentContext].max=max;
+  kRenderer_WindowsContexts.windows[currentContext].min = min;
+  kRenderer_WindowsContexts.windows[currentContext].max = max;
 }
 
 void kRenderer_launch()
 {
   compileShaders();
-  for(u32 i=0;i<kRenderer_WindowsContexts.length;i++){
+  // All functions return a value different than 0 whenever an error occurred
+  if (FT_Init_FreeType(&ft))
+  {
+    assert(0 && "ERROR::FREETYPE: Could not init FreeType Library");
+  }
+  fontMaps.currentFont = 0;
+  kRenderer_loadFont("ressources/fonts/roboto/Roboto-Regular.ttf", "roboto");
+  kRenderer_loadFont("ressources/fonts/rainyhearts/rainyhearts.ttf", "rainyhearts");
+  for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
+  {
     glfwMakeContextCurrent(kRenderer_WindowsContexts.windows[i].window);
     glClear(GL_COLOR_BUFFER_BIT);
-    currentContext=i;
+    currentContext = i;
     kRenderer_WindowsContexts.windows[i].context->init();
     glfwSwapBuffers(kRenderer_WindowsContexts.windows[i].window);
     glfwPollEvents();
   }
-  bool running=true;
-  while(running){
-    running=false;
-    double time=glfwGetTime();
-    for(u32 i=0;i<kRenderer_WindowsContexts.length;i++){
+  bool running = true;
+  while (running)
+  {
+    running = false;
+    double time = glfwGetTime();
+    for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
+    {
       glfwMakeContextCurrent(kRenderer_WindowsContexts.windows[i].window);
       glClear(GL_COLOR_BUFFER_BIT);
       currentContext = i;
       kRenderer_WindowsContexts.windows[i].context->draw();
-      glfwSwapInterval(kRenderer_WindowsContexts.windows[i].context->gSync?1:0);
+      glfwSwapInterval(kRenderer_WindowsContexts.windows[i].context->gSync ? 1 : 0);
       glfwSwapBuffers(kRenderer_WindowsContexts.windows[i].window);
       glfwPollEvents();
-      running|=!glfwWindowShouldClose(kRenderer_WindowsContexts.windows[i].window);
+      running |= !glfwWindowShouldClose(kRenderer_WindowsContexts.windows[i].window);
     }
-    lastTime=time;
+    lastTime = time;
   }
   glfwTerminate();
+}
+
+//---------------------------------
+
+void kRenderer_rotateViewport(v3 angle)
+{
+  rotation = angle;
+}
+
+void kRenderer_loadFont(const char *fontPath, const char *fontName)
+{
+  assert(fontMaps.length < kRenderer_maxFonts);
+  fontMaps.fonts[fontMaps.length].font_name = fontName;
+  FT_Face face;
+  if (FT_New_Face(ft, fontPath, 0, &face))
+  {
+    assert(0 && "ERROR::FREETYPE: Failed to load font");
+  }
+  else
+  {
+    // set size to load glyphs as
+    FT_Set_Pixel_Sizes(face, 0, 48);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    // modify for extended ascii
+    for (u8 c = 0; c < 128; c++)
+    {
+      // Load character glyph
+      if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+      {
+        assert(0 && "ERROR::FREETYTPE: Failed to load Glyph");
+        return;
+      }
+      // generate texture
+      u8 *grayScaleBuffer = malloc(sizeof(u8) * face->glyph->bitmap.width * face->glyph->bitmap.rows * 4);
+      for (u32 y = 0; y < face->glyph->bitmap.rows; y++)
+      {
+        for (u32 x = 0; x < face->glyph->bitmap.width; x++)
+        {
+          grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4] = 255;
+          grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 1] = 255;
+          grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 2] = 255;
+          grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 3] = face->glyph->bitmap.buffer[y * face->glyph->bitmap.width+x];
+        }
+      }
+      u32 texture;
+      kRenderer_bindTexture(&texture, grayScaleBuffer, face->glyph->bitmap.width, face->glyph->bitmap.rows, 4);
+      free(grayScaleBuffer);
+      fontMaps.fonts[fontMaps.length].character[c + 128].character = c;
+      fontMaps.fonts[fontMaps.length].character[c + 128].textureId = texture;
+      fontMaps.fonts[fontMaps.length].character[c + 128].startPos = iv2(face->glyph->bitmap_left, 48 - face->glyph->bitmap_top); // will have to test this
+      fontMaps.fonts[fontMaps.length].character[c + 128].width = face->glyph->bitmap.width;
+      fontMaps.fonts[fontMaps.length].character[c + 128].height = face->glyph->bitmap.rows;
+      fontMaps.fonts[fontMaps.length].character[c + 128].advance = face->glyph->advance.x >> 6;
+    }
+    glBindTexture(GL_TEXTURE_2D, 0);
+  }
+  fontMaps.length++;
+  FT_Done_Face(face);
 }
 
 void kRenderer_setDrawColor(v4 color)
@@ -530,10 +638,10 @@ void kRenderer_setDrawColor(v4 color)
 }
 void kRenderer_clear(v4 color)
 {
-  glClearColor(color.r,color.g,color.b,color.a);
+  glClearColor(color.r, color.g, color.b, color.a);
   glClear(GL_COLOR_BUFFER_BIT);
 }
-void kRenderer_clearGray(f32 gray) 
+void kRenderer_clearGray(f32 gray)
 {
   kRenderer_clear(v4(gray, gray, gray, 1));
 }
@@ -542,24 +650,29 @@ void kRenderer_drawRect(v2 points[4])
 {
   v2 p[3] = {points[0], points[1], points[3]};
   kRenderer_drawTriangle(p);
-  p[1]=points[2];
+  p[1] = points[2];
   kRenderer_drawTriangle(p);
 }
 void kRenderer_drawRectV4(v4 rect)
 {
-  v2 points[4]={toV2(rect), v2(rect.x, rect.y + rect.height),
-               v2(rect.x + rect.width, rect.y),
-               v2(rect.x + rect.width, rect.y + rect.height)};
+  v2 points[4] = {toV2(rect), v2(rect.x, rect.y + rect.height),
+                  v2(rect.x + rect.width, rect.y),
+                  v2(rect.x + rect.width, rect.y + rect.height)};
   kRenderer_drawRect(points);
 }
 void kRenderer_drawTriangle(v2 points[3])
 {
-  struct corner{v3 pos;f32 b;v4 color;};
+  struct corner
+  {
+    v3 pos;
+    f32 b;
+    v4 color;
+  };
   struct corner corners[3];
   for (u32 i = 0; i < 3; i++)
   {
     v4 rP = {points[i].x, points[i].y, 0.0f, 1.0f};
-    rP=V4MultiplyM4(rP, getMapper());
+    rP = V4MultiplyM4(rP, getMapper());
     struct corner a = {v3(rP.x, rP.y, rP.z),
                        0.0f,
                        kRenderer_WindowsContexts.windows[currentContext].context->currentColor};
@@ -569,7 +682,7 @@ void kRenderer_drawTriangle(v2 points[3])
   u32 VBO;
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(defaultVAO); // setup variables in gpu memory
+  glBindVertexArray(defaultVAO);                                               // setup variables in gpu memory
   glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners, GL_STATIC_DRAW); // initialise value VBO
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
@@ -588,12 +701,17 @@ void kRenderer_drawTriangle(v2 points[3])
 }
 void kRenderer_drawLine(v2 points[2])
 {
-  struct corner{v3 pos;f32 b;v4 color;};
+  struct corner
+  {
+    v3 pos;
+    f32 b;
+    v4 color;
+  };
   struct corner corners[2];
   for (u32 i = 0; i < 2; i++)
   {
     v4 rP = {points[i].x, points[i].y, 0.0f, 1.0f};
-    rP=V4MultiplyM4(rP, getMapper());
+    rP = V4MultiplyM4(rP, getMapper());
     struct corner a = {v3(rP.x, rP.y, 0.0f),
                        false,
                        kRenderer_WindowsContexts.windows[currentContext].context->currentColor};
@@ -632,7 +750,7 @@ void kRenderer_drawLineLoop(v2 *points, i32 numPoints)
 }
 void kRenderer_drawPoint(v2 point) // very slow
 {
-  kRenderer_drawRectV4(v4(point.x,point.y,1,1));
+  kRenderer_drawRectV4(v4(point.x, point.y, 1, 1));
 }
 void kRenderer_drawCircle(v2 startPoint, f32 radius)
 {
@@ -645,17 +763,114 @@ void kRenderer_drawCircle(v2 startPoint, f32 radius)
 }
 
 void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-                                        v3 position, i32 width, i32 height,v3 rotation)
+                                        v3 position, i32 width, i32 height, v3 rotation)
 {
   u32 texture;
-  kRenderer_bindTexture(&texture,buffer,bufferWidth,bufferHeight,numChannels);
-  kRenderer_drawStoredTexture_defaultShader(texture,position,width,height,rotation);
+  kRenderer_bindTexture(&texture, buffer, bufferWidth, bufferHeight, numChannels);
+  kRenderer_drawStoredTexture_defaultShader(texture, position, width, height, rotation);
   kRenderer_unbindTexture(texture);
 }
 void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-       i32 width, i32 height, void *args[kRenderer_maxShaderPrograms])// TODO
+                          v3 position, i32 width, i32 height, v3 rotation, void *args[kRenderer_maxShaderPrograms]) // TODO
 {
-  struct corner {v3 pos;f32 b;v4 color;};
+  u32 texture;
+  kRenderer_bindTexture(&texture, buffer, bufferWidth, bufferHeight, numChannels);
+  kRenderer_drawStoredTexture(texture, position, width, height, rotation, args);
+  kRenderer_unbindTexture(texture);
+}
+
+void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer, i32 realWidth, i32 realHeight, i32 numChannels)
+{
+  glGenTextures(1, textureIndex);
+  glBindTexture(GL_TEXTURE_2D, *textureIndex);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  if (numChannels == 1)
+  {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, realWidth, realHeight, 0, GL_RED,
+                 GL_UNSIGNED_BYTE, buffer);
+  }
+  else if (numChannels == 3)
+  {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, realWidth, realHeight, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, buffer);
+  }
+  else if (numChannels == 4)
+  {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, realWidth, realHeight, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, buffer);
+  }
+  glGenerateMipmap(GL_TEXTURE_2D);
+}
+void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation)
+{
+  struct corner
+  {
+    v3 pos;
+    f32 b;
+    v4 texCoord;
+  };
+  v3 points[4] = {v3(-width / 2.0, -height / 2.0, 0), v3(width / 2.0, -height / 2.0, 0), v3(-width / 2.0, height / 2.0, 0), v3(width / 2.0, height / 2.0, 0)};
+  struct corner corners[4];
+
+  m4 mat = M4InitDiagonal(1.0f);
+  mat = M4MultiplyM4(mat, getMapper());
+
+  mat = M4MultiplyM4(mat, M4TranslateV3(position));
+  mat = M4MultiplyM4(mat, M4TranslateV3(v3(width / 2.0, height / 2.0, 0)));
+
+  mat = M4MultiplyM4(mat, M4Rotate(-rotation.x, v3(1.0f, 0.0f, 0.0f)));
+  mat = M4MultiplyM4(mat, M4Rotate(-rotation.y, v3(0.0f, 1.0f, 0.0f)));
+  mat = M4MultiplyM4(mat, M4Rotate(-rotation.z, v3(0.0f, 0.0f, 1.0f)));
+
+  mat = M4MultiplyM4(mat, M4ScaleV3(v3(1.0f, -1.0f, 1.0f)));
+
+  for (u32 i = 0; i < 4; i++)
+  {
+    v4 rP = {points[i].x, points[i].y, points[i].z, 1.0f};
+    v4 translatedPoint = V4MultiplyM4(rP, mat);
+    rP = V4MultiplyM4(rP, mat);
+    struct corner a = {toV3(rP),
+                       1.0f,
+                       v4(1, 1, 1, 1)};
+    corners[i] = a;
+  }
+
+  corners[0].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
+  corners[1].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);
+  corners[2].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);
+  corners[3].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
+
+  u32 VBO;
+  struct corner corners1[6] = {corners[0], corners[1], corners[3], corners[0], corners[2], corners[3]};
+
+  glBindTexture(GL_TEXTURE_2D, textureIndex);
+
+  glGenBuffers(1, &VBO);
+  glBindVertexArray(defaultVAO); // setup variables in gpu memory
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 6, corners1, GL_STATIC_DRAW); // initialise value VBO
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
+  glEnableVertexAttribArray(2);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBindVertexArray(defaultVAO);
+  glUseProgram(defaultShader);
+  glUniform4f(glGetUniformLocation(defaultShader, "colorScale"), kRenderer_WindowsContexts.windows[currentContext].context->currentColor.r, kRenderer_WindowsContexts.windows[currentContext].context->currentColor.g, kRenderer_WindowsContexts.windows[currentContext].context->currentColor.b, kRenderer_WindowsContexts.windows[currentContext].context->currentColor.a);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glDeleteBuffers(1, &VBO);
+}
+void kRenderer_drawStoredTexture(u32 textureIndex, v3 position, i32 width, i32 height,
+                                 v3 rotation, void *args[kRenderer_maxShaderPrograms]) // TODO
+{
+
+  // struct corner {v3 pos;f32 b;v4 color;};
 
   // f32 vertices[] = {0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
   //                   0.5, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
@@ -747,105 +962,143 @@ void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 num
   // glDeleteBuffers(1, &VBO);
   // glDeleteBuffers(1, &EBO);
 }
-
-void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer,i32 realWidth, i32 realHeight, i32 numChannels)
+void kRenderer_unbindTexture(u32 textureIndex)
 {
-  glGenTextures(1, textureIndex);
-  glBindTexture(GL_TEXTURE_2D, *textureIndex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, realWidth, realHeight, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, buffer);
-  glGenerateMipmap(GL_TEXTURE_2D);
+  glDeleteTextures(1, &textureIndex);
 }
-void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation)
+
+void kRenderer_setFont(const char *fontName)
 {
+  for (u32 i = 0; i < fontMaps.length; i++)
+  {
+    if (CStringMatchCaseInsensitive(fontMaps.fonts[i].font_name, fontName))
+    {
+      fontMaps.currentFont = i;
+    }
+  }
+}
+void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale)
+{
+  u32 charactersIndexs[1024];
+  size_t textLength = 0;
+  u32 pixWidth = 0;
+  u32 pixHeight = 0;
+
+  for (const char *c = text; *c != '\0'; c++, textLength++)
+  {
+    u8 cIndex = (*c + 128) % 256;
+    if (fontMaps.fonts[fontMaps.currentFont].character[cIndex].character != *c)
+    {
+      for (u32 i = 0; i < 256; i++)
+      {
+        if (*c == fontMaps.fonts[fontMaps.currentFont].character[i].character)
+        {
+          pixWidth += fontMaps.fonts[fontMaps.currentFont].character[i].advance;
+          charactersIndexs[textLength] = i;
+          if (pixHeight < fontMaps.fonts[fontMaps.currentFont].character[i].height - fontMaps.fonts[fontMaps.currentFont].character[i].startPos.y)
+            pixHeight = fontMaps.fonts[fontMaps.currentFont].character[i].height - fontMaps.fonts[fontMaps.currentFont].character[i].startPos.y;
+        }
+      }
+    }
+    else
+    {
+      pixWidth += fontMaps.fonts[fontMaps.currentFont].character[cIndex].advance;
+      charactersIndexs[textLength] = cIndex;
+      if (pixHeight < fontMaps.fonts[fontMaps.currentFont].character[cIndex].height - fontMaps.fonts[fontMaps.currentFont].character[cIndex].startPos.y)
+        pixHeight = fontMaps.fonts[fontMaps.currentFont].character[cIndex].height - fontMaps.fonts[fontMaps.currentFont].character[cIndex].startPos.y;
+    }
+  }
+
+  v4 pixelPos = V4MultiplyM4(v4(position.x, position.y, position.z, 1),
+                             M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max,
+                                      v3(0, kRenderer_getWindowHeight(), 0), v3(kRenderer_getWindowWidth(), 0, 1)));
+
+  m4 mat = M4InitDiagonal(1);
+  mat = M4MultiplyM4(mat, M4Mapper(v3(0, kRenderer_getWindowHeight(), 0), v3(kRenderer_getWindowWidth(), 0, 1), v3(-1, -1, -1), v3(1, 1, 1)));
+  mat = M4MultiplyM4(mat, M4TranslateV3(toV3(pixelPos)));
+  mat = M4MultiplyM4(mat, M4ScaleV3(v3(scale, scale, 1)));
+  mat = M4MultiplyM4(mat, M4TranslateV3(v3(pixWidth / 2.0, pixHeight / 2.0, 0)));
+  mat = M4MultiplyM4(mat, M4Rotate(rotation.x, v3(1, 0, 0)));
+  mat = M4MultiplyM4(mat, M4Rotate(rotation.y, v3(0, 1, 0)));
+  mat = M4MultiplyM4(mat, M4Rotate(rotation.z, v3(0, 0, 1)));
+  mat = M4MultiplyM4(mat, M4TranslateV3(v3(-(pixWidth / 2.0), -(pixHeight / 2.0), 0)));
+
+  u32 widthOffset = 0;
   struct corner
   {
     v3 pos;
     f32 b;
     v4 texCoord;
   };
-  v3 points[4] = {v3(-width/2.0, -height/2.0, 0), v3(width/2.0, -height/2.0, 0), v3(-width/2.0, height/2.0, 0), v3(width/2.0, height/2.0, 0)};
-  struct corner corners[4];
-
-  m4 mat = M4InitDiagonal(1.0f);
-  mat = M4MultiplyM4(mat, getMapper());
-
-  mat = M4MultiplyM4(mat, M4TranslateV3(position));
-  mat = M4MultiplyM4(mat, M4TranslateV3(v3(width / 2.0, height / 2.0, 0)));
-
-  mat = M4MultiplyM4(mat, M4Rotate(-rotation.x, v3(1.0f, 0.0f, 0.0f)));
-  mat = M4MultiplyM4(mat, M4Rotate(-rotation.y, v3(0.0f, 1.0f, 0.0f)));
-  mat = M4MultiplyM4(mat, M4Rotate(-rotation.z, v3(0.0f, 0.0f, 1.0f)));
-
-  mat = M4MultiplyM4(mat, M4ScaleV3(v3(1.0f,-1.0f,1.0f)));
-
-  for (u32 i = 0; i < 4; i++)
+  for (u32 i = 0; i < textLength; i++)
   {
-    v4 rP = {points[i].x, points[i].y, points[i].z, 1.0f};
-    v4 translatedPoint = V4MultiplyM4(rP, mat);
-    rP = V4MultiplyM4(rP, mat);
-    struct corner a = {v3(rP.x, rP.y, rP.z),
-                       1.0f,
-                       v4(1, 1, 1, 1)};
-    corners[i] = a;
+    v3 characterPos = toV3(pixelPos);
+    characterPos.x += widthOffset;
+    characterPos = V3AddV3(characterPos, v3(fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].startPos.x,
+                                            fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].startPos.y, 0));
+    v3 texturePoints[4] = {
+        characterPos,
+        V3AddV3(characterPos, v3(fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].width, 0, 0)),
+        V3AddV3(characterPos, v3(0, fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].height, 0)),
+        V3AddV3(characterPos, v3(fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].width,
+                                 fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].height, 0))};
+    struct corner corners[4];
+    for (u32 j = 0; j < 4; j++)
+    {
+      v4 rP = v4(texturePoints[j].x, texturePoints[j].y, texturePoints[j].z, 1);
+      rP = V4MultiplyM4(rP, mat);
+      struct corner a = {toV3(rP), 1.0f, v4(0, 0, 0, 0)};
+      corners[j] = a;
+    }
+    corners[0].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
+    corners[1].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);
+    corners[2].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);
+    corners[3].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
+    if (1) // drawing of character
+    {
+      u32 VBO1, VBO2;
+      struct corner corners1[3] = {corners[0], corners[1], corners[3]};
+      struct corner corners2[3] = {corners[0], corners[2], corners[3]};
+
+      glBindTexture(GL_TEXTURE_2D, fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].textureId);
+
+      glGenBuffers(1, &VBO1);
+      glBindVertexArray(defaultVAO); // setup variables in gpu memory
+      glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners1, GL_STATIC_DRAW); // initialise value VBO
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
+      glEnableVertexAttribArray(0);
+      glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
+      glEnableVertexAttribArray(1);
+      glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
+      glEnableVertexAttribArray(2);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glBindVertexArray(defaultVAO);
+      glUseProgram(defaultShader);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+      glDeleteBuffers(1, &VBO1);
+
+      glGenBuffers(1, &VBO2);
+      glBindVertexArray(defaultVAO); // setup variables in gpu memory
+      glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners2, GL_STATIC_DRAW); // initialise value VBO
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
+      glEnableVertexAttribArray(0);
+      glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
+      glEnableVertexAttribArray(1);
+      glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
+      glEnableVertexAttribArray(2);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glBindVertexArray(defaultVAO);
+      glUseProgram(defaultShader);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+      glDeleteBuffers(1, &VBO2);
+    }
+
+    widthOffset += fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].advance;
   }
-
-  corners[0].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
-  corners[1].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);
-  corners[2].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);
-  corners[3].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
-
-  u32 VBO1, VBO2;
-  struct corner corners1[3] = {corners[0], corners[1], corners[3]};
-  struct corner corners2[3] = {corners[0], corners[2], corners[3]};
- 
-  glBindTexture(GL_TEXTURE_2D, textureIndex);
-
-  glGenBuffers(1, &VBO1);
-  glBindVertexArray(defaultVAO); // setup variables in gpu memory
-  glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners1, GL_STATIC_DRAW); // initialise value VBO
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
-  glEnableVertexAttribArray(2);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindVertexArray(defaultVAO);
-  glUseProgram(defaultShader);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
-  glDeleteBuffers(1, &VBO1);
-
-  glGenBuffers(1, &VBO2);
-  glBindVertexArray(defaultVAO); // setup variables in gpu memory
-  glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners2, GL_STATIC_DRAW); // initialise value VBO
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
-  glEnableVertexAttribArray(2);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindVertexArray(defaultVAO);
-  glUseProgram(defaultShader);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
-  glDeleteBuffers(1, &VBO2);
-}
-void kRenderer_drawStoredTexture(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation)// TODO
-{
-  
-}
-void kRenderer_unbindTexture(u32 textureIndex)
-{
-  glDeleteTextures(1, &textureIndex);
 }
 
 // key input
@@ -884,5 +1137,5 @@ iv2 kRenderer_getWindowSize()
 }
 f64 kRenderer_getTimeSinceLastFrame()
 {
-  return glfwGetTime()-lastTime;
+  return glfwGetTime() - lastTime;
 }

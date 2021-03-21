@@ -28,6 +28,11 @@ src/kRendererGLFW.c
 )
 
 set(KNGINE_HEADER_FILES
+src/utils.h
+src/kThread.h
+src/kStruct_def.h
+src/kRenderer.h
+
 src/EngineObjects.hpp
 src/Camera.hpp
 src/SpriteUtils.hpp
@@ -38,6 +43,8 @@ src/Engine.hpp
 )
 
 set(KNGINE_SOURCE_FILES
+src/kRendererGLFW.c
+
 src/EngineObjects.cpp 
 src/Camera_2D.cpp
 src/SpriteUtils.cpp
@@ -52,20 +59,22 @@ add_library(kNgineFramework
   ${KNGINEFRAMEWORK_HEADER_FILES}
 )
 
-add_subdirectory(extern/glad/)
-target_link_libraries(kNgineFramework PRIVATE glad)
-
-add_subdirectory(extern/glfw)
-target_link_libraries(kNgineFramework PRIVATE glfw)
-
-
-
 add_library(kNgine
   ${KNGINE_SOURCE_FILES}
   ${KNGINE_HEADER_FILES}
 )
 
-target_link_libraries(kNgine PUBLIC kNgineFramework)
+add_subdirectory(extern/glad/)
+target_link_libraries(kNgineFramework PRIVATE glad)
+target_link_libraries(kNgine PRIVATE glad)
+
+add_subdirectory(extern/glfw)
+target_link_libraries(kNgineFramework PRIVATE glfw)
+target_link_libraries(kNgine PRIVATE glfw)
+
+add_subdirectory(extern/freetype/)
+target_link_libraries(kNgineFramework PRIVATE freetype)
+target_link_libraries(kNgine PRIVATE freetype)
 
 
 set(BOX2D_BUILD_UNIT_TESTS OFF)
@@ -76,6 +85,10 @@ target_link_libraries(kNgine PRIVATE box2d)
 set(wave_enable_tests OFF)
 add_subdirectory(extern/wave)
 target_link_libraries(kNgine PRIVATE wave)
+
+# make_directory(fonts_data)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/ressources/ DESTINATION ${CMAKE_BINARY_DIR}/ressources/)
+
 
 if(APPLE)
   target_link_directories(kNgine PUBLIC "/usr/local/lib")

@@ -112,6 +112,7 @@ namespace kNgine
 
   static void frameUpdate()
   {
+    kRenderer_setDrawColor(v4(1, 1, 1, 1));
     f32 time=kRenderer_getTimeSinceLastFrame();
     std::vector<msg> msgs;
     msgs.push_back({msg::TIME_ELAPSED, time});
@@ -174,7 +175,8 @@ namespace kNgine
     seedRandomNumberGenerator();
     includeChildren();
     kRenderer_WindowContext context;
-    kRenderer_init(0, NULL, &context);
+    kRenderer_init(0, NULL);
+    kRenderer_createContext(&context);
     kRenderer_setWindowName(window_name.c_str());
     kRenderer_setWindowSize(window_size.x, window_size.y);
     kRenderer_createWindow(&context);

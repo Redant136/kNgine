@@ -3,9 +3,10 @@
 # main branch
 
 ## currently working on
-- [ ] text in renderer
 - [x] child is component entity instead of parent object (pog no bugs... maybe)
+- [ ] text in renderer
 ## testing
+- [ ] text in renderer
 - [ ] test openal audio engine
 ## next step
 - [ ] display debug info such as fps
@@ -25,6 +26,8 @@
 ## someday... maybe
 - [ ] select audio out openAL
 - [ ] support for ps4/5, xbox, ios or android
+- [ ] shadow (http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/)
+- [ ] extended ascii for french and accents
 - [ ] direct x
 - [ ] vulkan
 - [ ] 3d engine (https://www.youtube.com/watch?v=whyJzrVEgVc)
