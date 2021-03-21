@@ -152,7 +152,7 @@ namespace kNgine
     {
       iv2 windowSize = kRenderer_getWindowSize();
       std::vector<LayerRenderer *> renderers = findObject<LayerRenderer>(workingObjects, workingObjectsLength, ObjectFlags::RENDERER_LAYER);
-      for (u32 i = 0; i < renderingLayerOrder.orderLength; i++)
+      for (u32 i = 0; i < renderingLayerOrder.length; i++)
       {
         std::vector<LayerRenderer *> layer = orderObjectsByZ<LayerRenderer>(getRenderersAtLayer(renderers, renderingLayerOrder.order[i]));
         for (LayerRenderer *r : layer)
@@ -183,9 +183,9 @@ namespace kNgine
     sleepMillis(10);
     kRenderer_setStartFunction(frameUpdate);
     kRenderer_setDrawFunction(frameUpdate);
-    if (renderingLayerOrder.maxOrderLength <= 0)
+    if (renderingLayerOrder.length <= 0)
     {
-      renderingLayerOrder = LayerOrder(3);
+      renderingLayerOrder = LayerOrder();
       addLayerOrderDef(renderingLayerOrder, DEFAULT_LAYER);
       addLayerOrderDef(renderingLayerOrder, BACKGROUND);
       addLayerOrderDef(renderingLayerOrder, UI);

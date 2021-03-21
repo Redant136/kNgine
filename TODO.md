@@ -4,7 +4,7 @@
 
 ## currently working on
 - [x] child is component entity instead of parent object (pog no bugs... maybe)
-- [ ] text in renderer
+- [x] text in renderer
 ## testing
 - [ ] text in renderer
 - [ ] test openal audio engine

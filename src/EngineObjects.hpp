@@ -36,39 +36,40 @@ namespace kNgine
     AUDIO           = 1 << 7
   };
 
+  #define kNgine_maxLayerOrder 64
   struct LayerOrder{
-     size_t maxOrderLength;
-     size_t orderLength;
-     struct {u32 layerId;const char*name;}*ids;
-     u32*order;
+     size_t length;
+     struct {u32 layerId;const char*name;} ids[kNgine_maxLayerOrder];
+     u32 order[kNgine_maxLayerOrder];
   };
-  static LayerOrder layerOrderInit(size_t maxSize)// have to allocate array
+  static LayerOrder layerOrderInit()// have to allocate array
   {
-    LayerOrder lo = {maxSize, 0, NULL, new u32[maxSize]};
-    lo.ids = (typeof(lo.ids))malloc(sizeof(*lo.ids) * maxSize);
+    LayerOrder lo = {0, NULL, NULL};
     return lo;
   }
   static void addLayerOrderDef(LayerOrder*order, const char *layer)
   {
-    assert(order->orderLength < order->maxOrderLength);
-    order->ids[order->orderLength] = {(u32)order->orderLength, layer};
-    order->orderLength++;
+    assert(order->length < kNgine_maxLayerOrder);
+    order->ids[order->length] = {(u32)order->length, layer};
+    order->length++;
   }
   static void setLayerOrder(LayerOrder*order,u32*o){
-    for(u32 i=0;i<order->orderLength;i++){
+    for (u32 i = 0; i < order->length; i++)
+    {
       order->order[i]=o[i];
     }
   }
   static u32 layerO(LayerOrder order,const char*name)
   {
-    for(u32 i=0;i<order.orderLength;i++){
+    for (u32 i = 0; i < order.length; i++)
+    {
       if(order.ids[i].name==name){
         return order.ids[i].layerId;
       }
     }
     return 0;
   }
-#define LayerOrder(maxSize) layerOrderInit(maxSize)
+#define LayerOrder() layerOrderInit()
 #define addLayerOrderDef(order, layer) addLayerOrderDef(&order, #layer)
 #define setLayerOrder(order, o) setLayerOrder(&order, o)
 #define layerO(order, layer) layerO(order, #layer)
