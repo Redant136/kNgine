@@ -69,11 +69,11 @@ namespace kNgine
   //[animation_system]
   class SpriteAnimationSystem:public SpriteMapAccessor{//make sure that spriteanimation uses the same map
   protected:
-    struct accessor{
+    struct accessor_pair{
       std::string name;
       SpriteMapAccessor*accessor;
     };
-    std::vector<accessor>accessors;
+    std::vector<accessor_pair>accessors;
     SpriteMapAccessor *active;
   public:
     v2 spriteDimension;
@@ -84,7 +84,8 @@ namespace kNgine
       spriteDimension=v2(1,1);
     }
     void addSprite(SpriteMapAccessor *accessor,std::string name){
-      accessors.push_back({name,accessor});
+      struct accessor_pair a = { name,accessor };
+      accessors.push_back(a);
       accessor->object=this->object;
       if(active==NULL)active=accessor;
     }
