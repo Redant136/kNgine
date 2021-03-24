@@ -31,6 +31,7 @@
 #define fast_calc_precision 9
 #endif
 
+#ifndef utils_notypedefs
 typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -41,6 +42,7 @@ typedef uint32_t u32;
 typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
+#endif
 
 #if defined(utils_VectorObjects) && defined(__cplusplus)
 struct v2;
@@ -51,14 +53,14 @@ struct iv3;
 struct iv4;
 struct v2
 {
-  f32 x;
-  f32 y;
+  float x;
+  float y;
   v2()
   {
     this->x = 0;
     this->y = 0;
   }
-  v2(f32 x, f32 y)
+  v2(float x, float y)
   {
     this->x = x;
     this->y = y;
@@ -68,7 +70,7 @@ struct v2
     this->x = base.x;
     this->y = base.y;
   }
-  v2(f32 d)
+  v2(float d)
   {
     this->x = d;
     this->y = 0;
@@ -88,26 +90,26 @@ struct v2
     x -= a.x;
     y -= a.y;
   }
-  v2 operator+(const f32 a) { return v2(x + a, y + a); }
-  v2 operator-(const f32 a) { return v2(x - a, y - a); }
-  v2 operator*(const f32 a) { return v2(x * a, y * a); }
-  v2 operator/(const f32 a) { return v2(x / a, y / a); }
-  void operator+=(const f32 a)
+  v2 operator+(const float a) { return v2(x + a, y + a); }
+  v2 operator-(const float a) { return v2(x - a, y - a); }
+  v2 operator*(const float a) { return v2(x * a, y * a); }
+  v2 operator/(const float a) { return v2(x / a, y / a); }
+  void operator+=(const float a)
   {
     x += a;
     y += a;
   }
-  void operator-=(const f32 a)
+  void operator-=(const float a)
   {
     x -= a;
     y -= a;
   }
-  void operator*=(const f32 a)
+  void operator*=(const float a)
   {
     x *= a;
     y *= a;
   }
-  void operator/=(const f32 a)
+  void operator/=(const float a)
   {
     x /= a;
     y /= a;
@@ -119,17 +121,17 @@ struct v3
   {
     struct
     {
-      f32 x;
-      f32 y;
-      f32 z;
+      float x;
+      float y;
+      float z;
     };
     struct
     {
-      f32 r;
-      f32 g;
-      f32 b;
+      float r;
+      float g;
+      float b;
     };
-    f32 elements[3];
+    float elements[3];
   };
   v3()
   {
@@ -137,7 +139,7 @@ struct v3
     this->y = 0;
     this->z = 0;
   }
-  v3(f32 x, f32 y, f32 z)
+  v3(float x, float y, float z)
   {
     this->x = x;
     this->y = y;
@@ -149,7 +151,7 @@ struct v3
     this->y = vector2.y;
     this->z = 0;
   }
-  v3(f32 d)
+  v3(float d)
   {
     this->x = d;
     this->y = 0;
@@ -171,29 +173,29 @@ struct v3
     y -= a.y;
     z -= a.z;
   }
-  v3 operator+(const f32 a) { return v3(x + a, y + a, z + a); }
-  v3 operator-(const f32 a) { return v3(x - a, y - a, z - a); }
-  v3 operator*(const f32 a) { return v3(x * a, y * a, z * a); }
-  v3 operator/(const f32 a) { return v3(x / a, y / a, z / a); }
-  void operator+=(const f32 a)
+  v3 operator+(const float a) { return v3(x + a, y + a, z + a); }
+  v3 operator-(const float a) { return v3(x - a, y - a, z - a); }
+  v3 operator*(const float a) { return v3(x * a, y * a, z * a); }
+  v3 operator/(const float a) { return v3(x / a, y / a, z / a); }
+  void operator+=(const float a)
   {
     x += a;
     y += a;
     z += a;
   }
-  void operator-=(const f32 a)
+  void operator-=(const float a)
   {
     x -= a;
     y -= a;
     z -= a;
   }
-  void operator*=(const f32 a)
+  void operator*=(const float a)
   {
     x *= a;
     y *= a;
     z *= a;
   }
-  void operator/=(const f32 a)
+  void operator/=(const float a)
   {
     x /= a;
     y /= a;
@@ -212,30 +214,30 @@ struct v4
   {
     struct
     {
-      f32 x;
-      f32 y;
+      float x;
+      float y;
       union
       {
         struct
         {
-          f32 z;
-          f32 w;
+          float z;
+          float w;
         };
         struct
         {
-          f32 width;
-          f32 height;
+          float width;
+          float height;
         };
       };
     };
     struct
     {
-      f32 r;
-      f32 g;
-      f32 b;
-      f32 a;
+      float r;
+      float g;
+      float b;
+      float a;
     };
-    f32 elements[4];
+    float elements[4];
   };
   v4()
   {
@@ -244,7 +246,7 @@ struct v4
     this->z = 0;
     this->w = 0;
   }
-  v4(f32 x, f32 y, f32 z, f32 w)
+  v4(float x, float y, float z, float w)
   {
     this->x = x;
     this->y = y;
@@ -265,7 +267,7 @@ struct v4
     this->z = 0;
     this->w = 0;
   }
-  v4(f32 d)
+  v4(float d)
   {
     this->x = d;
     this->y = 0;
@@ -289,32 +291,32 @@ struct v4
     z -= a.z;
     w -= a.w;
   }
-  v4 operator+(const f32 a) { return v4(x + a, y + a, z + a, w + a); }
-  v4 operator-(const f32 a) { return v4(x - a, y - a, z - a, w - a); }
-  v4 operator*(const f32 a) { return v4(x * a, y * a, z * a, w * a); }
-  v4 operator/(const f32 a) { return v4(x / a, y / a, z / a, w / a); }
-  void operator+=(const f32 a)
+  v4 operator+(const float a) { return v4(x + a, y + a, z + a, w + a); }
+  v4 operator-(const float a) { return v4(x - a, y - a, z - a, w - a); }
+  v4 operator*(const float a) { return v4(x * a, y * a, z * a, w * a); }
+  v4 operator/(const float a) { return v4(x / a, y / a, z / a, w / a); }
+  void operator+=(const float a)
   {
     x += a;
     y += a;
     z += a;
     z += a;
   }
-  void operator-=(const f32 a)
+  void operator-=(const float a)
   {
     x -= a;
     y -= a;
     z -= a;
     z -= a;
   }
-  void operator*=(const f32 a)
+  void operator*=(const float a)
   {
     x *= a;
     y *= a;
     z *= a;
     z *= a;
   }
-  void operator/=(const f32 a)
+  void operator/=(const float a)
   {
     x /= a;
     y /= a;
@@ -337,13 +339,13 @@ struct v4
 };
 struct iv2
 {
-  i32 x, y;
+  int32_t x, y;
   iv2()
   {
     this->x = 0;
     this->y = 0;
   }
-  iv2(i32 x, i32 y)
+  iv2(int32_t x, int32_t y)
   {
     this->x = x;
     this->y = y;
@@ -353,15 +355,15 @@ struct iv2
     this->x = base.x;
     this->y = base.y;
   }
-  iv2(i32 d)
+  iv2(int32_t d)
   {
     this->x = d;
     this->y = 0;
   }
   iv2(const v2 &base)
   {
-    this->x = (i32)floor(base.x);
-    this->y = (i32)floor(base.y);
+    this->x = (int32_t)floor(base.x);
+    this->y = (int32_t)floor(base.y);
   }
   bool operator==(const iv2 &a) { return x == a.x && y == a.y; }
   bool operator!=(const iv2 &a) { return x != a.x || y != a.y; }
@@ -377,26 +379,26 @@ struct iv2
     x -= a.x;
     y -= a.y;
   }
-  iv2 operator+(const i32 a) { return iv2(x + a, y + a); }
-  iv2 operator-(const i32 a) { return iv2(x - a, y - a); }
-  iv2 operator*(const i32 a) { return iv2(x * a, y * a); }
-  iv2 operator/(const i32 a) { return iv2(x / a, y / a); }
-  void operator+=(const i32 a)
+  iv2 operator+(const int32_t a) { return iv2(x + a, y + a); }
+  iv2 operator-(const int32_t a) { return iv2(x - a, y - a); }
+  iv2 operator*(const int32_t a) { return iv2(x * a, y * a); }
+  iv2 operator/(const int32_t a) { return iv2(x / a, y / a); }
+  void operator+=(const int32_t a)
   {
     x += a;
     y += a;
   }
-  void operator-=(const i32 a)
+  void operator-=(const int32_t a)
   {
     x -= a;
     y -= a;
   }
-  void operator*=(const i32 a)
+  void operator*=(const int32_t a)
   {
     x *= a;
     y *= a;
   }
-  void operator/=(const i32 a)
+  void operator/=(const int32_t a)
   {
     x /= a;
     y /= a;
@@ -404,14 +406,14 @@ struct iv2
 };
 struct iv3
 {
-  i32 x, y, z;
+  int32_t x, y, z;
   iv3()
   {
     this->x = 0;
     this->y = 0;
     this->z = 0;
   }
-  iv3(i32 x, i32 y, i32 z)
+  iv3(int32_t x, int32_t y, int32_t z)
   {
     this->x = x;
     this->y = y;
@@ -423,7 +425,7 @@ struct iv3
     this->y = vector2.y;
     this->z = 0;
   }
-  iv3(i32 d)
+  iv3(int32_t d)
   {
     this->x = d;
     this->y = 0;
@@ -431,9 +433,9 @@ struct iv3
   }
   iv3(const v3 &base)
   {
-    this->x = (i32)floor(base.x);
-    this->y = (i32)floor(base.y);
-    this->z = (i32)floor(base.z);
+    this->x = (int32_t)floor(base.x);
+    this->y = (int32_t)floor(base.y);
+    this->z = (int32_t)floor(base.z);
   }
   bool operator==(const iv3 &a) { return x == a.x && y == a.y && z == a.z; }
   bool operator!=(const iv3 &a) { return x != a.x || y != a.y || z != a.z; }
@@ -451,29 +453,29 @@ struct iv3
     y -= a.y;
     z -= a.z;
   }
-  iv3 operator+(const i32 a) { return iv3(x + a, y + a, z + a); }
-  iv3 operator-(const i32 a) { return iv3(x - a, y - a, z - a); }
-  iv3 operator*(const i32 a) { return iv3(x * a, y * a, z * a); }
-  iv3 operator/(const i32 a) { return iv3(x / a, y / a, z / a); }
-  void operator+=(const i32 a)
+  iv3 operator+(const int32_t a) { return iv3(x + a, y + a, z + a); }
+  iv3 operator-(const int32_t a) { return iv3(x - a, y - a, z - a); }
+  iv3 operator*(const int32_t a) { return iv3(x * a, y * a, z * a); }
+  iv3 operator/(const int32_t a) { return iv3(x / a, y / a, z / a); }
+  void operator+=(const int32_t a)
   {
     x += a;
     y += a;
     z += a;
   }
-  void operator-=(const i32 a)
+  void operator-=(const int32_t a)
   {
     x -= a;
     y -= a;
     z -= a;
   }
-  void operator*=(const i32 a)
+  void operator*=(const int32_t a)
   {
     x *= a;
     y *= a;
     z *= a;
   }
-  void operator/=(const i32 a)
+  void operator/=(const int32_t a)
   {
     x /= a;
     y /= a;
@@ -489,7 +491,7 @@ struct iv3
 };
 struct iv4
 {
-  i32 x, y, z, w;
+  int32_t x, y, z, w;
   iv4()
   {
     this->x = 0;
@@ -497,7 +499,7 @@ struct iv4
     this->z = 0;
     this->w = 0;
   }
-  iv4(i32 x, i32 y, i32 z, i32 w)
+  iv4(int32_t x, int32_t y, int32_t z, int32_t w)
   {
     this->x = x;
     this->y = y;
@@ -518,7 +520,7 @@ struct iv4
     this->z = 0;
     this->w = 0;
   }
-  iv4(i32 d)
+  iv4(int32_t d)
   {
     this->x = d;
     this->y = 0;
@@ -527,10 +529,10 @@ struct iv4
   }
   iv4(const v4 &base)
   {
-    this->x = (i32)floor(base.x);
-    this->y = (i32)floor(base.y);
-    this->z = (i32)floor(base.z);
-    this->w = (i32)floor(base.w);
+    this->x = (int32_t)floor(base.x);
+    this->y = (int32_t)floor(base.y);
+    this->z = (int32_t)floor(base.z);
+    this->w = (int32_t)floor(base.w);
   }
   bool operator==(const iv4 &a)
   {
@@ -556,32 +558,32 @@ struct iv4
     z -= a.z;
     w -= a.w;
   }
-  iv4 operator+(const i32 a) { return iv4(x + a, y + a, z + a, w + a); }
-  iv4 operator-(const i32 a) { return iv4(x - a, y - a, z - a, w - a); }
-  iv4 operator*(const i32 a) { return iv4(x * a, y * a, z * a, w * a); }
-  iv4 operator/(const i32 a) { return iv4(x / a, y / a, z / a, w / a); }
-  void operator+=(const i32 a)
+  iv4 operator+(const int32_t a) { return iv4(x + a, y + a, z + a, w + a); }
+  iv4 operator-(const int32_t a) { return iv4(x - a, y - a, z - a, w - a); }
+  iv4 operator*(const int32_t a) { return iv4(x * a, y * a, z * a, w * a); }
+  iv4 operator/(const int32_t a) { return iv4(x / a, y / a, z / a, w / a); }
+  void operator+=(const int32_t a)
   {
     x += a;
     y += a;
     z += a;
     z += a;
   }
-  void operator-=(const i32 a)
+  void operator-=(const int32_t a)
   {
     x -= a;
     y -= a;
     z -= a;
     z -= a;
   }
-  void operator*=(const i32 a)
+  void operator*=(const int32_t a)
   {
     x *= a;
     y *= a;
     z *= a;
     z *= a;
   }
-  void operator/=(const i32 a)
+  void operator/=(const int32_t a)
   {
     x /= a;
     y /= a;
@@ -606,8 +608,8 @@ struct iv4
 };
 inline v2::v2(const iv2 &base)
 {
-  this->x = (f32)base.x;
-  this->y = (f32)base.y;
+  this->x = (float)base.x;
+  this->y = (float)base.y;
 }
 inline v2::v2(const v3 &base)
 {
@@ -621,9 +623,9 @@ inline v2::v2(const v4 &base)
 }
 inline v3::v3(const iv3 &base)
 {
-  this->x = (f32)base.x;
-  this->y = (f32)base.y;
-  this->z = (f32)base.z;
+  this->x = (float)base.x;
+  this->y = (float)base.y;
+  this->z = (float)base.z;
 }
 inline v3::v3(const v4 &base)
 {
@@ -633,10 +635,10 @@ inline v3::v3(const v4 &base)
 }
 inline v4::v4(const iv4 &base)
 {
-  this->x = (f32)base.x;
-  this->y = (f32)base.y;
-  this->z = (f32)base.z;
-  this->w = (f32)base.w;
+  this->x = (float)base.x;
+  this->y = (float)base.y;
+  this->z = (float)base.z;
+  this->w = (float)base.w;
 }
 #define V2ToArray(v) \
   {                  \
@@ -654,49 +656,49 @@ inline v4::v4(const iv4 &base)
 #else
 typedef struct v2
 {
-  f32 x;
-  f32 y;
+  float x;
+  float y;
 } v2;
 typedef union v3
 {
   struct
   {
-    f32 x;
-    f32 y;
-    f32 z;
+    float x;
+    float y;
+    float z;
   };
 
   struct
   {
-    f32 r;
-    f32 g;
-    f32 b;
+    float r;
+    float g;
+    float b;
   };
 
-  f32 elements[3];
+  float elements[3];
 } v3;
 typedef union v4
 {
   struct
   {
-    f32 x;
-    f32 y;
+    float x;
+    float y;
     union
     {
       struct
       {
-        f32 z;
+        float z;
 
         union
         {
-          f32 w;
-          f32 radius;
+          float w;
+          float radius;
         };
       };
       struct
       {
-        f32 width;
-        f32 height;
+        float width;
+        float height;
       };
     };
   };
@@ -704,33 +706,33 @@ typedef union v4
   struct
   {
     v3 xyz;
-    f32 _unused;
+    float _unused;
   };
 
   struct
   {
-    f32 r;
-    f32 g;
-    f32 b;
-    f32 a;
+    float r;
+    float g;
+    float b;
+    float a;
   };
 
-  f32 elements[4];
+  float elements[4];
 } v4;
 
-static v2 V2Init(f32 x, f32 y)
+static v2 V2Init(float x, float y)
 {
   v2 v = {x, y};
   return v;
 }
 #define v2(x, y) V2Init(x, y)
-static v3 V3Init(f32 x, f32 y, f32 z)
+static v3 V3Init(float x, float y, float z)
 {
   v3 v = {x, y, z};
   return v;
 }
 #define v3(x, y, z) V3Init(x, y, z)
-static v4 V4Init(f32 x, f32 y, f32 z, f32 w)
+static v4 V4Init(float x, float y, float z, float w)
 {
   v4 v = {x, y, z, w};
   return v;
@@ -740,60 +742,60 @@ static v4 V4Init(f32 x, f32 y, f32 z, f32 w)
 
 typedef struct iv2
 {
-  i32 x;
-  i32 y;
+  int32_t x;
+  int32_t y;
 } iv2;
 typedef union iv3
 {
   struct
   {
-    i32 x;
-    i32 y;
-    i32 z;
+    int32_t x;
+    int32_t y;
+    int32_t z;
   };
 
   struct
   {
-    i32 r;
-    i32 g;
-    i32 b;
+    int32_t r;
+    int32_t g;
+    int32_t b;
   };
 
-  i32 elements[3];
+  int32_t elements[3];
 } iv3;
 typedef union iv4
 {
   struct
   {
-    i32 x;
-    i32 y;
-    i32 z;
-    i32 w;
+    int32_t x;
+    int32_t y;
+    int32_t z;
+    int32_t w;
   };
 
   struct
   {
-    i32 r;
-    i32 g;
-    i32 b;
-    i32 a;
+    int32_t r;
+    int32_t g;
+    int32_t b;
+    int32_t a;
   };
 
-  i32 elements[4];
+  int32_t elements[4];
 } iv4;
-static iv2 IV2Init(i32 x, i32 y)
+static iv2 IV2Init(int32_t x, int32_t y)
 {
   iv2 v = {x, y};
   return v;
 }
 #define iv2(x, y) IV2Init(x, y)
-static iv3 IV3Init(i32 x, i32 y, i32 z)
+static iv3 IV3Init(int32_t x, int32_t y, int32_t z)
 {
   iv3 v = {x, y, z};
   return v;
 }
 #define iv3(x, y, z) IV3Init(x, y, z)
-static iv4 IV4Init(i32 x, i32 y, i32 z, i32 w)
+static iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
 {
   iv4 v = {x, y, z, w};
   return v;
@@ -804,17 +806,17 @@ static iv4 IV4Init(i32 x, i32 y, i32 z, i32 w)
 #define toV2(v) v2(v.x, v.y)
 #define toV3(v) v3(v.x, v.y, v.z)
 
-static f32 V2Dot(v2 a, v2 b)
+static float V2Dot(v2 a, v2 b)
 {
   return a.x * b.x + a.y * b.y;
 }
-static f32 V2LengthSquared(v2 v)
+static float V2LengthSquared(v2 v)
 {
   return v.x * v.x + v.y * v.y;
 }
 static v2 V2Normalize(v2 v)
 {
-  f32 length = sqrtf(V2LengthSquared(v));
+  float length = sqrtf(V2LengthSquared(v));
   v.x /= length;
   v.y /= length;
   return v;
@@ -829,7 +831,7 @@ static v2 V2MinusV2(v2 a, v2 b)
   v2 v = v2(a.x - b.x, a.y - b.y);
   return v;
 }
-static v2 V2MultiplyF32(v2 v, f32 f)
+static v2 V2MultiplyF32(v2 v, float f)
 {
   v.x *= f;
   v.y *= f;
@@ -845,33 +847,33 @@ static v3 V3MinusV3(v3 a, v3 b)
   v3 c = v3(a.x - b.x, a.y - b.y, a.z - b.z);
   return c;
 }
-static v3 V3MultiplyF32(v3 v, f32 f)
+static v3 V3MultiplyF32(v3 v, float f)
 {
   v.x *= f;
   v.y *= f;
   v.z *= f;
   return v;
 }
-static f32 V3LengthSquared(v3 a)
+static float V3LengthSquared(v3 a)
 {
   return a.x * a.x + a.y * a.y + a.z * a.z;
 }
-static f32 V3Length(v3 a)
+static float V3Length(v3 a)
 {
   return sqrtf(V3LengthSquared(a));
 }
 static v3 V3Normalize(v3 v)
 {
-  f32 length = V3Length(v);
+  float length = V3Length(v);
   v3 result = v3(
       v.x / length,
       v.y / length,
       v.z / length);
   return result;
 }
-static f32 V3Dot(v3 a, v3 b)
+static float V3Dot(v3 a, v3 b)
 {
-  f32 dot =
+  float dot =
       a.x * b.x +
       a.y * b.y +
       a.z * b.z;
@@ -885,9 +887,9 @@ static v3 V3Cross(v3 a, v3 b)
       a.x * b.y - a.y * b.x);
   return result;
 }
-static f32 minInV3(v3 v)
+static float minInV3(v3 v)
 {
-  f32 minimum = v.x;
+  float minimum = v.x;
   if (v.y < minimum)
   {
     minimum = v.y;
@@ -898,9 +900,9 @@ static f32 minInV3(v3 v)
   }
   return minimum;
 }
-static f32 maxInV3(v3 v)
+static float maxInV3(v3 v)
 {
-  f32 maximum = v.x;
+  float maximum = v.x;
   if (v.y > maximum)
   {
     maximum = v.y;
@@ -919,9 +921,9 @@ static bool V4RectHasPoint(v4 v, v2 p)
 
 typedef struct m4
 {
-  f32 elements[4][4];
+  float elements[4][4];
 } m4;
-static m4 M4InitFill(f32 val)
+static m4 M4InitFill(float val)
 {
   m4 m = {
       {
@@ -932,7 +934,7 @@ static m4 M4InitFill(f32 val)
       }};
   return m;
 }
-static m4 M4InitDiagonal(f32 diagonal)
+static m4 M4InitDiagonal(float diagonal)
 {
   m4 m = {
       {
@@ -947,9 +949,9 @@ static m4 M4MultiplyM4(m4 a, m4 b)
 {
   m4 c = {0};
 
-  for (i32 j = 0; j < 4; ++j)
+  for (int32_t j = 0; j < 4; ++j)
   {
-    for (i32 i = 0; i < 4; ++i)
+    for (int32_t i = 0; i < 4; ++i)
     {
       c.elements[i][j] = (a.elements[0][j] * b.elements[i][0] +
                           a.elements[1][j] * b.elements[i][1] +
@@ -960,11 +962,11 @@ static m4 M4MultiplyM4(m4 a, m4 b)
 
   return c;
 }
-static m4 M4MultiplyF32(m4 a, f32 b)
+static m4 M4MultiplyF32(m4 a, float b)
 {
-  for (i32 j = 0; j < 4; ++j)
+  for (int32_t j = 0; j < 4; ++j)
   {
-    for (i32 i = 0; i < 4; ++i)
+    for (int32_t i = 0; i < 4; ++i)
     {
       a.elements[i][j] *= b;
     }
@@ -972,7 +974,7 @@ static m4 M4MultiplyF32(m4 a, f32 b)
 
   return a;
 }
-static f32 V4Dot(v4 a, v4 b)
+static float V4Dot(v4 a, v4 b)
 {
   return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
@@ -986,7 +988,7 @@ static v4 V4MinusV4(v4 a, v4 b)
   v4 c = v4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
   return c;
 }
-static v4 V4MultiplyF32(v4 a, f32 f)
+static v4 V4MultiplyF32(v4 a, float f)
 {
   v4 c = v4(a.x * f, a.y * f, a.z * f, a.w * f);
   return c;
@@ -999,7 +1001,7 @@ static v4 V4MultiplyV4(v4 a, v4 b)
 static v4 V4MultiplyM4(v4 v, m4 m)
 {
   v4 result = v4(0, 0, 0, 0);
-  for (i32 i = 0; i < 4; ++i)
+  for (int32_t i = 0; i < 4; ++i)
   {
     result.elements[i] = (v.elements[0] * m.elements[0][i] +
                           v.elements[1] * m.elements[1][i] +
@@ -1024,10 +1026,10 @@ static m4 M4ScaleV3(v3 scale)
   result.elements[2][2] = scale.z;
   return result;
 }
-static m4 M4Perspective(f32 fov, f32 aspect_ratio, f32 near_z, f32 far_z)
+static m4 M4Perspective(float fov, float aspect_ratio, float near_z, float far_z)
 {
   m4 result = {0};
-  f32 tan_theta_over_2 = tanf(fov * (PIf / 360.f));
+  float tan_theta_over_2 = tanf(fov * (PIf / 360.f));
   result.elements[0][0] = 1.f / tan_theta_over_2;
   result.elements[1][1] = aspect_ratio / tan_theta_over_2;
   result.elements[2][3] = -1.f;
@@ -1036,7 +1038,7 @@ static m4 M4Perspective(f32 fov, f32 aspect_ratio, f32 near_z, f32 far_z)
   result.elements[3][3] = 0.f;
   return result;
 }
-static m4 M4Orthographic(f32 left, f32 right, f32 bottom, f32 top, f32 near_depth, f32 far_depth)
+static m4 M4Orthographic(float left, float right, float bottom, float top, float near_depth, float far_depth)
 {
   m4 result = {0};
 
@@ -1082,24 +1084,24 @@ static m4 M4LookAt(v3 eye, v3 center, v3 up)
 }
 static m4 M4Inverse(m4 m)
 {
-  f32 coef00 = m.elements[2][2] * m.elements[3][3] - m.elements[3][2] * m.elements[2][3];
-  f32 coef02 = m.elements[1][2] * m.elements[3][3] - m.elements[3][2] * m.elements[1][3];
-  f32 coef03 = m.elements[1][2] * m.elements[2][3] - m.elements[2][2] * m.elements[1][3];
-  f32 coef04 = m.elements[2][1] * m.elements[3][3] - m.elements[3][1] * m.elements[2][3];
-  f32 coef06 = m.elements[1][1] * m.elements[3][3] - m.elements[3][1] * m.elements[1][3];
-  f32 coef07 = m.elements[1][1] * m.elements[2][3] - m.elements[2][1] * m.elements[1][3];
-  f32 coef08 = m.elements[2][1] * m.elements[3][2] - m.elements[3][1] * m.elements[2][2];
-  f32 coef10 = m.elements[1][1] * m.elements[3][2] - m.elements[3][1] * m.elements[1][2];
-  f32 coef11 = m.elements[1][1] * m.elements[2][2] - m.elements[2][1] * m.elements[1][2];
-  f32 coef12 = m.elements[2][0] * m.elements[3][3] - m.elements[3][0] * m.elements[2][3];
-  f32 coef14 = m.elements[1][0] * m.elements[3][3] - m.elements[3][0] * m.elements[1][3];
-  f32 coef15 = m.elements[1][0] * m.elements[2][3] - m.elements[2][0] * m.elements[1][3];
-  f32 coef16 = m.elements[2][0] * m.elements[3][2] - m.elements[3][0] * m.elements[2][2];
-  f32 coef18 = m.elements[1][0] * m.elements[3][2] - m.elements[3][0] * m.elements[1][2];
-  f32 coef19 = m.elements[1][0] * m.elements[2][2] - m.elements[2][0] * m.elements[1][2];
-  f32 coef20 = m.elements[2][0] * m.elements[3][1] - m.elements[3][0] * m.elements[2][1];
-  f32 coef22 = m.elements[1][0] * m.elements[3][1] - m.elements[3][0] * m.elements[1][1];
-  f32 coef23 = m.elements[1][0] * m.elements[2][1] - m.elements[2][0] * m.elements[1][1];
+  float coef00 = m.elements[2][2] * m.elements[3][3] - m.elements[3][2] * m.elements[2][3];
+  float coef02 = m.elements[1][2] * m.elements[3][3] - m.elements[3][2] * m.elements[1][3];
+  float coef03 = m.elements[1][2] * m.elements[2][3] - m.elements[2][2] * m.elements[1][3];
+  float coef04 = m.elements[2][1] * m.elements[3][3] - m.elements[3][1] * m.elements[2][3];
+  float coef06 = m.elements[1][1] * m.elements[3][3] - m.elements[3][1] * m.elements[1][3];
+  float coef07 = m.elements[1][1] * m.elements[2][3] - m.elements[2][1] * m.elements[1][3];
+  float coef08 = m.elements[2][1] * m.elements[3][2] - m.elements[3][1] * m.elements[2][2];
+  float coef10 = m.elements[1][1] * m.elements[3][2] - m.elements[3][1] * m.elements[1][2];
+  float coef11 = m.elements[1][1] * m.elements[2][2] - m.elements[2][1] * m.elements[1][2];
+  float coef12 = m.elements[2][0] * m.elements[3][3] - m.elements[3][0] * m.elements[2][3];
+  float coef14 = m.elements[1][0] * m.elements[3][3] - m.elements[3][0] * m.elements[1][3];
+  float coef15 = m.elements[1][0] * m.elements[2][3] - m.elements[2][0] * m.elements[1][3];
+  float coef16 = m.elements[2][0] * m.elements[3][2] - m.elements[3][0] * m.elements[2][2];
+  float coef18 = m.elements[1][0] * m.elements[3][2] - m.elements[3][0] * m.elements[1][2];
+  float coef19 = m.elements[1][0] * m.elements[2][2] - m.elements[2][0] * m.elements[1][2];
+  float coef20 = m.elements[2][0] * m.elements[3][1] - m.elements[3][0] * m.elements[2][1];
+  float coef22 = m.elements[1][0] * m.elements[3][1] - m.elements[3][0] * m.elements[1][1];
+  float coef23 = m.elements[1][0] * m.elements[2][1] - m.elements[2][0] * m.elements[1][1];
 
   v4 fac0 = v4(coef00, coef00, coef02, coef03);
   v4 fac1 = v4(coef04, coef04, coef06, coef07);
@@ -1122,7 +1124,7 @@ static m4 M4Inverse(m4 m)
   v4 sign_b = v4(-1, +1, -1, +1);
 
   m4 inverse;
-  for (u32 i = 0; i < 4; ++i)
+  for (uint32_t i = 0; i < 4; ++i)
   {
     inverse.elements[0][i] = inv0.elements[i] * sign_a.elements[i];
     inverse.elements[1][i] = inv1.elements[i] * sign_b.elements[i];
@@ -1133,9 +1135,9 @@ static m4 M4Inverse(m4 m)
   v4 row0 = v4(inverse.elements[0][0], inverse.elements[1][0], inverse.elements[2][0], inverse.elements[3][0]);
   v4 m0 = v4(m.elements[0][0], m.elements[0][1], m.elements[0][2], m.elements[0][3]);
   v4 dot0 = V4MultiplyV4(m0, row0);
-  f32 dot1 = (dot0.x + dot0.y) + (dot0.z + dot0.w);
+  float dot1 = (dot0.x + dot0.y) + (dot0.z + dot0.w);
 
-  f32 one_over_det = 1 / dot1;
+  float one_over_det = 1 / dot1;
 
   return M4MultiplyF32(inverse, one_over_det);
 }
@@ -1160,15 +1162,15 @@ static m4 M4RemoveRotation(m4 mat)
 
   return mat;
 }
-static m4 M4Rotate(f32 angle, v3 axis)
+static m4 M4Rotate(float angle, v3 axis)
 {
   m4 result = M4InitDiagonal(1.f);
 
   axis = V3Normalize(axis);
 
-  f32 sin_theta = sinf(angle);
-  f32 cos_theta = cosf(angle);
-  f32 cos_value = 1.0f - cos_theta;
+  float sin_theta = sinf(angle);
+  float cos_theta = cosf(angle);
+  float cos_value = 1.0f - cos_theta;
 
   result.elements[0][0] = (axis.x * axis.x * cos_value) + cos_theta;
   result.elements[0][1] = (axis.x * axis.y * cos_value) + (axis.z * sin_theta);
@@ -1200,7 +1202,7 @@ static v3 calculateTriangleNormalNormalized(v3 p1, v3 p2, v3 p3)
 }
 static m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
 {
-  // f32 scale = (n - min.x) / (max.x - min.x) * (targetMax.x - targetMin.x) + targetMin.x;
+  // float scale = (n - min.x) / (max.x - min.x) * (targetMax.x - targetMin.x) + targetMin.x;
 
   m4 transform = M4InitDiagonal(1.0f);
   transform = M4MultiplyM4(transform, M4TranslateV3(V3MultiplyF32(targetMin, 1.0f)));
@@ -1218,10 +1220,10 @@ static m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
 #ifdef strManipulation
 #define StringCopy strcpy
 #define StringCopyN strncpy
-#define CalculateCStringLength(s) ((u32)strlen(s))
-#define CStringToI32(s) ((i32)atoi(s))
-#define CStringToI16(s) ((i16)atoi(s))
-#define CStringToF32(s) ((f32)atof(s))
+#define CalculateCStringLength(s) ((uint32_t)strlen(s))
+#define CStringToint32_t(s) ((int32_t)atoi(s))
+#define CStringToI16(s) ((int16_t)atoi(s))
+#define CStringToF32(s) ((float)atof(s))
 static bool CharIsSpace(char c)
 {
   return c <= 32;
@@ -1235,7 +1237,7 @@ static bool CharIsDigit(char c)
 {
   return (c >= '0' && c <= '9');
 }
-static i32 CharToLower(i32 c)
+static int32_t CharToLower(int32_t c)
 {
   if (c >= 'A' && c <= 'Z')
   {
@@ -1243,7 +1245,7 @@ static i32 CharToLower(i32 c)
   }
   return c;
 }
-static i32 CharToUpper(i32 c)
+static int32_t CharToUpper(int32_t c)
 {
   if (c >= 'a' && c <= 'z')
   {
@@ -1251,23 +1253,23 @@ static i32 CharToUpper(i32 c)
   }
   return c;
 }
-static u32 HashCString(char *string)
+static uint32_t HashCString(char *string)
 {
-  u32 hash = 5381;
-  i32 c;
+  uint32_t hash = 5381;
+  int32_t c;
   while ((c = *string++))
   {
     hash = ((hash << 5) + hash) + c;
   }
   return hash;
 }
-static bool CStringMatchCaseInsensitiveN(const char *str1, const char *str2, u32 n)
+static bool CStringMatchCaseInsensitiveN(const char *str1, const char *str2, uint32_t n)
 {
   bool result = 1;
 
   if (str1 && str2)
   {
-    for (u32 i = 0; i < n; ++i)
+    for (uint32_t i = 0; i < n; ++i)
     {
       if (CharToLower(str1[i]) != CharToLower(str2[i]))
       {
@@ -1293,7 +1295,7 @@ static bool CStringMatchCaseInsensitive(const char *str1, const char *str2)
 
   if (str1 && str2)
   {
-    for (u32 i = 0;; ++i)
+    for (uint32_t i = 0;; ++i)
     {
       if (CharToLower(str1[i]) != CharToLower(str2[i]))
       {
@@ -1313,13 +1315,13 @@ static bool CStringMatchCaseInsensitive(const char *str1, const char *str2)
 
   return result;
 }
-static bool CStringMatchCaseSensitiveN(const char *str1, const char *str2, u32 n)
+static bool CStringMatchCaseSensitiveN(const char *str1, const char *str2, uint32_t n)
 {
   bool result = 1;
 
   if (str1 && str2)
   {
-    for (u32 i = 0; i < n; ++i)
+    for (uint32_t i = 0; i < n; ++i)
     {
       if (str1[i] != str2[i])
       {
@@ -1345,7 +1347,7 @@ static bool CStringMatchCaseSensitive(const char *str1, const char *str2)
 
   if (str1 && str2)
   {
-    for (u32 i = 0;; ++i)
+    for (uint32_t i = 0;; ++i)
     {
       if (str1[i] != str2[i])
       {
@@ -1371,12 +1373,12 @@ static bool CStringContains(const char *str, const char *substr)
 
   if (str && substr)
   {
-    for (u32 i = 0; str[i]; ++i)
+    for (uint32_t i = 0; str[i]; ++i)
     {
       if (str[i] == substr[0])
       {
         result = 1;
-        for (u32 j = i + 1; str[j] && substr[j - i]; ++j)
+        for (uint32_t j = i + 1; str[j] && substr[j - i]; ++j)
         {
           if (str[j] != substr[j - i] && substr[j - i] != 0)
           {
@@ -1401,12 +1403,12 @@ static char *CStringPointerAfterSubstring(char *str, char *substr)
 
   if (str && substr)
   {
-    for (u32 i = 0; str[i]; ++i)
+    for (uint32_t i = 0; str[i]; ++i)
     {
       result = str + i;
       if (str[i] == substr[0])
       {
-        for (u32 j = 0;; ++j)
+        for (uint32_t j = 0;; ++j)
         {
           if (str[i + j] == substr[j])
           {
@@ -1442,10 +1444,10 @@ static char *CStringPointerAfterSubstring(char *str, char *substr)
 
   return result;
 }
-static u32 CStringIndexAfterSubstring(char *str, char *substr)
+static uint32_t CStringIndexAfterSubstring(char *str, char *substr)
 {
-  u32 result = 0;
-  for (u32 i = 0; str[i]; ++i)
+  uint32_t result = 0;
+  for (uint32_t i = 0; str[i]; ++i)
   {
     if (str[i] == substr[0])
     {
@@ -1457,10 +1459,10 @@ static u32 CStringIndexAfterSubstring(char *str, char *substr)
   }
   return result;
 }
-static u32 CStringFirstIndexAfterSubstring(char *str, char *substr)
+static uint32_t CStringFirstIndexAfterSubstring(char *str, char *substr)
 {
-  u32 result = 0;
-  for (u32 i = 0; str[i]; ++i)
+  uint32_t result = 0;
+  for (uint32_t i = 0; str[i]; ++i)
   {
     if (str[i] == substr[0])
     {
@@ -1479,13 +1481,13 @@ static char *CStringFindSubstring(char *str, char *substr)
 
   if (str && substr)
   {
-    for (u32 i = 0; str[i]; ++i)
+    for (uint32_t i = 0; str[i]; ++i)
     {
       if (str[i] == substr[0])
       {
         char *possible_result = str + i;
         bool match = 1;
-        for (u32 j = i + 1; str[j] && substr[j - i]; ++j)
+        for (uint32_t j = i + 1; str[j] && substr[j - i]; ++j)
         {
           if (str[j] != substr[j - i] && substr[j - i] != 0)
           {
@@ -1505,9 +1507,9 @@ static char *CStringFindSubstring(char *str, char *substr)
 
   return result;
 }
-static void CopyCStringToFixedSizeBuffer(char *destination, u32 destination_max, char *source)
+static void CopyCStringToFixedSizeBuffer(char *destination, uint32_t destination_max, char *source)
 {
-  for (u32 i = 0; i < destination_max; ++i)
+  for (uint32_t i = 0; i < destination_max; ++i)
   {
     destination[i] = source[i];
     if (source[i] == 0)
@@ -1517,9 +1519,9 @@ static void CopyCStringToFixedSizeBuffer(char *destination, u32 destination_max,
   }
   destination[destination_max - 1] = 0;
 }
-static void CopySubstringToStringUntilCharN(char *str1, u32 str1_max, char *str2, char str2_term)
+static void CopySubstringToStringUntilCharN(char *str1, uint32_t str1_max, char *str2, char str2_term)
 {
-  u32 write_pos = 0;
+  uint32_t write_pos = 0;
   while (1)
   {
     if (str2[write_pos] == str2_term || write_pos == str1_max - 1)
@@ -1534,13 +1536,13 @@ static void CopySubstringToStringUntilCharN(char *str1, u32 str1_max, char *str2
     }
   }
 }
-static i32 GetFirstI32FromCString(char *str)
+static int32_t GetFirstint32_tFromCString(char *str)
 {
-  i32 result = 0;
+  int32_t result = 0;
 
-  i32 last_digit = -1;
+  int32_t last_digit = -1;
 
-  for (i32 i = 0; str[i]; ++i)
+  for (int32_t i = 0; str[i]; ++i)
   {
     if (CharIsDigit(str[i]))
     {
@@ -1554,13 +1556,13 @@ static i32 GetFirstI32FromCString(char *str)
 
   if (last_digit >= 0)
   {
-    i32 digit_multiplier = 1;
+    int32_t digit_multiplier = 1;
 
-    for (i32 i = last_digit; i >= 0; --i)
+    for (int32_t i = last_digit; i >= 0; --i)
     {
       if (CharIsDigit(str[i]))
       {
-        i32 digit = str[i] - '0';
+        int32_t digit = str[i] - '0';
         result += digit_multiplier * digit;
         digit_multiplier *= 10;
       }
@@ -1577,13 +1579,13 @@ static i32 GetFirstI32FromCString(char *str)
 
   return result;
 }
-static f32 GetFirstF32FromCString(char *str)
+static float GetFirstF32FromCString(char *str)
 {
-  f32 result = 0;
+  float result = 0;
   bool found_first_digit = 0;
-  u32 float_write_pos = 0;
+  uint32_t float_write_pos = 0;
   char float_str[64] = {0};
-  u32 read_pos = 0;
+  uint32_t read_pos = 0;
   for (;; ++read_pos)
   {
     if (str[read_pos] == 0)
@@ -1623,12 +1625,12 @@ static f32 GetFirstF32FromCString(char *str)
 
 typedef struct rgbcolor
 {
-  u8 r;
-  u8 g;
-  u8 b;
-  u8 a;
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
+  uint8_t a;
 } rgbcolor;
-static rgbcolor RGBColorInit(u8 r, u8 g, u8 b, u8 a)
+static rgbcolor RGBColorInit(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
   rgbcolor c = {r, g, b, a};
   return c;
@@ -1636,17 +1638,17 @@ static rgbcolor RGBColorInit(u8 r, u8 g, u8 b, u8 a)
 #define rgbcolor(r, g, b, a) RGBColorInit(r, g, b, a)
 static v3 RGBToHSV(v3 rgb)
 {
-  f32 c_max = maxInV3(rgb);
-  f32 c_min = minInV3(rgb);
-  f32 delta = c_max - c_min;
+  float c_max = maxInV3(rgb);
+  float c_min = minInV3(rgb);
+  float delta = c_max - c_min;
   bool c_max_is_r = rgb.r > rgb.g && rgb.r > rgb.b;
   bool c_max_is_g = rgb.g > rgb.r && rgb.g > rgb.b;
   bool c_max_is_b = rgb.b > rgb.r && rgb.b > rgb.g;
-  f32 h = (c_max_is_r ? (rgb.g - rgb.b) / delta + 0 : c_max_is_g ? (rgb.b - rgb.r) / delta + 2
+  float h = (c_max_is_r ? (rgb.g - rgb.b) / delta + 0 : c_max_is_g ? (rgb.b - rgb.r) / delta + 2
                                                   : c_max_is_b   ? (rgb.r - rgb.g) / delta + 4
                                                                  : 0);
-  f32 s = c_max == 0 ? 0 : (delta / c_max);
-  f32 v = c_max;
+  float s = c_max == 0 ? 0 : (delta / c_max);
+  float v = c_max;
   v3 hsv = v3(h / 6.f, s, v);
   return hsv;
 }
@@ -1657,17 +1659,17 @@ static v3 RGBColorToHSV(rgbcolor rgba)
 }
 static v3 HSVToRGB(v3 hsv)
 {
-  f32 h = fmodf(hsv.x * 360.f, 360.f);
-  f32 s = hsv.y;
-  f32 v = hsv.z;
+  float h = fmodf(hsv.x * 360.f, 360.f);
+  float s = hsv.y;
+  float v = hsv.z;
 
-  f32 c = v * s;
-  f32 x = c * (1 - fabsf(fmodf((h / 60.f), 2) - 1));
-  f32 m = v - c;
+  float c = v * s;
+  float x = c * (1 - fabsf(fmodf((h / 60.f), 2) - 1));
+  float m = v - c;
 
-  f32 r;
-  f32 g;
-  f32 b;
+  float r;
+  float g;
+  float b;
 
   if ((h >= 0.f && h < 60.f) || (h >= 360.f && h < 420.f))
   {
@@ -1713,7 +1715,7 @@ static v3 HSVToRGB(v3 hsv)
 static rgbcolor HSVToRGBColor(v3 hsv)
 {
   v3 newColor = HSVToRGB(hsv);
-  return rgbcolor((i32)floorf(newColor.r * 255) % 255, (i32)floorf(newColor.g * 255) % 255, (i32)floorf(newColor.b * 255) % 255, 1);
+  return rgbcolor((int32_t)floorf(newColor.r * 255) % 255, (int32_t)floorf(newColor.g * 255) % 255, (int32_t)floorf(newColor.b * 255) % 255, 1);
 }
 
 typedef enum Key
@@ -1837,15 +1839,15 @@ typedef enum cardinal8dir
 
 static void seedRandomNumberGenerator(void)
 {
-  srand((u32)time(0));
+  srand((uint32_t)time(0));
 }
-static f32 randf()
+static float randf()
 {
   return ((float)rand() / (RAND_MAX));
 }
 #ifdef perlinNoise
-static i32 global_perlin_noise_seed = 0;
-static i32 global_perlin_noise_hash[] = {
+static int32_t global_perlin_noise_seed = 0;
+static int32_t global_perlin_noise_hash[] = {
     208, 34, 231, 213, 32, 248, 233, 56, 161, 78, 24, 140, 71, 48, 140, 254, 245, 255, 247, 247, 40,
     185, 248, 251, 245, 28, 124, 204, 204, 76, 36, 1, 107, 28, 234, 163, 202, 224, 245, 128, 167, 204,
     9, 92, 217, 54, 239, 174, 173, 102, 193, 189, 190, 121, 100, 108, 167, 44, 43, 77, 180, 204, 8, 81,
@@ -1859,42 +1861,42 @@ static i32 global_perlin_noise_hash[] = {
     135, 176, 183, 191, 253, 115, 184, 21, 233, 58, 129, 233, 142, 39, 128, 211, 118, 137, 139, 255,
     114, 20, 218, 113, 154, 27, 127, 246, 250, 1, 8, 198, 250, 209, 92, 222, 173, 21, 88, 102, 219};
 
-static i32 PerlinNoise2(i32 x, i32 y)
+static int32_t PerlinNoise2(int32_t x, int32_t y)
 {
-  i32 tmp = global_perlin_noise_hash[(y + global_perlin_noise_seed) % 256];
+  int32_t tmp = global_perlin_noise_hash[(y + global_perlin_noise_seed) % 256];
   return global_perlin_noise_hash[(tmp + x) % 256];
 }
-static f32 PerlinLinearlyInterpolate(f32 x, f32 y, f32 s)
+static float PerlinLinearlyInterpolate(float x, float y, float s)
 {
   return x + s * (y - x);
 }
-static f32 PerlinSmoothlyInterpolate(f32 x, f32 y, f32 s)
+static float PerlinSmoothlyInterpolate(float x, float y, float s)
 {
   return PerlinLinearlyInterpolate(x, y, s * s * (3 - 2 * s));
 }
-static f32 PerlinNoise2D(f32 x, f32 y)
+static float PerlinNoise2D(float x, float y)
 {
-  i32 x_int = (i32)x;
-  i32 y_int = (i32)y;
-  f32 x_frac = x - x_int;
-  f32 y_frac = y - y_int;
-  i32 s = PerlinNoise2(x_int, y_int);
-  i32 t = PerlinNoise2(x_int + 1, y_int);
-  i32 u = PerlinNoise2(x_int, y_int + 1);
-  i32 v = PerlinNoise2(x_int + 1, y_int + 1);
-  f32 low = PerlinSmoothlyInterpolate((f32)s, (f32)t, x_frac);
-  f32 high = PerlinSmoothlyInterpolate((f32)u, (f32)v, x_frac);
+  int32_t x_int = (int32_t)x;
+  int32_t y_int = (int32_t)y;
+  float x_frac = x - x_int;
+  float y_frac = y - y_int;
+  int32_t s = PerlinNoise2(x_int, y_int);
+  int32_t t = PerlinNoise2(x_int + 1, y_int);
+  int32_t u = PerlinNoise2(x_int, y_int + 1);
+  int32_t v = PerlinNoise2(x_int + 1, y_int + 1);
+  float low = PerlinSmoothlyInterpolate((float)s, (float)t, x_frac);
+  float high = PerlinSmoothlyInterpolate((float)u, (float)v, x_frac);
   return PerlinSmoothlyInterpolate(low, high, y_frac);
 }
-static f32 Perlin2D(f32 x, f32 y, f32 freq, i32 depth)
+static float Perlin2D(float x, float y, float freq, int32_t depth)
 {
-  f32 xa = x * freq;
-  f32 ya = y * freq;
-  f32 amp = 1.0;
-  f32 fin = 0;
-  f32 div = 0.0;
+  float xa = x * freq;
+  float ya = y * freq;
+  float amp = 1.0;
+  float fin = 0;
+  float div = 0.0;
 
-  for (i32 i = 0; i < depth; i++)
+  for (int32_t i = 0; i < depth; i++)
   {
     div += 256 * amp;
     fin += PerlinNoise2D(xa, ya) * amp;
@@ -1907,9 +1909,9 @@ static f32 Perlin2D(f32 x, f32 y, f32 freq, i32 depth)
 }
 #endif
 
-static f32 interpolateLinear(f32 t)
+static float interpolateLinear(float t)
 {
-  f32 result = 0;
+  float result = 0;
   if (t < 0)
   {
     result = 0;
@@ -1924,9 +1926,9 @@ static f32 interpolateLinear(f32 t)
   }
   return result;
 }
-static f32 interpolateSmooth(f32 t)
+static float interpolateSmooth(float t)
 {
-  f32 result = 0;
+  float result = 0;
   if (t < 0)
   {
     result = 0;
@@ -1937,36 +1939,36 @@ static f32 interpolateSmooth(f32 t)
   }
   else
   {
-    f32 t2 = t * t;
-    f32 t4 = t2 * t2;
-    f32 t6 = t2 * t4;
+    float t2 = t * t;
+    float t4 = t2 * t2;
+    float t6 = t2 * t4;
     result = (4 / 9) * t6 - (17 / 9) * t4 + (22 / 9) * t2;
   }
   return result;
 }
-static f32 regularizeDegree(f32 angle)
+static float regularizeDegree(float angle)
 {
-  f32 degree = fmodf(angle, 360);
+  float degree = fmodf(angle, 360);
   if (degree < 0)
     degree += 360;
   return degree;
 }
-static f32 regularizeRad(f32 angle)
+static float regularizeRad(float angle)
 {
-  f32 rad = fmodf(angle, 2 * PIf);
+  float rad = fmodf(angle, 2 * PIf);
   if (rad < 0)
     rad += 2 * PIf;
   return rad;
 }
-static f32 degreeToRad(f32 degree) { return degree / 180.0 * PIf; }
-static f32 radToDegree(f32 rad) { return rad / PIf * 180; }
-static f32 fast_cos(f32 angle)
+static float degreeToRad(float degree) { return degree / 180.0 * PIf; }
+static float radToDegree(float rad) { return rad / PIf * 180; }
+static float fast_cos(float angle)
 {
-  f32 t_angle = regularizeRad(angle) - PIf;
-  f32 res = 0;
-  f32 x = 1;
-  i32 precision = fast_calc_precision;
-  i32 factorialPrecision = 20;
+  float t_angle = regularizeRad(angle) - PIf;
+  float res = 0;
+  float x = 1;
+  int32_t precision = fast_calc_precision;
+  int32_t factorialPrecision = 20;
   unsigned long long factorials[] = {0,
                                      1,
                                      2,
@@ -1987,7 +1989,7 @@ static f32 fast_cos(f32 angle)
                                      355687428096000,
                                      6402373705728000,
                                      121645100408832000};
-  for (i32 i = 0; i <= precision && i < factorialPrecision; i += 4)
+  for (int32_t i = 0; i <= precision && i < factorialPrecision; i += 4)
   {
     res += x / factorials[i];
     x *= t_angle * t_angle;
@@ -1996,13 +1998,13 @@ static f32 fast_cos(f32 angle)
   }
   return -res;
 }
-static f32 fast_sin(f32 angle)
+static float fast_sin(float angle)
 {
-  f32 t_angle = regularizeRad(angle) - PIf;
-  f32 res = 0;
-  f32 x = t_angle;
-  i32 precision = fast_calc_precision;
-  i32 factorialPrecision = 21;
+  float t_angle = regularizeRad(angle) - PIf;
+  float res = 0;
+  float x = t_angle;
+  int32_t precision = fast_calc_precision;
+  int32_t factorialPrecision = 21;
   unsigned long long factorials[] = {0,
                                      1,
                                      2,
@@ -2024,7 +2026,7 @@ static f32 fast_sin(f32 angle)
                                      6402373705728000,
                                      121645100408832000,
                                      2432902008176640000};
-  for (i32 i = 1; i <= precision && i < factorialPrecision; i += 4)
+  for (int32_t i = 1; i <= precision && i < factorialPrecision; i += 4)
   {
     res += x / factorials[i];
     x *= t_angle * t_angle;
@@ -2033,7 +2035,7 @@ static f32 fast_sin(f32 angle)
   }
   return -res;
 }
-static f32 fast_atan(f32 a)
+static float fast_atan(float a)
 {
   if ((a > -1.5 && a < -0.7) || (a < 1.4 && a >= 0.6))
   {
@@ -2041,10 +2043,10 @@ static f32 fast_atan(f32 a)
   }
   if (a > -1 && a < 1)
   {
-    f32 res = 0;
-    f32 x = a;
-    i32 precision = fast_calc_precision;
-    for (i32 i = 1; i <= precision; i += 2)
+    float res = 0;
+    float x = a;
+    int32_t precision = fast_calc_precision;
+    for (int32_t i = 1; i <= precision; i += 2)
     {
       res += x / (4 * i - 3);
       x *= a * a;
@@ -2055,10 +2057,10 @@ static f32 fast_atan(f32 a)
   }
   else
   {
-    f32 res = 0;
-    f32 x = -a;
-    i32 precision = 11;
-    for (i32 i = 1; i < precision * 2; i += 2)
+    float res = 0;
+    float x = -a;
+    int32_t precision = 11;
+    for (int32_t i = 1; i < precision * 2; i += 2)
     {
       res += 1.0 / ((4 * i - 3) * x);
       x *= a * a;
@@ -2077,7 +2079,7 @@ static f32 fast_atan(f32 a)
   }
 }
 
-static void sleepMillis(u32 millis)
+static void sleepMillis(uint32_t millis)
 {
 #ifdef _WIN32
   Sleep(millis);
@@ -2098,7 +2100,7 @@ public:
     this->targetMin = v4(0, 0, 0, 0);
     this->targetMax = v4(0, 0, 0, 0);
   }
-  mapper(f32 min, f32 max, f32 targetMin, f32 targetMax)
+  mapper(float min, float max, float targetMin, float targetMax)
   {
     this->min = v4(min, 0, 0, 0);
     this->max = v4(max, 0, 0, 0);
@@ -2126,33 +2128,33 @@ public:
     this->targetMin = targetMin;
     this->targetMax = targetMax;
   }
-  f32 map(f32 n)
+  float map(float n)
   {
-    f32 scale = (n - min.x) / (max.x - min.x);
+    float scale = (n - min.x) / (max.x - min.x);
     return scale * (targetMax.x - targetMin.x) + targetMin.x;
   }
   v2 map(v2 n)
   {
-    f32 xScale = V4MinusV4(v4(n.x, n.y, 0, 0), min).x / (V4MinusV4(max, min)).x;
-    f32 yScale = V4MinusV4(v4(n.x, n.y, 0, 0), min).y / (V4MinusV4(max, min)).y;
+    float xScale = V4MinusV4(v4(n.x, n.y, 0, 0), min).x / (V4MinusV4(max, min)).x;
+    float yScale = V4MinusV4(v4(n.x, n.y, 0, 0), min).y / (V4MinusV4(max, min)).y;
     return v2(xScale * V4MinusV4(targetMax, targetMin).x + targetMin.x,
               yScale * V4MinusV4(targetMax, targetMin).y + targetMin.y);
   }
   v3 map(v3 n)
   {
-    f32 xScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).x / (V4MinusV4(max, min)).x;
-    f32 yScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).y / (V4MinusV4(max, min)).y;
-    f32 zScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).z / (V4MinusV4(max, min)).z;
+    float xScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).x / (V4MinusV4(max, min)).x;
+    float yScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).y / (V4MinusV4(max, min)).y;
+    float zScale = V4MinusV4(v4(n.x, n.y, n.z, 0), min).z / (V4MinusV4(max, min)).z;
     return v3(xScale * V4MinusV4(targetMax, targetMin).x + targetMin.x,
               yScale * V4MinusV4(targetMax, targetMin).y + targetMin.y,
               zScale * V4MinusV4(targetMax, targetMin).z + targetMin.z);
   }
   v4 map(v4 n)
   {
-    f32 xScale = V4MinusV4(n, min).x / (V4MinusV4(max, min)).x;
-    f32 yScale = V4MinusV4(n, min).y / (V4MinusV4(max, min)).y;
-    f32 zScale = V4MinusV4(n, min).z / (V4MinusV4(max, min)).z;
-    f32 wScale = V4MinusV4(n, min).w / (V4MinusV4(max, min)).w;
+    float xScale = V4MinusV4(n, min).x / (V4MinusV4(max, min)).x;
+    float yScale = V4MinusV4(n, min).y / (V4MinusV4(max, min)).y;
+    float zScale = V4MinusV4(n, min).z / (V4MinusV4(max, min)).z;
+    float wScale = V4MinusV4(n, min).w / (V4MinusV4(max, min)).w;
     return v4(xScale * V4MinusV4(targetMax, targetMin).x + targetMin.x,
               yScale * V4MinusV4(targetMax, targetMin).y + targetMin.y,
               zScale * V4MinusV4(targetMax, targetMin).z + targetMin.z,

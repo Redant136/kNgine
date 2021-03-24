@@ -3,8 +3,6 @@
 # main branch
 
 ## currently working on
-- [x] child is component entity instead of parent object (pog no bugs... maybe)
-- [x] text in renderer
 ## testing
 - [ ] text in renderer
 - [ ] test openal audio engine
@@ -14,6 +12,7 @@
 ## research
 - [ ] header only kRenderer
 - [ ] metal
+- [ ] https://thebookofshaders.com/
 ## procrastinating
 - [ ] custom shader in renderer
 - [ ] object info tool
