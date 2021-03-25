@@ -112,7 +112,6 @@ namespace kNgine
 
   static void frameUpdate()
   {
-    kRenderer_setDrawColor(v4(1, 1, 1, 1));
     f32 time=kRenderer_getTimeSinceLastFrame();
     std::vector<msg> msgs;
     msgs.push_back({msg::TIME_ELAPSED, time});
@@ -148,6 +147,7 @@ namespace kNgine
     {
       workingObjects[i]->update(msgs);
     }
+    kRenderer_setDrawColor(v4(1, 1, 1, 1));
     if (workingObjectsLength > 0)
     {
       iv2 windowSize = kRenderer_getWindowSize();

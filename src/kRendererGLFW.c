@@ -864,6 +864,7 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i3
   glUseProgram(defaultShader);
   glUniform4f(glGetUniformLocation(defaultShader, "colorScale"), kRenderer_WindowsContexts.windows[currentContext].context->currentColor.r, kRenderer_WindowsContexts.windows[currentContext].context->currentColor.g, kRenderer_WindowsContexts.windows[currentContext].context->currentColor.b, kRenderer_WindowsContexts.windows[currentContext].context->currentColor.a);
   glDrawArrays(GL_TRIANGLES, 0, 6);
+  glUniform4f(glGetUniformLocation(defaultShader, "colorScale"), 1.0, 1.0, 1.0, 1.0);
   glDeleteBuffers(1, &VBO);
 }
 void kRenderer_drawStoredTexture(u32 textureIndex, v3 position, i32 width, i32 height,
