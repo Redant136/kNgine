@@ -44,616 +44,7 @@ typedef float f32;
 typedef double f64;
 #endif
 
-#if defined(utils_VectorObjects) && defined(__cplusplus)
-struct v2;
-struct v3;
-struct v4;
-struct iv2;
-struct iv3;
-struct iv4;
-struct v2
-{
-  float x;
-  float y;
-  v2()
-  {
-    this->x = 0;
-    this->y = 0;
-  }
-  v2(float x, float y)
-  {
-    this->x = x;
-    this->y = y;
-  }
-  v2(const v2 &base)
-  {
-    this->x = base.x;
-    this->y = base.y;
-  }
-  v2(float d)
-  {
-    this->x = d;
-    this->y = 0;
-  }
-  v2(const iv2 &base);
-  v2(const v3 &base);
-  v2(const v4 &base);
-  v2 operator+(const v2 a) { return v2(x + a.x, y + a.y); }
-  v2 operator-(const v2 a) { return v2(x - a.x, y - a.y); }
-  void operator+=(const v2 a)
-  {
-    x += a.x;
-    y += a.y;
-  }
-  void operator-=(const v2 a)
-  {
-    x -= a.x;
-    y -= a.y;
-  }
-  v2 operator+(const float a) { return v2(x + a, y + a); }
-  v2 operator-(const float a) { return v2(x - a, y - a); }
-  v2 operator*(const float a) { return v2(x * a, y * a); }
-  v2 operator/(const float a) { return v2(x / a, y / a); }
-  void operator+=(const float a)
-  {
-    x += a;
-    y += a;
-  }
-  void operator-=(const float a)
-  {
-    x -= a;
-    y -= a;
-  }
-  void operator*=(const float a)
-  {
-    x *= a;
-    y *= a;
-  }
-  void operator/=(const float a)
-  {
-    x /= a;
-    y /= a;
-  }
-};
-struct v3
-{
-  union
-  {
-    struct
-    {
-      float x;
-      float y;
-      float z;
-    };
-    struct
-    {
-      float r;
-      float g;
-      float b;
-    };
-    float elements[3];
-  };
-  v3()
-  {
-    this->x = 0;
-    this->y = 0;
-    this->z = 0;
-  }
-  v3(float x, float y, float z)
-  {
-    this->x = x;
-    this->y = y;
-    this->z = z;
-  }
-  v3(const v2 &vector2)
-  {
-    this->x = vector2.x;
-    this->y = vector2.y;
-    this->z = 0;
-  }
-  v3(float d)
-  {
-    this->x = d;
-    this->y = 0;
-    this->z = 0;
-  }
-  v3(const iv3 &base);
-  v3(const v4 &base);
-  v3 operator+(const v3 a) { return v3(x + a.x, y + a.y, z + a.z); }
-  v3 operator-(const v3 a) { return v3(x - a.x, y - a.y, z - a.z); }
-  void operator+=(const v3 a)
-  {
-    x += a.x;
-    y += a.y;
-    z += a.z;
-  }
-  void operator-=(const v3 a)
-  {
-    x -= a.x;
-    y -= a.y;
-    z -= a.z;
-  }
-  v3 operator+(const float a) { return v3(x + a, y + a, z + a); }
-  v3 operator-(const float a) { return v3(x - a, y - a, z - a); }
-  v3 operator*(const float a) { return v3(x * a, y * a, z * a); }
-  v3 operator/(const float a) { return v3(x / a, y / a, z / a); }
-  void operator+=(const float a)
-  {
-    x += a;
-    y += a;
-    z += a;
-  }
-  void operator-=(const float a)
-  {
-    x -= a;
-    y -= a;
-    z -= a;
-  }
-  void operator*=(const float a)
-  {
-    x *= a;
-    y *= a;
-    z *= a;
-  }
-  void operator/=(const float a)
-  {
-    x /= a;
-    y /= a;
-    z /= a;
-  }
-  v3 &operator=(const v2 &a)
-  {
-    this->x = a.x;
-    this->y = a.y;
-    return *this;
-  }
-};
-struct v4
-{
-  union
-  {
-    struct
-    {
-      float x;
-      float y;
-      union
-      {
-        struct
-        {
-          float z;
-          float w;
-        };
-        struct
-        {
-          float width;
-          float height;
-        };
-      };
-    };
-    struct
-    {
-      float r;
-      float g;
-      float b;
-      float a;
-    };
-    float elements[4];
-  };
-  v4()
-  {
-    this->x = 0;
-    this->y = 0;
-    this->z = 0;
-    this->w = 0;
-  }
-  v4(float x, float y, float z, float w)
-  {
-    this->x = x;
-    this->y = y;
-    this->z = z;
-    this->w = w;
-  }
-  v4(const v3 &vector3)
-  {
-    this->x = vector3.x;
-    this->y = vector3.y;
-    this->z = vector3.z;
-    this->w = 0;
-  }
-  v4(const v2 &vector2)
-  {
-    this->x = vector2.x;
-    this->y = vector2.y;
-    this->z = 0;
-    this->w = 0;
-  }
-  v4(float d)
-  {
-    this->x = d;
-    this->y = 0;
-    this->z = 0;
-    this->w = 0;
-  }
-  v4(const iv4 &base);
-  v4 operator+(const v4 a) { return v4(x + a.x, y + a.y, z + a.z, w + a.w); }
-  v4 operator-(const v4 a) { return v4(x - a.x, y - a.y, z - a.z, w - a.w); }
-  void operator+=(const v4 a)
-  {
-    x += a.x;
-    y += a.y;
-    z += a.z;
-    w += a.w;
-  }
-  void operator-=(const v4 a)
-  {
-    x -= a.x;
-    y -= a.y;
-    z -= a.z;
-    w -= a.w;
-  }
-  v4 operator+(const float a) { return v4(x + a, y + a, z + a, w + a); }
-  v4 operator-(const float a) { return v4(x - a, y - a, z - a, w - a); }
-  v4 operator*(const float a) { return v4(x * a, y * a, z * a, w * a); }
-  v4 operator/(const float a) { return v4(x / a, y / a, z / a, w / a); }
-  void operator+=(const float a)
-  {
-    x += a;
-    y += a;
-    z += a;
-    z += a;
-  }
-  void operator-=(const float a)
-  {
-    x -= a;
-    y -= a;
-    z -= a;
-    z -= a;
-  }
-  void operator*=(const float a)
-  {
-    x *= a;
-    y *= a;
-    z *= a;
-    z *= a;
-  }
-  void operator/=(const float a)
-  {
-    x /= a;
-    y /= a;
-    z /= a;
-    z /= a;
-  }
-  v4 &operator=(const v2 &a)
-  {
-    this->x = a.x;
-    this->y = a.y;
-    return *this;
-  }
-  v4 &operator=(const v3 &a)
-  {
-    this->x = a.x;
-    this->y = a.y;
-    this->z = a.z;
-    return *this;
-  }
-};
-struct iv2
-{
-  int32_t x, y;
-  iv2()
-  {
-    this->x = 0;
-    this->y = 0;
-  }
-  iv2(int32_t x, int32_t y)
-  {
-    this->x = x;
-    this->y = y;
-  }
-  iv2(const iv2 &base)
-  {
-    this->x = base.x;
-    this->y = base.y;
-  }
-  iv2(int32_t d)
-  {
-    this->x = d;
-    this->y = 0;
-  }
-  iv2(const v2 &base)
-  {
-    this->x = (int32_t)floor(base.x);
-    this->y = (int32_t)floor(base.y);
-  }
-  bool operator==(const iv2 &a) { return x == a.x && y == a.y; }
-  bool operator!=(const iv2 &a) { return x != a.x || y != a.y; }
-  iv2 operator+(const iv2 a) { return iv2(x + a.x, y + a.y); }
-  iv2 operator-(const iv2 a) { return iv2(x - a.x, y - a.y); }
-  void operator+=(const iv2 a)
-  {
-    x += a.x;
-    y += a.y;
-  }
-  void operator-=(const iv2 a)
-  {
-    x -= a.x;
-    y -= a.y;
-  }
-  iv2 operator+(const int32_t a) { return iv2(x + a, y + a); }
-  iv2 operator-(const int32_t a) { return iv2(x - a, y - a); }
-  iv2 operator*(const int32_t a) { return iv2(x * a, y * a); }
-  iv2 operator/(const int32_t a) { return iv2(x / a, y / a); }
-  void operator+=(const int32_t a)
-  {
-    x += a;
-    y += a;
-  }
-  void operator-=(const int32_t a)
-  {
-    x -= a;
-    y -= a;
-  }
-  void operator*=(const int32_t a)
-  {
-    x *= a;
-    y *= a;
-  }
-  void operator/=(const int32_t a)
-  {
-    x /= a;
-    y /= a;
-  }
-};
-struct iv3
-{
-  int32_t x, y, z;
-  iv3()
-  {
-    this->x = 0;
-    this->y = 0;
-    this->z = 0;
-  }
-  iv3(int32_t x, int32_t y, int32_t z)
-  {
-    this->x = x;
-    this->y = y;
-    this->z = z;
-  }
-  iv3(const iv2 &vector2)
-  {
-    this->x = vector2.x;
-    this->y = vector2.y;
-    this->z = 0;
-  }
-  iv3(int32_t d)
-  {
-    this->x = d;
-    this->y = 0;
-    this->z = 0;
-  }
-  iv3(const v3 &base)
-  {
-    this->x = (int32_t)floor(base.x);
-    this->y = (int32_t)floor(base.y);
-    this->z = (int32_t)floor(base.z);
-  }
-  bool operator==(const iv3 &a) { return x == a.x && y == a.y && z == a.z; }
-  bool operator!=(const iv3 &a) { return x != a.x || y != a.y || z != a.z; }
-  iv3 operator+(const iv3 a) { return iv3(x + a.x, y + a.y, z + a.z); }
-  iv3 operator-(const iv3 a) { return iv3(x - a.x, y - a.y, z - a.z); }
-  void operator+=(const iv3 a)
-  {
-    x += a.x;
-    y += a.y;
-    z += a.z;
-  }
-  void operator-=(const iv3 a)
-  {
-    x -= a.x;
-    y -= a.y;
-    z -= a.z;
-  }
-  iv3 operator+(const int32_t a) { return iv3(x + a, y + a, z + a); }
-  iv3 operator-(const int32_t a) { return iv3(x - a, y - a, z - a); }
-  iv3 operator*(const int32_t a) { return iv3(x * a, y * a, z * a); }
-  iv3 operator/(const int32_t a) { return iv3(x / a, y / a, z / a); }
-  void operator+=(const int32_t a)
-  {
-    x += a;
-    y += a;
-    z += a;
-  }
-  void operator-=(const int32_t a)
-  {
-    x -= a;
-    y -= a;
-    z -= a;
-  }
-  void operator*=(const int32_t a)
-  {
-    x *= a;
-    y *= a;
-    z *= a;
-  }
-  void operator/=(const int32_t a)
-  {
-    x /= a;
-    y /= a;
-    z /= a;
-  }
-  iv3 &operator=(const iv2 &a)
-  {
-    this->x = a.x;
-    this->y = a.y;
-    return *this;
-  }
-  iv2 toIV2() { return iv2(x, y); }
-};
-struct iv4
-{
-  int32_t x, y, z, w;
-  iv4()
-  {
-    this->x = 0;
-    this->y = 0;
-    this->z = 0;
-    this->w = 0;
-  }
-  iv4(int32_t x, int32_t y, int32_t z, int32_t w)
-  {
-    this->x = x;
-    this->y = y;
-    this->z = z;
-    this->w = w;
-  }
-  iv4(const iv3 &vector3)
-  {
-    this->x = vector3.x;
-    this->y = vector3.y;
-    this->z = vector3.z;
-    this->w = 0;
-  }
-  iv4(const iv2 &vector2)
-  {
-    this->x = vector2.x;
-    this->y = vector2.y;
-    this->z = 0;
-    this->w = 0;
-  }
-  iv4(int32_t d)
-  {
-    this->x = d;
-    this->y = 0;
-    this->z = 0;
-    this->w = 0;
-  }
-  iv4(const v4 &base)
-  {
-    this->x = (int32_t)floor(base.x);
-    this->y = (int32_t)floor(base.y);
-    this->z = (int32_t)floor(base.z);
-    this->w = (int32_t)floor(base.w);
-  }
-  bool operator==(const iv4 &a)
-  {
-    return x == a.x && y == a.y && z == a.z && w == a.w;
-  }
-  bool operator!=(const iv4 &a)
-  {
-    return x != a.x || y != a.y || z != a.z || w != a.w;
-  }
-  iv4 operator+(const iv4 a) { return iv4(x + a.x, y + a.y, z + a.z, w + a.w); }
-  iv4 operator-(const iv4 a) { return iv4(x - a.x, y - a.y, z - a.z, w - a.w); }
-  void operator+=(const iv4 a)
-  {
-    x += a.x;
-    y += a.y;
-    z += a.z;
-    w += a.w;
-  }
-  void operator-=(const iv4 a)
-  {
-    x -= a.x;
-    y -= a.y;
-    z -= a.z;
-    w -= a.w;
-  }
-  iv4 operator+(const int32_t a) { return iv4(x + a, y + a, z + a, w + a); }
-  iv4 operator-(const int32_t a) { return iv4(x - a, y - a, z - a, w - a); }
-  iv4 operator*(const int32_t a) { return iv4(x * a, y * a, z * a, w * a); }
-  iv4 operator/(const int32_t a) { return iv4(x / a, y / a, z / a, w / a); }
-  void operator+=(const int32_t a)
-  {
-    x += a;
-    y += a;
-    z += a;
-    z += a;
-  }
-  void operator-=(const int32_t a)
-  {
-    x -= a;
-    y -= a;
-    z -= a;
-    z -= a;
-  }
-  void operator*=(const int32_t a)
-  {
-    x *= a;
-    y *= a;
-    z *= a;
-    z *= a;
-  }
-  void operator/=(const int32_t a)
-  {
-    x /= a;
-    y /= a;
-    z /= a;
-    z /= a;
-  }
-  iv4 &operator=(const iv2 &a)
-  {
-    this->x = a.x;
-    this->y = a.y;
-    return *this;
-  }
-  iv4 &operator=(const iv3 &a)
-  {
-    this->x = a.x;
-    this->y = a.y;
-    this->z = a.z;
-    return *this;
-  }
-  iv2 toIV2() { return iv2(x, y); }
-  iv3 toIV3() { return iv3(x, y, z); }
-};
-inline v2::v2(const iv2 &base)
-{
-  this->x = (float)base.x;
-  this->y = (float)base.y;
-}
-inline v2::v2(const v3 &base)
-{
-  this->x = base.x;
-  this->y = base.y;
-}
-inline v2::v2(const v4 &base)
-{
-  this->x = base.x;
-  this->y = base.y;
-}
-inline v3::v3(const iv3 &base)
-{
-  this->x = (float)base.x;
-  this->y = (float)base.y;
-  this->z = (float)base.z;
-}
-inline v3::v3(const v4 &base)
-{
-  this->x = base.x;
-  this->y = base.y;
-  this->z = base.z;
-}
-inline v4::v4(const iv4 &base)
-{
-  this->x = (float)base.x;
-  this->y = (float)base.y;
-  this->z = (float)base.z;
-  this->w = (float)base.w;
-}
-#define V2ToArray(v) \
-  {                  \
-    v.x, v.y         \
-  }
-#define V3ToArray(v) \
-  {                  \
-    v.x, v.y, v.z    \
-  }
-#define V4ToArray(v)   \
-  {                    \
-    v.x, v.y, v.z, v.w \
-  }
 
-#else
 typedef struct v2
 {
   float x;
@@ -802,7 +193,652 @@ static iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
 }
 #define iv4(x, y, z, w) IV4Init(x, y, z, w)
 
+#if defined(utils_VectorObjects) && defined(__cplusplus)
+struct kv2;
+struct kv3;
+struct kv4;
+struct kiv2;
+struct kiv3;
+struct kiv4;
+struct kv2
+{
+  float x;
+  float y;
+  kv2()
+  {
+    this->x = 0;
+    this->y = 0;
+  }
+  kv2(float x, float y)
+  {
+    this->x = x;
+    this->y = y;
+  }
+  kv2(v2&base){
+    this->x=base.x;
+    this->y=base.y;
+  }
+  kv2(const kv2 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+  }
+  kv2(float d)
+  {
+    this->x = d;
+    this->y = 0;
+  }
+  kv2(const kiv2 &base);
+  kv2(const kv3 &base);
+  kv2(const kv4 &base);
+  kv2 operator+(const kv2 a) { return kv2(x + a.x, y + a.y); }
+  kv2 operator-(const kv2 a) { return kv2(x - a.x, y - a.y); }
+  void operator+=(const kv2 a)
+  {
+    x += a.x;
+    y += a.y;
+  }
+  void operator-=(const kv2 a)
+  {
+    x -= a.x;
+    y -= a.y;
+  }
+  kv2 operator+(const float a) { return kv2(x + a, y + a); }
+  kv2 operator-(const float a) { return kv2(x - a, y - a); }
+  kv2 operator*(const float a) { return kv2(x * a, y * a); }
+  kv2 operator/(const float a) { return kv2(x / a, y / a); }
+  void operator+=(const float a)
+  {
+    x += a;
+    y += a;
+  }
+  void operator-=(const float a)
+  {
+    x -= a;
+    y -= a;
+  }
+  void operator*=(const float a)
+  {
+    x *= a;
+    y *= a;
+  }
+  void operator/=(const float a)
+  {
+    x /= a;
+    y /= a;
+  }
+};
+struct kv3
+{
+  union
+  {
+    struct
+    {
+      float x;
+      float y;
+      float z;
+    };
+    struct
+    {
+      float r;
+      float g;
+      float b;
+    };
+    float elements[3];
+  };
+  kv3()
+  {
+    this->x = 0;
+    this->y = 0;
+    this->z = 0;
+  }
+  kv3(float x, float y, float z)
+  {
+    this->x = x;
+    this->y = y;
+    this->z = z;
+  }
+  kv3(v3 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+    this->z = base.z;
+  }
+  kv3(const kv2 &vector2)
+  {
+    this->x = vector2.x;
+    this->y = vector2.y;
+    this->z = 0;
+  }
+  kv3(float d)
+  {
+    this->x = d;
+    this->y = 0;
+    this->z = 0;
+  }
+  kv3(const kiv3 &base);
+  kv3(const kv4 &base);
+  kv3 operator+(const kv3 a) { return kv3(x + a.x, y + a.y, z + a.z); }
+  kv3 operator-(const kv3 a) { return kv3(x - a.x, y - a.y, z - a.z); }
+  void operator+=(const kv3 a)
+  {
+    x += a.x;
+    y += a.y;
+    z += a.z;
+  }
+  void operator-=(const kv3 a)
+  {
+    x -= a.x;
+    y -= a.y;
+    z -= a.z;
+  }
+  kv3 operator+(const float a) { return kv3(x + a, y + a, z + a); }
+  kv3 operator-(const float a) { return kv3(x - a, y - a, z - a); }
+  kv3 operator*(const float a) { return kv3(x * a, y * a, z * a); }
+  kv3 operator/(const float a) { return kv3(x / a, y / a, z / a); }
+  void operator+=(const float a)
+  {
+    x += a;
+    y += a;
+    z += a;
+  }
+  void operator-=(const float a)
+  {
+    x -= a;
+    y -= a;
+    z -= a;
+  }
+  void operator*=(const float a)
+  {
+    x *= a;
+    y *= a;
+    z *= a;
+  }
+  void operator/=(const float a)
+  {
+    x /= a;
+    y /= a;
+    z /= a;
+  }
+  kv3 &operator=(const kv2 &a)
+  {
+    this->x = a.x;
+    this->y = a.y;
+    return *this;
+  }
+};
+struct kv4
+{
+  union
+  {
+    struct
+    {
+      float x;
+      float y;
+      union
+      {
+        struct
+        {
+          float z;
+          float w;
+        };
+        struct
+        {
+          float width;
+          float height;
+        };
+      };
+    };
+    struct
+    {
+      float r;
+      float g;
+      float b;
+      float a;
+    };
+    float elements[4];
+  };
+  kv4()
+  {
+    this->x = 0;
+    this->y = 0;
+    this->z = 0;
+    this->w = 0;
+  }
+  kv4(float x, float y, float z, float w)
+  {
+    this->x = x;
+    this->y = y;
+    this->z = z;
+    this->w = w;
+  }
+  kv4(v4 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+    this->z = base.z;
+    this->w = base.w;
+  }
+  kv4(const kv3 &vector3)
+  {
+    this->x = vector3.x;
+    this->y = vector3.y;
+    this->z = vector3.z;
+    this->w = 0;
+  }
+  kv4(const kv2 &vector2)
+  {
+    this->x = vector2.x;
+    this->y = vector2.y;
+    this->z = 0;
+    this->w = 0;
+  }
+  kv4(float d)
+  {
+    this->x = d;
+    this->y = 0;
+    this->z = 0;
+    this->w = 0;
+  }
+  kv4(const kiv4 &base);
+  kv4 operator+(const kv4 a) { return kv4(x + a.x, y + a.y, z + a.z, w + a.w); }
+  kv4 operator-(const kv4 a) { return kv4(x - a.x, y - a.y, z - a.z, w - a.w); }
+  void operator+=(const kv4 a)
+  {
+    x += a.x;
+    y += a.y;
+    z += a.z;
+    w += a.w;
+  }
+  void operator-=(const kv4 a)
+  {
+    x -= a.x;
+    y -= a.y;
+    z -= a.z;
+    w -= a.w;
+  }
+  kv4 operator+(const float a) { return kv4(x + a, y + a, z + a, w + a); }
+  kv4 operator-(const float a) { return kv4(x - a, y - a, z - a, w - a); }
+  kv4 operator*(const float a) { return kv4(x * a, y * a, z * a, w * a); }
+  kv4 operator/(const float a) { return kv4(x / a, y / a, z / a, w / a); }
+  void operator+=(const float a)
+  {
+    x += a;
+    y += a;
+    z += a;
+    z += a;
+  }
+  void operator-=(const float a)
+  {
+    x -= a;
+    y -= a;
+    z -= a;
+    z -= a;
+  }
+  void operator*=(const float a)
+  {
+    x *= a;
+    y *= a;
+    z *= a;
+    z *= a;
+  }
+  void operator/=(const float a)
+  {
+    x /= a;
+    y /= a;
+    z /= a;
+    z /= a;
+  }
+  kv4 &operator=(const kv2 &a)
+  {
+    this->x = a.x;
+    this->y = a.y;
+    return *this;
+  }
+  kv4 &operator=(const kv3 &a)
+  {
+    this->x = a.x;
+    this->y = a.y;
+    this->z = a.z;
+    return *this;
+  }
+};
+struct kiv2
+{
+  int32_t x, y;
+  kiv2()
+  {
+    this->x = 0;
+    this->y = 0;
+  }
+  kiv2(int32_t x, int32_t y)
+  {
+    this->x = x;
+    this->y = y;
+  }
+  kiv2(iv2 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+  }
+  kiv2(const kiv2 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+  }
+  kiv2(int32_t d)
+  {
+    this->x = d;
+    this->y = 0;
+  }
+  kiv2(const kv2 &base)
+  {
+    this->x = (int32_t)floor(base.x);
+    this->y = (int32_t)floor(base.y);
+  }
+  bool operator==(const kiv2 &a) { return x == a.x && y == a.y; }
+  bool operator!=(const kiv2 &a) { return x != a.x || y != a.y; }
+  kiv2 operator+(const kiv2 a) { return kiv2(x + a.x, y + a.y); }
+  kiv2 operator-(const kiv2 a) { return kiv2(x - a.x, y - a.y); }
+  void operator+=(const kiv2 a)
+  {
+    x += a.x;
+    y += a.y;
+  }
+  void operator-=(const kiv2 a)
+  {
+    x -= a.x;
+    y -= a.y;
+  }
+  kiv2 operator+(const int32_t a) { return kiv2(x + a, y + a); }
+  kiv2 operator-(const int32_t a) { return kiv2(x - a, y - a); }
+  kiv2 operator*(const int32_t a) { return kiv2(x * a, y * a); }
+  kiv2 operator/(const int32_t a) { return kiv2(x / a, y / a); }
+  void operator+=(const int32_t a)
+  {
+    x += a;
+    y += a;
+  }
+  void operator-=(const int32_t a)
+  {
+    x -= a;
+    y -= a;
+  }
+  void operator*=(const int32_t a)
+  {
+    x *= a;
+    y *= a;
+  }
+  void operator/=(const int32_t a)
+  {
+    x /= a;
+    y /= a;
+  }
+};
+struct kiv3
+{
+  int32_t x, y, z;
+  kiv3()
+  {
+    this->x = 0;
+    this->y = 0;
+    this->z = 0;
+  }
+  kiv3(int32_t x, int32_t y, int32_t z)
+  {
+    this->x = x;
+    this->y = y;
+    this->z = z;
+  }
+  kiv3(iv3 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+    this->z = base.z;
+  }
+  kiv3(const kiv2 &vector2)
+  {
+    this->x = vector2.x;
+    this->y = vector2.y;
+    this->z = 0;
+  }
+  kiv3(int32_t d)
+  {
+    this->x = d;
+    this->y = 0;
+    this->z = 0;
+  }
+  kiv3(const kv3 &base)
+  {
+    this->x = (int32_t)floor(base.x);
+    this->y = (int32_t)floor(base.y);
+    this->z = (int32_t)floor(base.z);
+  }
+  bool operator==(const kiv3 &a) { return x == a.x && y == a.y && z == a.z; }
+  bool operator!=(const kiv3 &a) { return x != a.x || y != a.y || z != a.z; }
+  kiv3 operator+(const kiv3 a) { return kiv3(x + a.x, y + a.y, z + a.z); }
+  kiv3 operator-(const kiv3 a) { return kiv3(x - a.x, y - a.y, z - a.z); }
+  void operator+=(const kiv3 a)
+  {
+    x += a.x;
+    y += a.y;
+    z += a.z;
+  }
+  void operator-=(const kiv3 a)
+  {
+    x -= a.x;
+    y -= a.y;
+    z -= a.z;
+  }
+  kiv3 operator+(const int32_t a) { return kiv3(x + a, y + a, z + a); }
+  kiv3 operator-(const int32_t a) { return kiv3(x - a, y - a, z - a); }
+  kiv3 operator*(const int32_t a) { return kiv3(x * a, y * a, z * a); }
+  kiv3 operator/(const int32_t a) { return kiv3(x / a, y / a, z / a); }
+  void operator+=(const int32_t a)
+  {
+    x += a;
+    y += a;
+    z += a;
+  }
+  void operator-=(const int32_t a)
+  {
+    x -= a;
+    y -= a;
+    z -= a;
+  }
+  void operator*=(const int32_t a)
+  {
+    x *= a;
+    y *= a;
+    z *= a;
+  }
+  void operator/=(const int32_t a)
+  {
+    x /= a;
+    y /= a;
+    z /= a;
+  }
+  kiv3 &operator=(const kiv2 &a)
+  {
+    this->x = a.x;
+    this->y = a.y;
+    return *this;
+  }
+  kiv2 toIV2() { return kiv2(x, y); }
+};
+struct kiv4
+{
+  int32_t x, y, z, w;
+  kiv4()
+  {
+    this->x = 0;
+    this->y = 0;
+    this->z = 0;
+    this->w = 0;
+  }
+  kiv4(int32_t x, int32_t y, int32_t z, int32_t w)
+  {
+    this->x = x;
+    this->y = y;
+    this->z = z;
+    this->w = w;
+  }
+  kiv4(iv4 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+    this->z = base.z;
+    this->w = base.w;
+  }
+  kiv4(const kiv3 &vector3)
+  {
+    this->x = vector3.x;
+    this->y = vector3.y;
+    this->z = vector3.z;
+    this->w = 0;
+  }
+  kiv4(const kiv2 &vector2)
+  {
+    this->x = vector2.x;
+    this->y = vector2.y;
+    this->z = 0;
+    this->w = 0;
+  }
+  kiv4(int32_t d)
+  {
+    this->x = d;
+    this->y = 0;
+    this->z = 0;
+    this->w = 0;
+  }
+  kiv4(const kv4 &base)
+  {
+    this->x = (int32_t)floor(base.x);
+    this->y = (int32_t)floor(base.y);
+    this->z = (int32_t)floor(base.z);
+    this->w = (int32_t)floor(base.w);
+  }
+  bool operator==(const kiv4 &a)
+  {
+    return x == a.x && y == a.y && z == a.z && w == a.w;
+  }
+  bool operator!=(const kiv4 &a)
+  {
+    return x != a.x || y != a.y || z != a.z || w != a.w;
+  }
+  kiv4 operator+(const kiv4 a) { return kiv4(x + a.x, y + a.y, z + a.z, w + a.w); }
+  kiv4 operator-(const kiv4 a) { return kiv4(x - a.x, y - a.y, z - a.z, w - a.w); }
+  void operator+=(const kiv4 a)
+  {
+    x += a.x;
+    y += a.y;
+    z += a.z;
+    w += a.w;
+  }
+  void operator-=(const kiv4 a)
+  {
+    x -= a.x;
+    y -= a.y;
+    z -= a.z;
+    w -= a.w;
+  }
+  kiv4 operator+(const int32_t a) { return kiv4(x + a, y + a, z + a, w + a); }
+  kiv4 operator-(const int32_t a) { return kiv4(x - a, y - a, z - a, w - a); }
+  kiv4 operator*(const int32_t a) { return kiv4(x * a, y * a, z * a, w * a); }
+  kiv4 operator/(const int32_t a) { return kiv4(x / a, y / a, z / a, w / a); }
+  void operator+=(const int32_t a)
+  {
+    x += a;
+    y += a;
+    z += a;
+    z += a;
+  }
+  void operator-=(const int32_t a)
+  {
+    x -= a;
+    y -= a;
+    z -= a;
+    z -= a;
+  }
+  void operator*=(const int32_t a)
+  {
+    x *= a;
+    y *= a;
+    z *= a;
+    z *= a;
+  }
+  void operator/=(const int32_t a)
+  {
+    x /= a;
+    y /= a;
+    z /= a;
+    z /= a;
+  }
+  kiv4 &operator=(const kiv2 &a)
+  {
+    this->x = a.x;
+    this->y = a.y;
+    return *this;
+  }
+  kiv4 &operator=(const kiv3 &a)
+  {
+    this->x = a.x;
+    this->y = a.y;
+    this->z = a.z;
+    return *this;
+  }
+  kiv2 toIV2() { return kiv2(x, y); }
+  kiv3 toIV3() { return kiv3(x, y, z); }
+};
+inline kv2::kv2(const kiv2 &base)
+{
+  this->x = (float)base.x;
+  this->y = (float)base.y;
+}
+inline kv2::kv2(const kv3 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+}
+inline kv2::kv2(const kv4 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+}
+inline kv3::kv3(const kiv3 &base)
+{
+  this->x = (float)base.x;
+  this->y = (float)base.y;
+  this->z = (float)base.z;
+}
+inline kv3::kv3(const kv4 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+  this->z = base.z;
+}
+inline kv4::kv4(const kiv4 &base)
+{
+  this->x = (float)base.x;
+  this->y = (float)base.y;
+  this->z = (float)base.z;
+  this->w = (float)base.w;
+}
+#define V2ToArray(v) \
+  {                  \
+    v.x, v.y         \
+  }
+#define V3ToArray(v) \
+  {                  \
+    v.x, v.y, v.z    \
+  }
+#define V4ToArray(v)   \
+  {                    \
+    v.x, v.y, v.z, v.w \
+  }
+
 #endif
+
 #define toV2(v) v2(v.x, v.y)
 #define toV3(v) v3(v.x, v.y, v.z)
 #define toV4(v) v4(v.x, v.y, v.z,v.w)
