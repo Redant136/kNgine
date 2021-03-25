@@ -27,11 +27,11 @@
 #define EULERS_NUMBER 2.7182818284590452353602874713527
 #define EULERS_NUMBERf 2.7182818284590452353602874713527f
 
-#ifndef fast_calc_precision
-#define fast_calc_precision 9
+#ifndef utils_utils_FastCalcPrecision
+#define utils_FastCalcPrecision 9
 #endif
 
-#ifndef utils_notypedefs
+#ifndef utils_NoTypedefs
 typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -1877,6 +1877,7 @@ typedef enum cardinal8dir
   CENTER
 } cardinal8dir;
 
+#ifndef utils_NoRand
 static void seedRandomNumberGenerator(void)
 {
   srand((uint32_t)time(0));
@@ -1885,6 +1886,8 @@ static float randf()
 {
   return ((float)rand() / (RAND_MAX));
 }
+#endif
+
 #ifdef perlinNoise
 static int32_t global_perlin_noise_seed = 0;
 static int32_t global_perlin_noise_hash[] = {
@@ -2007,7 +2010,7 @@ static float fast_cos(float angle)
   float t_angle = regularizeRad(angle) - PIf;
   float res = 0;
   float x = 1;
-  int32_t precision = fast_calc_precision;
+  int32_t precision = utils_FastCalcPrecision;
   int32_t factorialPrecision = 20;
   unsigned long long factorials[] = {0,
                                      1,
@@ -2043,7 +2046,7 @@ static float fast_sin(float angle)
   float t_angle = regularizeRad(angle) - PIf;
   float res = 0;
   float x = t_angle;
-  int32_t precision = fast_calc_precision;
+  int32_t precision = utils_FastCalcPrecision;
   int32_t factorialPrecision = 21;
   unsigned long long factorials[] = {0,
                                      1,
@@ -2085,7 +2088,7 @@ static float fast_atan(float a)
   {
     float res = 0;
     float x = a;
-    int32_t precision = fast_calc_precision;
+    int32_t precision = utils_FastCalcPrecision;
     for (int32_t i = 1; i <= precision; i += 2)
     {
       res += x / (4 * i - 3);
