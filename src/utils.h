@@ -805,6 +805,10 @@ static iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
 #endif
 #define toV2(v) v2(v.x, v.y)
 #define toV3(v) v3(v.x, v.y, v.z)
+#define toV4(v) v4(v.x, v.y, v.z,v.w)
+#define toIV2(v) iv2(v.x, v.y)
+#define toIV3(v) iv3(v.x, v.y, v.z)
+#define toIV4(v) iv3(v.x, v.y, v.z, v.w)
 
 static float V2Dot(v2 a, v2 b)
 {
