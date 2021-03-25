@@ -57,6 +57,7 @@ namespace kNgine
     struct AudioQueue
     {
       std::string name;
+      bool start = false;
       bool isPlaying=false;
       BaseAudioBuffer *buffer;
       bool discard = true;
@@ -70,6 +71,7 @@ namespace kNgine
       }
       AudioQueue(const AudioQueue &base)
       {
+        this->start=base.start;
         this->buffer = base.buffer;
         this->discard = base.discard;
         this->loop = base.loop;
@@ -88,7 +90,7 @@ namespace kNgine
     void play(BaseAudioBuffer *buffer);
     void queueBuffer(const char *name, BaseAudioBuffer *buffer, bool loop = false);
 
-    void play(u32 index = 0) { queue[index].isPlaying=true; }
+    void play(u32 index = 0) { queue[index].start=true; }
     void play(const char*name);// TODO(AC) implement this
     bool isPlaying(u32 index = 0) { return queue[index].isPlaying; }
     void setLoop(bool loop, u32 index = 0) { queue[index].loop = loop; }

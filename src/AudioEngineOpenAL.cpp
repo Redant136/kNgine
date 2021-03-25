@@ -298,8 +298,9 @@ namespace kNgine
       }
       ALint state = AL_PLAYING;
       alGetSourcei(buffer->source, AL_SOURCE_STATE, &state);
-      if(q->isPlaying&&state==AL_STOPPED){
+      if(q->start&&state==AL_STOPPED){
         alSourcePlay(buffer->source);
+        q->start=false;
         state = AL_PLAYING;
       }
       if(q->stop&&q->isPlaying){

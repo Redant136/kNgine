@@ -68,6 +68,7 @@ namespace kNgine{
   void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop)
   {
     queue.push_back(AudioQueue(name,buffer));
+    queue[queue.size()-1].loop=loop;
   }
   void AudioEngine::load(std::vector<EngineObject *> objects)
   {
@@ -86,8 +87,9 @@ namespace kNgine{
       }else{
         bufferPlaying=false;
       }
-      if(q->isPlaying&&!bufferPlaying){
+      if(q->start&&!bufferPlaying){
         [buffer->sound play];
+        q->start=false;
       }
       if(q->stop&&q->isPlaying){
         [buffer->sound stop];
