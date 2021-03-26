@@ -147,7 +147,6 @@ namespace kNgine
     {
       workingObjects[i]->update(msgs);
     }
-    kRenderer_setDrawColor(v4(1, 1, 1, 1));
     if (workingObjectsLength > 0)
     {
       iv2 windowSize = kRenderer_getWindowSize();
@@ -157,6 +156,7 @@ namespace kNgine
         std::vector<LayerRenderer *> layer = orderObjectsByZ<LayerRenderer>(getRenderersAtLayer(renderers, renderingLayerOrder.order[i]));
         for (LayerRenderer *r : layer)
         {
+          kRenderer_setDrawColor(v4(1, 1, 1, 1));
           r->updateWindowSize(windowSize.x, windowSize.y);
           r->render();
         }

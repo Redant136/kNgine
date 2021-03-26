@@ -93,7 +93,6 @@ static void framebuffer_size_callback(GLFWwindow *window, i32 width, i32 height)
       if (fCompare(kRenderer_WindowsContexts.windows[i].min.y, kRenderer_WindowsContexts.windows[i].context->height) &&
           fCompare(kRenderer_WindowsContexts.windows[i].max.x, kRenderer_WindowsContexts.windows[i].context->width))
       {
-        printf("a\n");
         kRenderer_WindowsContexts.windows[i].min.y = (f32)height;
         kRenderer_WindowsContexts.windows[i].max.x = (f32)width;
       }
@@ -683,11 +682,6 @@ void kRenderer_drawTriangle(v2 points[3])
                        kRenderer_WindowsContexts.windows[currentContext].context->currentColor};
     corners[i] = a;
   }
-
-  v3 min = kRenderer_WindowsContexts.windows[currentContext].min;
-  v3 max = kRenderer_WindowsContexts.windows[currentContext].max;
-  // printf("%f,%f,%f\n", min.x, min.y, min.z);
-  // printf("%f,%f,%f\n", max.x, max.y, max.z);
 
   u32 VBO;
   glGenBuffers(1, &VBO);
