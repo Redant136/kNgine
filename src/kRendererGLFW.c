@@ -94,8 +94,8 @@ static void framebuffer_size_callback(GLFWwindow *window, i32 width, i32 height)
           fCompare(kRenderer_WindowsContexts.windows[i].max.x, kRenderer_WindowsContexts.windows[i].context->width))
       {
         printf("a\n");
-        kRenderer_WindowsContexts.windows[i].min.y = height;
-        kRenderer_WindowsContexts.windows[i].max.x = width;
+        kRenderer_WindowsContexts.windows[i].min.y = (f32)height;
+        kRenderer_WindowsContexts.windows[i].max.x = (f32)width;
       }
       kRenderer_WindowsContexts.windows[i].context->windowSize = iv2(width, height);
     }
@@ -438,7 +438,7 @@ i32 kRenderer_createContext(kRenderer_WindowContext *context)
   kRenderer_WindowContext c = {"kRenderer", v4(1, 1, 1, 1), iv2(1920, 1080), true, {1, {{{3, {kTYPE_v3, kTYPE_BOOL, kTYPE_v4}}, 2, {{kRenderer_SHADER_Vertex, vertexShaderSource}, {kRenderer_SHADER_Fragment, fragmentShaderSource}}}}}, NULL, NULL};
   *context = c;
   assert(kRenderer_WindowsContexts.length < kRenderer_maxWindows);
-  currentContext = kRenderer_WindowsContexts.length;
+  currentContext = (u32)kRenderer_WindowsContexts.length;
   kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].context = context;
   kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].min = v3(0, 1080, 0);
   kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].max = v3(1920, 0, 1);
@@ -479,8 +479,8 @@ i32 kRenderer_createWindow(kRenderer_WindowContext *context)
     if (kRenderer_WindowsContexts.windows[i].context == context)
     {
       kRenderer_WindowsContexts.windows[i].window = window;
-      kRenderer_WindowsContexts.windows[i].min = v3(0, kRenderer_getWindowHeight(), 0);
-      kRenderer_WindowsContexts.windows[i].max = v3(kRenderer_getWindowWidth(), 0, 1);
+      kRenderer_WindowsContexts.windows[i].min = v3(0.f, (f32)kRenderer_getWindowHeight(), 0.f);
+      kRenderer_WindowsContexts.windows[i].max = v3((f32)kRenderer_getWindowWidth(), 0.f, 1.f);
     }
   }
   if (defaultVAO == 0)
@@ -501,8 +501,8 @@ void kRenderer_setWindowSize(i32 width, i32 height)
   if (fCompare(kRenderer_WindowsContexts.windows[currentContext].min.y, kRenderer_WindowsContexts.windows[currentContext].context->height) &&
       fCompare(kRenderer_WindowsContexts.windows[currentContext].max.x, kRenderer_WindowsContexts.windows[currentContext].context->width))
   {
-    kRenderer_WindowsContexts.windows[currentContext].min.y = height;
-    kRenderer_WindowsContexts.windows[currentContext].max.x = width;
+    kRenderer_WindowsContexts.windows[currentContext].max.x = (f32)width;
+    kRenderer_WindowsContexts.windows[currentContext].min.y = (f32)height;
   }
   kRenderer_WindowsContexts.windows[currentContext].context->windowSize = iv2(width, height);
   if (kRenderer_WindowsContexts.windows[currentContext].window != NULL)
@@ -624,7 +624,7 @@ void kRenderer_loadFont(const char *fontPath, const char *fontName)
       fontMaps.fonts[fontMaps.length].character[c + 128].startPos = iv2(face->glyph->bitmap_left, 48 - face->glyph->bitmap_top); // will have to test this
       fontMaps.fonts[fontMaps.length].character[c + 128].width = face->glyph->bitmap.width;
       fontMaps.fonts[fontMaps.length].character[c + 128].height = face->glyph->bitmap.rows;
-      fontMaps.fonts[fontMaps.length].character[c + 128].advance = face->glyph->advance.x >> 6;
+      fontMaps.fonts[fontMaps.length].character[c + 128].advance = (u8)face->glyph->advance.x >> 6;
     }
     glBindTexture(GL_TEXTURE_2D, 0);
   }
@@ -756,7 +756,7 @@ void kRenderer_drawCircle(v2 startPoint, f32 radius)
 {
   for (i32 a = 0; a < 360; a++)
   {
-    double angle = a * M_PI / 180;
+    float angle = a * PIf / 180;
     v2 line[2] = {startPoint, V2AddV2(startPoint, v2(fast_cos(angle) * radius, fast_sin(angle) * radius))};
     kRenderer_drawLine(line);
   }
@@ -812,14 +812,14 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i3
     f32 b;
     v4 texCoord;
   };
-  v3 points[4] = {v3(-width / 2.0, -height / 2.0, 0), v3(width / 2.0, -height / 2.0, 0), v3(-width / 2.0, height / 2.0, 0), v3(width / 2.0, height / 2.0, 0)};
+  v3 points[4] = {v3(-width / 2.0f, -height / 2.0f, 0), v3(width / 2.0f, -height / 2.0f, 0), v3(-width / 2.0f, height / 2.0f, 0), v3(width / 2.0f, height / 2.0f, 0)};
   struct corner corners[4];
 
   m4 mat = M4InitDiagonal(1.0f);
   mat = M4MultiplyM4(mat, getMapper());
 
   mat = M4MultiplyM4(mat, M4TranslateV3(position));
-  mat = M4MultiplyM4(mat, M4TranslateV3(v3(width / 2.0, height / 2.0, 0)));
+  mat = M4MultiplyM4(mat, M4TranslateV3(v3(width / 2.f, height / 2.f, 0.f)));
 
   mat = M4MultiplyM4(mat, M4Rotate(-rotation.x, v3(1.0f, 0.0f, 0.0f)));
   mat = M4MultiplyM4(mat, M4Rotate(-rotation.y, v3(0.0f, 1.0f, 0.0f)));
@@ -830,7 +830,6 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i3
   for (u32 i = 0; i < 4; i++)
   {
     v4 rP = {points[i].x, points[i].y, points[i].z, 1.0f};
-    v4 translatedPoint = V4MultiplyM4(rP, mat);
     rP = V4MultiplyM4(rP, mat);
     struct corner a = {toV3(rP),
                        1.0f,
@@ -996,7 +995,7 @@ void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale
         {
           pixWidth += fontMaps.fonts[fontMaps.currentFont].character[i].advance;
           charactersIndexs[textLength] = i;
-          if (pixHeight < fontMaps.fonts[fontMaps.currentFont].character[i].height - fontMaps.fonts[fontMaps.currentFont].character[i].startPos.y)
+          if ((i32)pixHeight < fontMaps.fonts[fontMaps.currentFont].character[i].height - fontMaps.fonts[fontMaps.currentFont].character[i].startPos.y)
             pixHeight = fontMaps.fonts[fontMaps.currentFont].character[i].height - fontMaps.fonts[fontMaps.currentFont].character[i].startPos.y;
         }
       }
@@ -1005,24 +1004,24 @@ void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale
     {
       pixWidth += fontMaps.fonts[fontMaps.currentFont].character[cIndex].advance;
       charactersIndexs[textLength] = cIndex;
-      if (pixHeight < fontMaps.fonts[fontMaps.currentFont].character[cIndex].height - fontMaps.fonts[fontMaps.currentFont].character[cIndex].startPos.y)
+      if ((i32)pixHeight < fontMaps.fonts[fontMaps.currentFont].character[cIndex].height - fontMaps.fonts[fontMaps.currentFont].character[cIndex].startPos.y)
         pixHeight = fontMaps.fonts[fontMaps.currentFont].character[cIndex].height - fontMaps.fonts[fontMaps.currentFont].character[cIndex].startPos.y;
     }
   }
 
   v4 pixelPos = V4MultiplyM4(v4(position.x, position.y, position.z, 1),
                              M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max,
-                                      v3(0, kRenderer_getWindowHeight(), 0), v3(kRenderer_getWindowWidth(), 0, 1)));
+                                      v3(0.f, (f32)kRenderer_getWindowHeight(), 0.f), v3((f32)kRenderer_getWindowWidth(), 0.f, 1.f)));
 
   m4 mat = M4InitDiagonal(1);
-  mat = M4MultiplyM4(mat, M4Mapper(v3(0, kRenderer_getWindowHeight(), 0), v3(kRenderer_getWindowWidth(), 0, 1), v3(-1, -1, -1), v3(1, 1, 1)));
+  mat = M4MultiplyM4(mat, M4Mapper(v3(0.f, (f32)kRenderer_getWindowHeight(), 0.f), v3((f32)kRenderer_getWindowWidth(), 0.f, 1.f), v3(-1.f, -1.f, -1.f), v3(1.f, 1.f, 1.f)));
   mat = M4MultiplyM4(mat, M4TranslateV3(toV3(pixelPos)));
   mat = M4MultiplyM4(mat, M4ScaleV3(v3(scale, scale, 1)));
-  mat = M4MultiplyM4(mat, M4TranslateV3(v3(pixWidth / 2.0, pixHeight / 2.0, 0)));
-  mat = M4MultiplyM4(mat, M4Rotate(rotation.x, v3(1, 0, 0)));
-  mat = M4MultiplyM4(mat, M4Rotate(rotation.y, v3(0, 1, 0)));
-  mat = M4MultiplyM4(mat, M4Rotate(rotation.z, v3(0, 0, 1)));
-  mat = M4MultiplyM4(mat, M4TranslateV3(v3(-(pixWidth / 2.0), -(pixHeight / 2.0), 0)));
+  mat = M4MultiplyM4(mat, M4TranslateV3(v3(pixWidth / 2.f, pixHeight / 2.f, 0.f)));
+  mat = M4MultiplyM4(mat, M4Rotate(rotation.x, v3(1.f, 0.f, 0.f)));
+  mat = M4MultiplyM4(mat, M4Rotate(rotation.y, v3(0.f, 1.f, 0.f)));
+  mat = M4MultiplyM4(mat, M4Rotate(rotation.z, v3(0.f, 0.f, 1.f)));
+  mat = M4MultiplyM4(mat, M4TranslateV3(v3(-(pixWidth / 2.f), -(pixHeight / 2.f), 0)));
 
   u32 widthOffset = 0;
   struct corner
@@ -1035,8 +1034,8 @@ void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale
   {
     v3 characterPos = toV3(pixelPos);
     characterPos.x += widthOffset;
-    characterPos = V3AddV3(characterPos, v3(fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].startPos.x,
-                                            fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].startPos.y, 0));
+    characterPos = V3AddV3(characterPos, v3((f32)fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].startPos.x,
+                                            (f32)fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].startPos.y, 0.f));
     v3 texturePoints[4] = {
         characterPos,
         V3AddV3(characterPos, v3(fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].width, 0, 0)),
@@ -1111,7 +1110,7 @@ v2 kRenderer_cursorPosition()
 {
   f64 xpos, ypos;
   glfwGetCursorPos(kRenderer_WindowsContexts.windows[currentContext].window, &xpos, &ypos);
-  return v2(xpos, ypos);
+  return v2((f32)xpos, (f32)ypos);
 }
 bool kRenderer_mouseStatusPressed(Key e)
 {

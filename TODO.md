@@ -3,9 +3,11 @@
 # main branch
 
 ## currently working on
+- [ ] openal audio engine
+- [ ] test openal on linux to see if bug is windows only
+- [ ] header-only renderer (DO YOUR RESEARCH)
 ## testing
 - [ ] text in renderer
-- [ ] test openal audio engine
 ## next step
 - [ ] display debug info such as fps
 - [ ] make key message bit manipulation

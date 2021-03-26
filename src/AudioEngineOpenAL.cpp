@@ -84,13 +84,13 @@ namespace kNgine
         // i32 samples = audioFile.getNumSamplesPerChannel();
         // i32 chan = audioFile.getNumChannels();
         ALenum format;
-        if (chan == 1 && samplerate == 8)
+        if (chan == 1 && samplerate == 44100)
           format = AL_FORMAT_MONO8;
-        else if (chan == 1 && samplerate == 16)
+        else if (chan == 1 && samplerate == 48000)
           format = AL_FORMAT_MONO16;
-        else if (chan == 2 && samplerate == 8)
+        else if (chan == 2 && samplerate == 44100)
           format = AL_FORMAT_STEREO8;
-        else if (chan == 2 && samplerate == 16)
+        else if (chan == 2 && samplerate == 48000)
           format = AL_FORMAT_STEREO16;
         else
         {
@@ -100,7 +100,6 @@ namespace kNgine
               << samplerate << " bps" << std::endl;
           std::cout<<samples<<std::endl;
         }
-        // std::vector<u_int16_t>pcm_data=audioFile.get;
         alBufferData(buffer, format, content.data(), samples * sizeof(float), samplerate);
         if (!check_alc_errors(__FILE__, __LINE__, openALDevice) || buffer == AL_NONE)
         {
@@ -256,6 +255,7 @@ namespace kNgine
   }
   void AudioEngine::play(BaseAudioBuffer* buffer){
     queueBuffer("",buffer,false);
+    queue[queue.size() - 1].discard = true;
     play(queue.size()-1);
   }
   void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop){
@@ -296,21 +296,28 @@ namespace kNgine
       {
         std::cerr << "gen source" << std::endl;
       }
-      ALint state = AL_PLAYING;
-      alGetSourcei(buffer->source, AL_SOURCE_STATE, &state);
-      if(q->start&&state==AL_STOPPED){
+      if(q->start){
         alSourcePlay(buffer->source);
         q->start=false;
-        state = AL_PLAYING;
       }
-      if(q->stop&&q->isPlaying){
+      if(q->stop){
         alSourceStop(buffer->source);
         alSourceRewind(buffer->source);
         q->isPlaying=false;
       }else{
-        alGetSourcei(buffer->source, AL_SOURCE_STATE, &state);
-        q->isPlaying=state==AL_PLAYING;
+        std::cout << "a" << std::endl;
+        ALint state = AL_PLAYING;
+        q->isPlaying = true;
+        while (q->isPlaying) {
+            std::cout << "a" << std::endl;
+
+          alGetSourcei(buffer->source, AL_SOURCE_STATE, &state);
+          q->isPlaying=state==AL_PLAYING;
+        }
       }
+      //std::cout << q->isPlaying << std::endl;
+      //std::cout << queue.size() << std::endl;
+
       if (q->discard&&!q->isPlaying)
       {
         alDeleteSources(1, &buffer->source);

@@ -1103,22 +1103,22 @@ static m4 M4LookAt(v3 eye, v3 center, v3 up)
   result.elements[0][0] = s.x;
   result.elements[0][1] = u.x;
   result.elements[0][2] = -f.x;
-  result.elements[0][3] = 0.0f;
+  result.elements[0][3] = 0.f;
 
   result.elements[1][0] = s.y;
   result.elements[1][1] = u.y;
   result.elements[1][2] = -f.y;
-  result.elements[1][3] = 0.0f;
+  result.elements[1][3] = 0.f;
 
   result.elements[2][0] = s.z;
   result.elements[2][1] = u.z;
   result.elements[2][2] = -f.z;
-  result.elements[2][3] = 0.0f;
+  result.elements[2][3] = 0.f;
 
   result.elements[3][0] = -V3Dot(s, eye);
   result.elements[3][1] = -V3Dot(u, eye);
   result.elements[3][2] = V3Dot(f, eye);
-  result.elements[3][3] = 1.0f;
+  result.elements[3][3] = 1.f;
 
   return result;
 }
@@ -1210,7 +1210,7 @@ static m4 M4Rotate(float angle, v3 axis)
 
   float sin_theta = sinf(angle);
   float cos_theta = cosf(angle);
-  float cos_value = 1.0f - cos_theta;
+  float cos_value = 1.f - cos_theta;
 
   result.elements[0][0] = (axis.x * axis.x * cos_value) + cos_theta;
   result.elements[0][1] = (axis.x * axis.y * cos_value) + (axis.z * sin_theta);
@@ -1244,11 +1244,11 @@ static m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
 {
   // float scale = (n - min.x) / (max.x - min.x) * (targetMax.x - targetMin.x) + targetMin.x;
 
-  m4 transform = M4InitDiagonal(1.0f);
-  transform = M4MultiplyM4(transform, M4TranslateV3(V3MultiplyF32(targetMin, 1.0f)));
+  m4 transform = M4InitDiagonal(1.f);
+  transform = M4MultiplyM4(transform, M4TranslateV3(V3MultiplyF32(targetMin, 1.f)));
   transform = M4MultiplyM4(transform, M4ScaleV3(v3(targetMax.x - targetMin.x, targetMax.y - targetMin.y, targetMax.z - targetMin.z)));
-  transform = M4MultiplyM4(transform, M4ScaleV3(v3(1.0f / (max.x - min.x), 1.0f / (max.y - min.y), 1.0f / (max.z - min.z))));
-  transform = M4MultiplyM4(transform, M4TranslateV3(V3MultiplyF32(min, -1.0f)));
+  transform = M4MultiplyM4(transform, M4ScaleV3(v3(1.f / (max.x - min.x), 1.f / (max.y - min.y), 1.f / (max.z - min.z))));
+  transform = M4MultiplyM4(transform, M4TranslateV3(V3MultiplyF32(min, -1.f)));
 
   return transform;
 }
@@ -1694,7 +1694,7 @@ static v3 RGBToHSV(v3 rgb)
 }
 static v3 RGBColorToHSV(rgbcolor rgba)
 {
-  v3 newColor = v3(rgba.r / 255.0f, rgba.g / 255.0f, rgba.b / 255.0f);
+  v3 newColor = v3(rgba.r / 255.f, rgba.g / 255.f, rgba.b / 255.f);
   return RGBToHSV(newColor);
 }
 static v3 HSVToRGB(v3 hsv)
@@ -2003,7 +2003,7 @@ static float regularizeRad(float angle)
     rad += 2 * PIf;
   return rad;
 }
-static float degreeToRad(float degree) { return degree / 180.0 * PIf; }
+static float degreeToRad(float degree) { return degree / 180.f * PIf; }
 static float radToDegree(float rad) { return rad / PIf * 180; }
 static float fast_cos(float angle)
 {
@@ -2105,9 +2105,9 @@ static float fast_atan(float a)
     int32_t precision = 11;
     for (int32_t i = 1; i < precision * 2; i += 2)
     {
-      res += 1.0 / ((4 * i - 3) * x);
+      res += 1.f / ((4 * i - 3) * x);
       x *= a * a;
-      res -= 1.0 / ((4 * i - 1) * x);
+      res -= 1.f / ((4 * i - 1) * x);
       x *= a * a;
     }
     if (x < 0)
