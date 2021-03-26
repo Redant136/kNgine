@@ -479,8 +479,12 @@ i32 kRenderer_createWindow(kRenderer_WindowContext *context)
     if (kRenderer_WindowsContexts.windows[i].context == context)
     {
       kRenderer_WindowsContexts.windows[i].window = window;
-      kRenderer_WindowsContexts.windows[i].min = v3(0.f, (f32)kRenderer_getWindowHeight(), 0.f);
-      kRenderer_WindowsContexts.windows[i].max = v3((f32)kRenderer_getWindowWidth(), 0.f, 1.f);
+      if (fCompare(kRenderer_WindowsContexts.windows[currentContext].min.y, kRenderer_WindowsContexts.windows[currentContext].context->height) &&
+          fCompare(kRenderer_WindowsContexts.windows[currentContext].max.x, kRenderer_WindowsContexts.windows[currentContext].context->width)){
+        kRenderer_WindowsContexts.windows[i].min = v3(0.f, (f32)kRenderer_getWindowHeight(), 0.f);
+        kRenderer_WindowsContexts.windows[i].max = v3((f32)kRenderer_getWindowWidth(), 0.f, 1.f);
+      }
+      kRenderer_WindowsContexts.windows[currentContext].context->windowSize=kRenderer_getWindowSize();
     }
   }
   if (defaultVAO == 0)
@@ -503,6 +507,7 @@ void kRenderer_setWindowSize(i32 width, i32 height)
   {
     kRenderer_WindowsContexts.windows[currentContext].max.x = (f32)width;
     kRenderer_WindowsContexts.windows[currentContext].min.y = (f32)height;
+    
   }
   kRenderer_WindowsContexts.windows[currentContext].context->windowSize = iv2(width, height);
   if (kRenderer_WindowsContexts.windows[currentContext].window != NULL)
@@ -678,6 +683,11 @@ void kRenderer_drawTriangle(v2 points[3])
                        kRenderer_WindowsContexts.windows[currentContext].context->currentColor};
     corners[i] = a;
   }
+
+  v3 min = kRenderer_WindowsContexts.windows[currentContext].min;
+  v3 max = kRenderer_WindowsContexts.windows[currentContext].max;
+  // printf("%f,%f,%f\n", min.x, min.y, min.z);
+  // printf("%f,%f,%f\n", max.x, max.y, max.z);
 
   u32 VBO;
   glGenBuffers(1, &VBO);
