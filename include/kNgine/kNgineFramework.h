@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../src/utils.h"
-#include "../../src/kThread.h"
-#include "../../src/kStruct_def.h"
-#include "../../src/kRenderer.h"
+#include "../../src/kFramework/utils.h"
+#include "../../src/kFramework/kThread.h"
+#include "../../src/kFramework/kStruct_def.h"
+#include "../../src/kFramework/kRenderer.h"

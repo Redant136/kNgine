@@ -1,9 +1,9 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include "utils.h"
+#include "../kFramework/utils.h"
 #include "EngineObjects.hpp"
-#include "kRenderer.h"
+#include "../kFramework/kRenderer.h"
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
 

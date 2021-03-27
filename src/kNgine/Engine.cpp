@@ -3,9 +3,9 @@
 #include <functional>
 #include <random>
 #include <ctime>
-#include "utils.h"
+#include "../kFramework/utils.h"
 #include "EngineObjects.hpp"
-#include "kRenderer.h"
+#include "../kFramework/kRenderer.h"
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
 #include "Engine.hpp"

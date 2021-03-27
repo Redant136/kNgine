@@ -3,16 +3,16 @@
 #include "kNgineFramework.h"
 
 // basics of all objects
-#include "../../src/EngineObjects.hpp"
+#include "../../src/kNgine/EngineObjects.hpp"
 // specific objects
-#include "../../src/Camera.hpp"
-#include "../../src/PhysicsB2.hpp"
-#include "../../src/SpriteUtils.hpp"
-#include "../../src/AudioEngine.hpp"
-#include "../../src/Tilemap.hpp"
+#include "../../src/kNgine/Camera.hpp"
+#include "../../src/kNgine/PhysicsB2.hpp"
+#include "../../src/kNgine/SpriteUtils.hpp"
+#include "../../src/kNgine/AudioEngine.hpp"
+#include "../../src/kNgine/Tilemap.hpp"
 
 // not complete
-#include "../../src/TextBox.hpp"
+#include "../../src/kNgine/TextBox.hpp"
 
 // engine
-#include "../../src/Engine.hpp"
+#include "../../src/kNgine/Engine.hpp"

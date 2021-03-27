@@ -1,9 +1,9 @@
 #pragma once
 
 #include <vector>
-#include "utils.h"
+#include "../kFramework/utils.h"
 #include "EngineObjects.hpp"
-#include "../extern/box2d/include/box2d/box2d.h"
+#include "../../extern/box2d/include/box2d/box2d.h"
 
 namespace kNgine{
   //this cannot be used with custom physics engine

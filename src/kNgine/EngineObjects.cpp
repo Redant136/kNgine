@@ -1,10 +1,10 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include "utils.h"
+#include "../kFramework/utils.h"
 #include "EngineObjects.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include "../extern/stb/stb_image.h"
+#include "../../extern/stb/stb_image.h"
 
 #include <iostream>
 

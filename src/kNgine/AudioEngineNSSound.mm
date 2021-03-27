@@ -1,8 +1,7 @@
 #import <Foundation/Foundation.h>
 #include <AppKit/NSSound.h>
 #include "EngineObjects.hpp"
-#include "utils.h"
-#include "kThread.h"
+#include "../kFramework/utils.h"
 #include "AudioEngine.hpp"
 
 #include <stdio.h>

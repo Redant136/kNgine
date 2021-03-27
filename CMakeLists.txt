@@ -5,52 +5,57 @@ if(APPLE)
   include_directories ( /usr/local/include) 
   link_directories( /usr/local/lib)
   set(OSSpecificFiles
-    src/AudioEngineNSSound.mm
+    src/kNgine/AudioEngineNSSound.mm
   )
 else()
   if(WIN32)
     add_compile_definitions(_USE_MATH_DEFINES)
   endif()
   set(OSSpecificFiles
-    src/AudioEngineOpenAL.cpp
+    src/kNgine/AudioEngineOpenAL.cpp
   )
 endif()
 
+option(kRenderer_HEADER_ONLY "sets if you link kRenderer" OFF)
+
+if(kRenderer_HEADER_ONLY)
+set(kRendererSource "")
+else()
+set(kRendererSource "src/kFramework/kRendererGLFW.c")
+endif()
+
 set(KNGINEFRAMEWORK_HEADER_FILES 
-src/utils.h
-src/kThread.h
-src/kStruct_def.h
-src/kRenderer.h
+src/kFramework/utils.h
+src/kFramework/kThread.h
+src/kFramework/kStruct_def.h
+src/kFramework/kRenderer.h
 )
 
 set(KNGINEFRAMEWORK_SOURCE_FILES
-src/kRendererGLFW.c
+${kRendererSource}
 )
 
 set(KNGINE_HEADER_FILES
-src/utils.h
-src/kThread.h
-src/kStruct_def.h
-src/kRenderer.h
+${KNGINEFRAMEWORK_HEADER_FILES}
 
-src/EngineObjects.hpp
-src/Camera.hpp
-src/SpriteUtils.hpp
-src/PhysicsB2.hpp
-src/AudioEngine.hpp
+src/kNgine/EngineObjects.hpp
+src/kNgine/Camera.hpp
+src/kNgine/SpriteUtils.hpp
+src/kNgine/PhysicsB2.hpp
+src/kNgine/AudioEngine.hpp
 
-src/Engine.hpp
+src/kNgine/Engine.hpp
 )
 
 set(KNGINE_SOURCE_FILES
-src/kRendererGLFW.c
+${KNGINEFRAMEWORK_SOURCE_FILES}
 
-src/EngineObjects.cpp 
-src/Camera_2D.cpp
-src/SpriteUtils.cpp
-src/PhysicsB2.cpp
-src/Tilemap.cpp
-src/Engine.cpp
+src/kNgine/EngineObjects.cpp 
+src/kNgine/Camera_2D.cpp
+src/kNgine/SpriteUtils.cpp
+src/kNgine/PhysicsB2.cpp
+src/kNgine/Tilemap.cpp
+src/kNgine/Engine.cpp
 ${OSSpecificFiles}
 )
 
