@@ -170,6 +170,10 @@ namespace kNgine
     }
     msgs = std::vector<msg>();
   }
+  static void frameStart(){
+    reloadObjects();
+    frameUpdate();
+  }
   static void start()
   {
     seedRandomNumberGenerator();
@@ -180,9 +184,9 @@ namespace kNgine
     kRenderer_setWindowName(window_name.c_str());
     kRenderer_setWindowSize(window_size.x, window_size.y);
     kRenderer_createWindow(&context);
-    sleepMillis(10);
-    kRenderer_setStartFunction(frameUpdate);
+    kRenderer_setStartFunction(frameStart);
     kRenderer_setDrawFunction(frameUpdate);
+    sleepMillis(10);
     if (renderingLayerOrder.length <= 0)
     {
       renderingLayerOrder = LayerOrder();
@@ -206,7 +210,6 @@ namespace kNgine
     {
       obj->init(objects);
     }
-    reloadObjects();
     kRenderer_launch();
     for (u32 i = 0; i < workingObjectsLength; i++)
     {

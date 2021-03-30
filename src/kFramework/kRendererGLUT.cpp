@@ -2,17 +2,171 @@
 #define utils_StrManipulation
 #include "utils.h"
 #include "kRenderer.h"
+#define GL_SILENCE_DEPRECATION
 #include <glad/glad.h>
-#ifdef __unix__
-#define GLFW_INCLUDE_GLCOREARB
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glext.h>
 #endif
-#include <GLFW/glfw3.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+// void (*partialDisplayFunction)();
+// void (*partialDrawFunction)();
+// double getWindowWidth()
+// {
+//   return glutGet(GLUT_WINDOW_WIDTH);
+// }
+// double getWindowHeight()
+// {
+//   return glutGet(GLUT_WINDOW_HEIGHT);
+// }
+
+// void init(int argc, char **argv)
+// {
+//   glutInit(&argc, argv);
+//   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+//   glutInitWindowPosition(0, 0);
+// }
+// void setWindowSize(int width, int height)
+// {
+//   glutInitWindowSize(1920, 1080);
+// }
+// void setWindowName(const char *windowName)
+// {
+//   glutCreateWindow(windowName);
+// }
+// void completeDisplayFunc()
+// {
+//   glOrtho(0, renderer::getWindowWidth(), renderer::getWindowHeight(), 0, 0, 1);
+//   partialDisplayFunction();
+//   glutSwapBuffers();
+// }
+// void setupWindow(void (*startDisplayFunc)())
+// {
+//   partialDisplayFunction = startDisplayFunc;
+//   glutDisplayFunc(completeDisplayFunc);
+// }
+// void completeDrawFunc()
+// {
+//   partialDrawFunction();
+//   glutSwapBuffers();
+// }
+// void drawFunction(void (*refreshFunction)())
+// {
+//   partialDrawFunction = refreshFunction;
+//   glutIdleFunc(completeDrawFunc);
+// }
+// void launch()
+// {
+//   glutMainLoop();
+// }
+
+// void setDrawColor(double r, double g, double b, double a)
+// {
+//   glColor4d(r, g, b, a);
+// }
+// void clear(double r, double g, double b, double a)
+// {
+//   glClearColor(r, g, b, a);
+//   glClear(GL_COLOR_BUFFER_BIT);
+// }
+// void clear()
+// {
+//   clear(1, 1, 1, 0);
+// }
+
+// void drawRect(v2 points[4])
+// {
+//   glBegin(GL_QUAD_STRIP);
+//   glVertex2d(points[0].x, points[0].y);
+//   glVertex2d(points[1].x, points[1].y);
+//   glVertex2d(points[2].x, points[2].y);
+//   glVertex2d(points[3].x, points[3].y);
+//   glEnd();
+// }
+// void drawRect(v2 startPos, double width, double height)
+// {
+//   v2 points[4]{v2(startPos),
+//                v2(startPos.x, startPos.y + height),
+//                v2(startPos.x + width, startPos.y),
+//                v2(startPos.x + width, startPos.y + height)};
+//   renderer::drawRect(points);
+// }
+// void drawTriangle(v2 points[3])
+// {
+//   glBegin(GL_TRIANGLES);
+//   glVertex2d(points[0].x, points[0].y);
+//   glVertex2d(points[1].x, points[1].y);
+//   glVertex2d(points[2].x, points[2].y);
+//   glEnd();
+// }
+// void drawLine(v2 points[2])
+// {
+//   glBegin(GL_LINE);
+//   glVertex2d(points[0].x, points[0].y);
+//   glVertex2d(points[1].x, points[1].y);
+//   glEnd();
+// }
+// void drawPoint(v2 point)
+// {
+//   glBegin(GL_POINTS);
+//   glVertex2d(point.x, point.y);
+//   glEnd();
+// }
+// void drawLineLoop(v2 *points, int numPoints)
+// {
+//   glBegin(GL_LINE_LOOP);
+//   for (int i = 0; i < numPoints; i++)
+//   {
+//     glVertex2d(points[i].x, points[i].y);
+//   }
+//   glEnd();
+// }
+// void drawPolygon(v2 *points, double numPoints)
+// {
+//   glBegin(GL_POLYGON);
+//   for (int i = 0; i < numPoints; i++)
+//   {
+//     glVertex2d(points[i].x, points[i].y);
+//   }
+//   glEnd();
+// }
+// void drawColorMap(color *colors, v2 position, int width, int height)
+// {
+//   for (int i = 0; i < height; i++)
+//   {
+//     for (int j = 0; j < width; j++)
+//     {
+//       color c = colors[i * width + j];
+//       renderer::setDrawColor(c.r, c.g, c.b, c.a);
+//       renderer::drawPoint(position + v2(j, i));
+//     }
+//   }
+// }
+
+// v2 convertToRelativePosition(v2 pos)
+// {
+//   v2 nPos = pos;
+//   nPos.x /= getWindowWidth();
+//   nPos.y /= renderer::getWindowHeight();
+//   return nPos;
+// }
+// v2 convertToAbsolutePosition(v2 pos)
+// {
+//   v2 nPos = pos;
+//   nPos.x *= renderer::getWindowWidth();
+//   nPos.y *= renderer::getWindowHeight();
+//   return nPos;
+// }
+
 #include <stdio.h>
 
-FT_Library ft;
+static FT_Library ft;
 
 static v3 rotation = {0, 0, 0};
 
@@ -44,7 +198,7 @@ static struct
     v3 min;
     v3 max;
     kRenderer_WindowContext *context;
-    GLFWwindow *window;
+    GLint window;
   } windows[kRenderer_maxWindows];
 } kRenderer_WindowsContexts;
 static u32 currentContext = 0;
@@ -84,231 +238,234 @@ static const char *fragmentShaderSource =
     "  }\n"
     "}\0";
 
-static void framebuffer_size_callback(GLFWwindow *window, i32 width, i32 height)
-{
-  for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
-  {
-    if (kRenderer_WindowsContexts.windows[i].window == window)
-    {
-      if (fCompare(kRenderer_WindowsContexts.windows[i].min.y, kRenderer_WindowsContexts.windows[i].context->height) &&
-          fCompare(kRenderer_WindowsContexts.windows[i].max.x, kRenderer_WindowsContexts.windows[i].context->width))
-      {
-        kRenderer_WindowsContexts.windows[i].min.y = (f32)height;
-        kRenderer_WindowsContexts.windows[i].max.x = (f32)width;
-      }
-      kRenderer_WindowsContexts.windows[i].context->windowSize = iv2(width, height);
-    }
-  }
-  glViewport(0, 0, width, height);
-}
-static i32 KeyToGLFW(Key k)
-{
-  switch (k)
-  {
-  case SPACE:
-    return GLFW_KEY_SPACE;
-  case APOSTROPHE:
-    return GLFW_KEY_APOSTROPHE /* ' */;
-  case COMMA:
-    return GLFW_KEY_COMMA /* , */;
-  case MINUS:
-    return GLFW_KEY_MINUS /* - */;
-  case PERIOD:
-    return GLFW_KEY_PERIOD /* . */;
-  case SLASH:
-    return GLFW_KEY_SLASH /* / */;
-  case KEY_0:
-    return GLFW_KEY_0;
-  case KEY_1:
-    return GLFW_KEY_1;
-  case KEY_2:
-    return GLFW_KEY_2;
-  case KEY_3:
-    return GLFW_KEY_3;
-  case KEY_4:
-    return GLFW_KEY_4;
-  case KEY_5:
-    return GLFW_KEY_5;
-  case KEY_6:
-    return GLFW_KEY_6;
-  case KEY_7:
-    return GLFW_KEY_7;
-  case KEY_8:
-    return GLFW_KEY_8;
-  case KEY_9:
-    return GLFW_KEY_9;
-  case SEMICOLON:
-    return GLFW_KEY_SEMICOLON /* ; */;
-  case EQUAL:
-    return GLFW_KEY_EQUAL /* = */;
-  case KEY_A:
-    return GLFW_KEY_A;
-  case KEY_B:
-    return GLFW_KEY_B;
-  case KEY_C:
-    return GLFW_KEY_C;
-  case KEY_D:
-    return GLFW_KEY_D;
-  case KEY_E:
-    return GLFW_KEY_E;
-  case KEY_F:
-    return GLFW_KEY_F;
-  case KEY_G:
-    return GLFW_KEY_G;
-  case KEY_H:
-    return GLFW_KEY_H;
-  case KEY_I:
-    return GLFW_KEY_I;
-  case KEY_J:
-    return GLFW_KEY_J;
-  case KEY_K:
-    return GLFW_KEY_K;
-  case KEY_L:
-    return GLFW_KEY_L;
-  case KEY_M:
-    return GLFW_KEY_M;
-  case KEY_N:
-    return GLFW_KEY_N;
-  case KEY_O:
-    return GLFW_KEY_O;
-  case KEY_P:
-    return GLFW_KEY_P;
-  case KEY_Q:
-    return GLFW_KEY_Q;
-  case KEY_R:
-    return GLFW_KEY_R;
-  case KEY_S:
-    return GLFW_KEY_S;
-  case KEY_T:
-    return GLFW_KEY_T;
-  case KEY_U:
-    return GLFW_KEY_U;
-  case KEY_V:
-    return GLFW_KEY_V;
-  case KEY_W:
-    return GLFW_KEY_W;
-  case KEY_X:
-    return GLFW_KEY_X;
-  case KEY_Y:
-    return GLFW_KEY_Y;
-  case KEY_Z:
-    return GLFW_KEY_Z;
-  case LEFT_BRACKET:
-    return GLFW_KEY_LEFT_BRACKET /* [ */;
-  case BACKSLASH:
-    return GLFW_KEY_BACKSLASH /* \ */;
-  case RIGHT_BRACKET:
-    return GLFW_KEY_RIGHT_BRACKET /* ] */;
-  case GRAVE_ACCENT:
-    return GLFW_KEY_GRAVE_ACCENT /* ` */;
-  case ESCAPE:
-    return GLFW_KEY_ESCAPE;
-  case ENTER:
-    return GLFW_KEY_ENTER;
-  case TAB:
-    return GLFW_KEY_TAB;
-  case BACKSPACE:
-    return GLFW_KEY_BACKSPACE;
-  case KEY_RIGHT:
-    return GLFW_KEY_RIGHT;
-  case KEY_LEFT:
-    return GLFW_KEY_LEFT;
-  case KEY_DOWN:
-    return GLFW_KEY_DOWN;
-  case KEY_UP:
-    return GLFW_KEY_UP;
-  case F1:
-    return GLFW_KEY_F1;
-  case F2:
-    return GLFW_KEY_F2;
-  case F3:
-    return GLFW_KEY_F3;
-  case F4:
-    return GLFW_KEY_F4;
-  case F5:
-    return GLFW_KEY_F5;
-  case F6:
-    return GLFW_KEY_F6;
-  case F7:
-    return GLFW_KEY_F7;
-  case F8:
-    return GLFW_KEY_F8;
-  case F9:
-    return GLFW_KEY_F9;
-  case F10:
-    return GLFW_KEY_F10;
-  case F11:
-    return GLFW_KEY_F11;
-  case F12:
-    return GLFW_KEY_F12;
-  case F13:
-    return GLFW_KEY_F13;
-  case F14:
-    return GLFW_KEY_F14;
-  case F15:
-    return GLFW_KEY_F15;
-  case F16:
-    return GLFW_KEY_F16;
-  case F17:
-    return GLFW_KEY_F17;
-  case F18:
-    return GLFW_KEY_F18;
-  case F19:
-    return GLFW_KEY_F19;
-  case F20:
-    return GLFW_KEY_F20;
-  case F21:
-    return GLFW_KEY_F21;
-  case F22:
-    return GLFW_KEY_F22;
-  case F23:
-    return GLFW_KEY_F23;
-  case F24:
-    return GLFW_KEY_F24;
-  case F25:
-    return GLFW_KEY_F25;
-  case LEFT_SHIFT:
-    return GLFW_KEY_LEFT_SHIFT;
-  case LEFT_CONTROL:
-    return GLFW_KEY_LEFT_CONTROL;
-  case LEFT_ALT:
-    return GLFW_KEY_LEFT_ALT;
-  case LEFT_SUPER:
-    return GLFW_KEY_LEFT_SUPER;
-  case RIGHT_SHIFT:
-    return GLFW_KEY_RIGHT_SHIFT;
-  case RIGHT_CONTROL:
-    return GLFW_KEY_RIGHT_CONTROL;
-  case RIGHT_ALT:
-    return GLFW_KEY_RIGHT_ALT;
-  default:
-    return GLFW_KEY_UNKNOWN;
-  }
-}
-static i32 MouseToGLFW(Key k)
-{
-  switch (k)
-  {
-  case MOUSE1:
-    return GLFW_MOUSE_BUTTON_1;
-  case MOUSE2:
-    return GLFW_MOUSE_BUTTON_2;
-  case MOUSE3:
-    return GLFW_MOUSE_BUTTON_3;
-  case MOUSE4:
-    return GLFW_MOUSE_BUTTON_4;
-  case MOUSE5:
-    return GLFW_MOUSE_BUTTON_5;
-  case MOUSE6:
-    return GLFW_MOUSE_BUTTON_6;
-  case MOUSE7:
-    return GLFW_MOUSE_BUTTON_7;
-  case MOUSE8:
-    return GLFW_MOUSE_BUTTON_8;
-  default:
-    return GLFW_MOUSE_BUTTON_1;
-  }
-}
+// static void framebuffer_size_callback(GLFWwindow *window, i32 width, i32 height)
+// {
+//   for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
+//   {
+//     if (kRenderer_WindowsContexts.windows[i].window == window)
+//     {
+//       if (fCompare(kRenderer_WindowsContexts.windows[i].min.y, kRenderer_WindowsContexts.windows[i].context->height) &&
+//           fCompare(kRenderer_WindowsContexts.windows[i].max.x, kRenderer_WindowsContexts.windows[i].context->width))
+//       {
+//         kRenderer_WindowsContexts.windows[i].min.y = (f32)height;
+//         kRenderer_WindowsContexts.windows[i].max.x = (f32)width;
+//       }
+//       kRenderer_WindowsContexts.windows[i].context->windowSize = iv2(width, height);
+//     }
+//   }
+//   glViewport(0, 0, width, height);
+// }
+
+// static i32 KeyToGLFW(Key k)
+// {
+//   switch (k)
+//   {
+//   case SPACE:
+//     return GLFW_KEY_SPACE;
+//   case APOSTROPHE:
+//     return GLFW_KEY_APOSTROPHE /* ' */;
+//   case COMMA:
+//     return GLFW_KEY_COMMA /* , */;
+//   case MINUS:
+//     return GLFW_KEY_MINUS /* - */;
+//   case PERIOD:
+//     return GLFW_KEY_PERIOD /* . */;
+//   case SLASH:
+//     return GLFW_KEY_SLASH /* / */;
+//   case KEY_0:
+//     return GLFW_KEY_0;
+//   case KEY_1:
+//     return GLFW_KEY_1;
+//   case KEY_2:
+//     return GLFW_KEY_2;
+//   case KEY_3:
+//     return GLFW_KEY_3;
+//   case KEY_4:
+//     return GLFW_KEY_4;
+//   case KEY_5:
+//     return GLFW_KEY_5;
+//   case KEY_6:
+//     return GLFW_KEY_6;
+//   case KEY_7:
+//     return GLFW_KEY_7;
+//   case KEY_8:
+//     return GLFW_KEY_8;
+//   case KEY_9:
+//     return GLFW_KEY_9;
+//   case SEMICOLON:
+//     return GLFW_KEY_SEMICOLON /* ; */;
+//   case EQUAL:
+//     return GLFW_KEY_EQUAL /* = */;
+//   case KEY_A:
+//     return GLFW_KEY_A;
+//   case KEY_B:
+//     return GLFW_KEY_B;
+//   case KEY_C:
+//     return GLFW_KEY_C;
+//   case KEY_D:
+//     return GLFW_KEY_D;
+//   case KEY_E:
+//     return GLFW_KEY_E;
+//   case KEY_F:
+//     return GLFW_KEY_F;
+//   case KEY_G:
+//     return GLFW_KEY_G;
+//   case KEY_H:
+//     return GLFW_KEY_H;
+//   case KEY_I:
+//     return GLFW_KEY_I;
+//   case KEY_J:
+//     return GLFW_KEY_J;
+//   case KEY_K:
+//     return GLFW_KEY_K;
+//   case KEY_L:
+//     return GLFW_KEY_L;
+//   case KEY_M:
+//     return GLFW_KEY_M;
+//   case KEY_N:
+//     return GLFW_KEY_N;
+//   case KEY_O:
+//     return GLFW_KEY_O;
+//   case KEY_P:
+//     return GLFW_KEY_P;
+//   case KEY_Q:
+//     return GLFW_KEY_Q;
+//   case KEY_R:
+//     return GLFW_KEY_R;
+//   case KEY_S:
+//     return GLFW_KEY_S;
+//   case KEY_T:
+//     return GLFW_KEY_T;
+//   case KEY_U:
+//     return GLFW_KEY_U;
+//   case KEY_V:
+//     return GLFW_KEY_V;
+//   case KEY_W:
+//     return GLFW_KEY_W;
+//   case KEY_X:
+//     return GLFW_KEY_X;
+//   case KEY_Y:
+//     return GLFW_KEY_Y;
+//   case KEY_Z:
+//     return GLFW_KEY_Z;
+//   case LEFT_BRACKET:
+//     return GLFW_KEY_LEFT_BRACKET /* [ */;
+//   case BACKSLASH:
+//     return GLFW_KEY_BACKSLASH /* \ */;
+//   case RIGHT_BRACKET:
+//     return GLFW_KEY_RIGHT_BRACKET /* ] */;
+//   case GRAVE_ACCENT:
+//     return GLFW_KEY_GRAVE_ACCENT /* ` */;
+//   case ESCAPE:
+//     return GLFW_KEY_ESCAPE;
+//   case ENTER:
+//     return GLFW_KEY_ENTER;
+//   case TAB:
+//     return GLFW_KEY_TAB;
+//   case BACKSPACE:
+//     return GLFW_KEY_BACKSPACE;
+//   case KEY_RIGHT:
+//     return GLFW_KEY_RIGHT;
+//   case KEY_LEFT:
+//     return GLFW_KEY_LEFT;
+//   case KEY_DOWN:
+//     return GLFW_KEY_DOWN;
+//   case KEY_UP:
+//     return GLFW_KEY_UP;
+//   case F1:
+//     return GLFW_KEY_F1;
+//   case F2:
+//     return GLFW_KEY_F2;
+//   case F3:
+//     return GLFW_KEY_F3;
+//   case F4:
+//     return GLFW_KEY_F4;
+//   case F5:
+//     return GLFW_KEY_F5;
+//   case F6:
+//     return GLFW_KEY_F6;
+//   case F7:
+//     return GLFW_KEY_F7;
+//   case F8:
+//     return GLFW_KEY_F8;
+//   case F9:
+//     return GLFW_KEY_F9;
+//   case F10:
+//     return GLFW_KEY_F10;
+//   case F11:
+//     return GLFW_KEY_F11;
+//   case F12:
+//     return GLFW_KEY_F12;
+//   case F13:
+//     return GLFW_KEY_F13;
+//   case F14:
+//     return GLFW_KEY_F14;
+//   case F15:
+//     return GLFW_KEY_F15;
+//   case F16:
+//     return GLFW_KEY_F16;
+//   case F17:
+//     return GLFW_KEY_F17;
+//   case F18:
+//     return GLFW_KEY_F18;
+//   case F19:
+//     return GLFW_KEY_F19;
+//   case F20:
+//     return GLFW_KEY_F20;
+//   case F21:
+//     return GLFW_KEY_F21;
+//   case F22:
+//     return GLFW_KEY_F22;
+//   case F23:
+//     return GLFW_KEY_F23;
+//   case F24:
+//     return GLFW_KEY_F24;
+//   case F25:
+//     return GLFW_KEY_F25;
+//   case LEFT_SHIFT:
+//     return GLFW_KEY_LEFT_SHIFT;
+//   case LEFT_CONTROL:
+//     return GLFW_KEY_LEFT_CONTROL;
+//   case LEFT_ALT:
+//     return GLFW_KEY_LEFT_ALT;
+//   case LEFT_SUPER:
+//     return GLFW_KEY_LEFT_SUPER;
+//   case RIGHT_SHIFT:
+//     return GLFW_KEY_RIGHT_SHIFT;
+//   case RIGHT_CONTROL:
+//     return GLFW_KEY_RIGHT_CONTROL;
+//   case RIGHT_ALT:
+//     return GLFW_KEY_RIGHT_ALT;
+//   default:
+//     return GLFW_KEY_UNKNOWN;
+//   }
+// }
+
+// static i32 MouseToGLFW(Key k)
+// {
+//   switch (k)
+//   {
+//   case MOUSE1:
+//     return GLFW_MOUSE_BUTTON_1;
+//   case MOUSE2:
+//     return GLFW_MOUSE_BUTTON_2;
+//   case MOUSE3:
+//     return GLFW_MOUSE_BUTTON_3;
+//   case MOUSE4:
+//     return GLFW_MOUSE_BUTTON_4;
+//   case MOUSE5:
+//     return GLFW_MOUSE_BUTTON_5;
+//   case MOUSE6:
+//     return GLFW_MOUSE_BUTTON_6;
+//   case MOUSE7:
+//     return GLFW_MOUSE_BUTTON_7;
+//   case MOUSE8:
+//     return GLFW_MOUSE_BUTTON_8;
+//   default:
+//     return GLFW_MOUSE_BUTTON_1;
+//   }
+// }
+
 static void compileShaders()
 {
   if (1)
@@ -327,7 +484,6 @@ static void compileShaders()
       printf("%s\n", infoLog);
       assert(0 && "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n");
     }
-
     i32 fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
@@ -343,7 +499,6 @@ static void compileShaders()
     glDeleteShader(vertexShader);
     glAttachShader(defaultShader, fragmentShader);
     glDeleteShader(fragmentShader);
-
     glLinkProgram(defaultShader);
     // check for linking errors
     glGetProgramiv(defaultShader, GL_LINK_STATUS, &success);
@@ -367,13 +522,13 @@ static void compileShaders()
         GLenum shaderType;
         switch (kRenderer_WindowsContexts.windows[i].context->windowShaders.programs[j].shaders[s].shaderType)
         {
-        case kRenderer_SHADER_Vertex:
+        case kRenderer_WindowContext::shaderTypes::kRenderer_SHADER_Vertex:
           shaderType = GL_VERTEX_SHADER;
           break;
-        case kRenderer_SHADER_Fragment:
+        case kRenderer_WindowContext::shaderTypes::kRenderer_SHADER_Fragment:
           shaderType = GL_FRAGMENT_SHADER;
           break;
-        case kRenderer_SHADER_Geometry:
+        case kRenderer_WindowContext::shaderTypes::kRenderer_SHADER_Geometry:
           shaderType = GL_GEOMETRY_SHADER;
           break;
         default:
@@ -394,7 +549,6 @@ static void compileShaders()
         glAttachShader(kRenderer_WindowsContexts.windows[i].shaderPrograms[j], shader);
         glDeleteShader(shader);
       }
-
       glLinkProgram(kRenderer_WindowsContexts.windows[i].shaderPrograms[j]);
       // error check
       glGetProgramiv(kRenderer_WindowsContexts.windows[i].shaderPrograms[j], GL_LINK_STATUS, &success);
@@ -407,6 +561,7 @@ static void compileShaders()
     }
   }
 }
+
 static m4 getMapper()
 {
   m4 mapper = M4InitDiagonal(1);
@@ -419,22 +574,18 @@ static m4 getMapper()
 
 i32 kRenderer_init(i32 argc, const char **argv)
 {
-  if (!glfwInit())
-  {
-    assert(0 && "could not create context");
-    return -1;
-  }
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glutInit(&argc, (char**)argv);
+  u64 glutOptions = GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH;
 #ifdef __APPLE__
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glutOptions|=GLUT_3_2_CORE_PROFILE;
 #endif
+  glutInitDisplayMode(glutOptions);
+  glutInitWindowPosition(0, 0);
   return 0;
 }
 i32 kRenderer_createContext(kRenderer_WindowContext *context)
 {
-  kRenderer_WindowContext c = {"kRenderer", v4(1, 1, 1, 1), iv2(1920, 1080), true, {1, {{{3, {kTYPE_v3, kTYPE_BOOL, kTYPE_v4}}, 2, {{kRenderer_SHADER_Vertex, vertexShaderSource}, {kRenderer_SHADER_Fragment, fragmentShaderSource}}}}}, NULL, NULL};
+  kRenderer_WindowContext c = {"kRenderer", v4(1, 1, 1, 1), iv2(1920, 1080), true, {0, NULL}, NULL, NULL};
   *context = c;
   assert(kRenderer_WindowsContexts.length < kRenderer_maxWindows);
   currentContext = (u32)kRenderer_WindowsContexts.length;
@@ -459,43 +610,40 @@ i32 kRenderer_makeCurrentContext(kRenderer_WindowContext *context)
 }
 i32 kRenderer_createWindow(kRenderer_WindowContext *context)
 {
-  GLFWwindow *window = glfwCreateWindow(context->width, context->height, context->name, NULL, NULL);
-  if (window == NULL)
-  {
-    glfwTerminate();
-    assert(0 && "cannot create window");
-    return -1;
-  }
-  glfwMakeContextCurrent(window);
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+  glutInitWindowSize(context->width, context->height);
+  GLint window = glutCreateWindow(context->name);
+  if (!gladLoadGL())
   {
     assert(0 && "could not initialize GLAD");
     return -1;
   }
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
   for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
   {
     if (kRenderer_WindowsContexts.windows[i].context == context)
     {
       kRenderer_WindowsContexts.windows[i].window = window;
       if (fCompare(kRenderer_WindowsContexts.windows[currentContext].min.y, kRenderer_WindowsContexts.windows[currentContext].context->height) &&
-          fCompare(kRenderer_WindowsContexts.windows[currentContext].max.x, kRenderer_WindowsContexts.windows[currentContext].context->width)){
+          fCompare(kRenderer_WindowsContexts.windows[currentContext].max.x, kRenderer_WindowsContexts.windows[currentContext].context->width))
+      {
         kRenderer_WindowsContexts.windows[i].min = v3(0.f, (f32)kRenderer_getWindowHeight(), 0.f);
         kRenderer_WindowsContexts.windows[i].max = v3((f32)kRenderer_getWindowWidth(), 0.f, 1.f);
       }
-      kRenderer_WindowsContexts.windows[currentContext].context->windowSize=kRenderer_getWindowSize();
+      kRenderer_WindowsContexts.windows[currentContext].context->windowSize = kRenderer_getWindowSize();
     }
   }
-  if (defaultVAO == 0)
-  {
-    glGenVertexArrays(1, &defaultVAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
-    glEnableVertexAttribArray(2);
-  }
+
+  // if (defaultVAO == 0)
+  // {
+  //   glGenVertexArrays(1, &defaultVAO);
+  //   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
+  //   glEnableVertexAttribArray(0);
+  //   glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
+  //   glEnableVertexAttribArray(1);
+  //   glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
+  //   glEnableVertexAttribArray(2);
+  // }
+
   return 0;
 }
 
@@ -506,10 +654,9 @@ void kRenderer_setWindowSize(i32 width, i32 height)
   {
     kRenderer_WindowsContexts.windows[currentContext].max.x = (f32)width;
     kRenderer_WindowsContexts.windows[currentContext].min.y = (f32)height;
-    
   }
   kRenderer_WindowsContexts.windows[currentContext].context->windowSize = iv2(width, height);
-  if (kRenderer_WindowsContexts.windows[currentContext].window != NULL)
+  if (kRenderer_WindowsContexts.windows[currentContext].window != 0)
   {
     glViewport(0, 0, width, height);
   }
@@ -517,9 +664,9 @@ void kRenderer_setWindowSize(i32 width, i32 height)
 void kRenderer_setWindowName(const char *windowName)
 {
   kRenderer_WindowsContexts.windows[currentContext].context->name = windowName;
-  if (kRenderer_WindowsContexts.windows[currentContext].window != NULL)
+  if (kRenderer_WindowsContexts.windows[currentContext].window != 0)
   {
-    glfwSetWindowTitle(kRenderer_WindowsContexts.windows[currentContext].window, windowName);
+    glutSetWindowTitle(windowName);
   }
 }
 void kRenderer_setStartFunction(void (*startDisplayFunc)())
@@ -538,7 +685,6 @@ void kRenderer_setWindowBoundsScale(v3 min, v3 max)
 
 void kRenderer_launch()
 {
-  compileShaders();
   // All functions return a value different than 0 whenever an error occurred
   if (FT_Init_FreeType(&ft))
   {
@@ -549,32 +695,40 @@ void kRenderer_launch()
   kRenderer_loadFont("ressources/fonts/rainyhearts/rainyhearts.ttf", "rainyhearts");
   for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
   {
-    glfwMakeContextCurrent(kRenderer_WindowsContexts.windows[i].window);
-    glClear(GL_COLOR_BUFFER_BIT);
-    currentContext = i;
-    kRenderer_WindowsContexts.windows[i].context->init();
-    glfwSwapBuffers(kRenderer_WindowsContexts.windows[i].window);
-    glfwPollEvents();
-  }
-  bool running = true;
-  while (running)
-  {
-    running = false;
-    double time = glfwGetTime();
-    for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
-    {
-      glfwMakeContextCurrent(kRenderer_WindowsContexts.windows[i].window);
+    glutSetWindow(kRenderer_WindowsContexts.windows[i].window);
+    currentContext=i;
+    glutDisplayFunc([]() {
       glClear(GL_COLOR_BUFFER_BIT);
-      currentContext = i;
-      kRenderer_WindowsContexts.windows[i].context->draw();
-      glfwSwapInterval(kRenderer_WindowsContexts.windows[i].context->gSync ? 1 : 0);
-      glfwSwapBuffers(kRenderer_WindowsContexts.windows[i].window);
-      glfwPollEvents();
-      running |= !glfwWindowShouldClose(kRenderer_WindowsContexts.windows[i].window);
-    }
-    lastTime = time;
+      kRenderer_WindowsContexts.windows[currentContext].context->init();
+      glutSwapBuffers();
+    });
+    glutIdleFunc([]() {
+      glClear(GL_COLOR_BUFFER_BIT);
+      kRenderer_WindowsContexts.windows[currentContext].context->draw();
+      glutSwapBuffers();
+    });
   }
-  glfwTerminate();
+
+  // assert(0 && "test stop, everything ok");
+  glutMainLoop();
+  // while (running)
+  // {
+  //   running = false;
+  //   // double time = glfwGetTime();
+  //   for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
+  //   {
+  //     // glfwMakeContextCurrent(kRenderer_WindowsContexts.windows[i].window);
+  //     glClear(GL_COLOR_BUFFER_BIT);
+  //     currentContext = i;
+  //     kRenderer_WindowsContexts.windows[i].context->draw();
+  //     // glfwSwapInterval(kRenderer_WindowsContexts.windows[i].context->gSync ? 1 : 0);
+  //     // glfwSwapBuffers(kRenderer_WindowsContexts.windows[i].window);
+  //     // glfwPollEvents();
+  //     // running |= !glfwWindowShouldClose(kRenderer_WindowsContexts.windows[i].window);
+  //   }
+  //   // lastTime = time;
+  // }
+  // glfwTerminate();
 }
 
 //---------------------------------
@@ -609,7 +763,7 @@ void kRenderer_loadFont(const char *fontPath, const char *fontName)
         return;
       }
       // generate texture
-      u8 *grayScaleBuffer = malloc(sizeof(u8) * face->glyph->bitmap.width * face->glyph->bitmap.rows * 4);
+      u8 *grayScaleBuffer = new u8[face->glyph->bitmap.width * face->glyph->bitmap.rows * 4];
       for (u32 y = 0; y < face->glyph->bitmap.rows; y++)
       {
         for (u32 x = 0; x < face->glyph->bitmap.width; x++)
@@ -617,12 +771,12 @@ void kRenderer_loadFont(const char *fontPath, const char *fontName)
           grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4] = 255;
           grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 1] = 255;
           grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 2] = 255;
-          grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 3] = face->glyph->bitmap.buffer[y * face->glyph->bitmap.width+x];
+          grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 3] = face->glyph->bitmap.buffer[y * face->glyph->bitmap.width + x];
         }
       }
       u32 texture;
       kRenderer_bindTexture(&texture, grayScaleBuffer, face->glyph->bitmap.width, face->glyph->bitmap.rows, 4);
-      free(grayScaleBuffer);
+      delete[]grayScaleBuffer;
       fontMaps.fonts[fontMaps.length].character[c + 128].character = c;
       fontMaps.fonts[fontMaps.length].character[c + 128].textureId = texture;
       fontMaps.fonts[fontMaps.length].character[c + 128].startPos = iv2(face->glyph->bitmap_left, 48 - face->glyph->bitmap_top); // will have to test this
@@ -659,8 +813,7 @@ void kRenderer_drawRect(v2 points[4])
 }
 void kRenderer_drawRectV4(v4 rect)
 {
-  v2 points[4] = {toV2(rect), 
-                  v2(rect.x, rect.y + rect.height),
+  v2 points[4] = {toV2(rect), v2(rect.x, rect.y + rect.height),
                   v2(rect.x + rect.width, rect.y),
                   v2(rect.x + rect.width, rect.y + rect.height)};
   kRenderer_drawRect(points);
@@ -1027,7 +1180,6 @@ void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale
   mat = M4MultiplyM4(mat, M4Rotate(rotation.y, v3(0.f, 1.f, 0.f)));
   mat = M4MultiplyM4(mat, M4Rotate(rotation.z, v3(0.f, 0.f, 1.f)));
   mat = M4MultiplyM4(mat, M4TranslateV3(v3(-(pixWidth / 2.f), -(pixHeight / 2.f), 0)));
-  mat = M4MultiplyM4(mat, M4TranslateV3(V3MultiplyF32(toV3(pixelPos),-1.f)));
 
   u32 widthOffset = 0;
   struct corner
@@ -1053,7 +1205,7 @@ void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale
     {
       v4 rP = v4(texturePoints[j].x, texturePoints[j].y, texturePoints[j].z, 1);
       rP = V4MultiplyM4(rP, mat);
-      struct corner a = {toV3(rP), 1.0f, v4(0, 0, 0, 1)};
+      struct corner a = {toV3(rP), 1.0f, v4(0, 0, 0, 0)};
       corners[j] = a;
     }
     corners[0].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -1062,72 +1214,86 @@ void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale
     corners[3].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
     if (1) // drawing of character
     {
-      u32 VBO;
-      struct corner corners1[6] = {corners[0], corners[1], corners[3], corners[0], corners[2], corners[3]};
+      u32 VBO1, VBO2;
+      struct corner corners1[3] = {corners[0], corners[1], corners[3]};
+      struct corner corners2[3] = {corners[0], corners[2], corners[3]};
 
       glBindTexture(GL_TEXTURE_2D, fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].textureId);
 
-      glGenBuffers(1, &VBO);
-      glBindBuffer(GL_ARRAY_BUFFER, VBO);
+      glGenBuffers(1, &VBO1);
       glBindVertexArray(defaultVAO); // setup variables in gpu memory
-      glBufferData(GL_ARRAY_BUFFER, sizeof(struct corner) * 6, corners1, GL_STATIC_DRAW); // initialise value VBO
-
+      glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners1, GL_STATIC_DRAW); // initialise value VBO
       glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
       glEnableVertexAttribArray(0);
       glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
       glEnableVertexAttribArray(1);
       glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
       glEnableVertexAttribArray(2);
-
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glBindVertexArray(defaultVAO);
       glUseProgram(defaultShader);
-      glUniform4f(glGetUniformLocation(defaultShader, "colorScale"), kRenderer_WindowsContexts.windows[currentContext].context->currentColor.r, kRenderer_WindowsContexts.windows[currentContext].context->currentColor.g, kRenderer_WindowsContexts.windows[currentContext].context->currentColor.b, kRenderer_WindowsContexts.windows[currentContext].context->currentColor.a);
-      glDrawArrays(GL_TRIANGLES, 0, 6);
-      glUniform4f(glGetUniformLocation(defaultShader, "colorScale"), 1.0, 1.0, 1.0, 1.0);
-      glDeleteBuffers(1, &VBO);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+      glDeleteBuffers(1, &VBO1);
+
+      glGenBuffers(1, &VBO2);
+      glBindVertexArray(defaultVAO); // setup variables in gpu memory
+      glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 8 * 3, corners2, GL_STATIC_DRAW); // initialise value VBO
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
+      glEnableVertexAttribArray(0);
+      glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 3));
+      glEnableVertexAttribArray(1);
+      glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(sizeof(f32) * 4));
+      glEnableVertexAttribArray(2);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glBindVertexArray(defaultVAO);
+      glUseProgram(defaultShader);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+      glDeleteBuffers(1, &VBO2);
     }
 
-    widthOffset += fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].advance + fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].width;
+    widthOffset += fontMaps.fonts[fontMaps.currentFont].character[charactersIndexs[i]].advance;
   }
 }
 
 // key input
 bool kRenderer_keyStatusPressed(Key e)
 {
-  return glfwGetKey(kRenderer_WindowsContexts.windows[currentContext].window, KeyToGLFW(e)) == GLFW_PRESS;
+  // return glfwGetKey(kRenderer_WindowsContexts.windows[currentContext].window, KeyToGLFW(e)) == GLFW_PRESS;
 }
 v2 kRenderer_cursorPosition()
 {
   f64 xpos, ypos;
-  glfwGetCursorPos(kRenderer_WindowsContexts.windows[currentContext].window, &xpos, &ypos);
+  // glfwGetCursorPos(kRenderer_WindowsContexts.windows[currentContext].window, &xpos, &ypos);
   return v2((f32)xpos, (f32)ypos);
 }
 bool kRenderer_mouseStatusPressed(Key e)
 {
-  return glfwGetMouseButton(kRenderer_WindowsContexts.windows[currentContext].window, MouseToGLFW(e)) == GLFW_PRESS;
+  // return glfwGetMouseButton(kRenderer_WindowsContexts.windows[currentContext].window, MouseToGLFW(e)) == GLFW_PRESS;
 }
 
 i32 kRenderer_getWindowWidth()
 {
   i32 width, height;
-  glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
+  // glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
   return width;
 }
 i32 kRenderer_getWindowHeight()
 {
   i32 width, height;
-  glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
+  // glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
   return height;
 }
 iv2 kRenderer_getWindowSize()
 {
   i32 width, height;
-  glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
+  // glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
   return iv2(width, height);
 }
 f64 kRenderer_getTimeSinceLastFrame()
 {
-  return glfwGetTime() - lastTime;
+  // return glfwGetTime() - lastTime;
 }

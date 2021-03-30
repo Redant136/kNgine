@@ -27,6 +27,12 @@ extern "C"
       };
     };
     bool gSync;
+    enum shaderTypes
+    {
+      kRenderer_SHADER_Vertex,
+      kRenderer_SHADER_Fragment,
+      kRenderer_SHADER_Geometry
+    };
     // the first argument of the shader must be v3 position
     struct
     {
@@ -37,12 +43,7 @@ extern "C"
         size_t length;
         struct
         {
-          enum
-          {
-            kRenderer_SHADER_Vertex,
-            kRenderer_SHADER_Fragment,
-            kRenderer_SHADER_Geometry
-          } shaderType;
+          enum shaderTypes shaderType;
           const char *shader;
         } shaders[kRenderer_maxShadersPerProgram];
       } programs[kRenderer_maxShaderPrograms];
@@ -105,10 +106,6 @@ extern "C"
   i32 kRenderer_getWindowHeight();
   iv2 kRenderer_getWindowSize();
   f64 kRenderer_getTimeSinceLastFrame();
-
-#ifdef kRenderer_HEADER_ONLY
-
-#endif
 
 #ifdef __cplusplus
 }

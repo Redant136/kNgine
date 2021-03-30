@@ -3,16 +3,17 @@
 # main branch
 
 ## currently working on
-- [ ] openal audio engine
-- [ ] test openal on linux to see if bug is windows only
-- [ ] header-only renderer (DO YOUR RESEARCH)
+- [ ] OpenGL glut 2.0
 ## testing
+- [ ] header-only renderer
 - [ ] text in renderer
 ## next step
+- [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf)
+- [ ] openal audio engine
+- [ ] test openal on linux to see if bug is windows only
 - [ ] display debug info such as fps
 - [ ] make key message bit manipulation
 ## research
-- [ ] header only kRenderer
 - [ ] metal
 - [ ] https://thebookofshaders.com/
 ## procrastinating

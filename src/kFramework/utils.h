@@ -1257,7 +1257,7 @@ static m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
 #define fCompare(a,b) (fabsf(a-b)<0.0001)
 #define fCompareN(a,b,n) (fabsf(a - b) < n)
 
-#ifdef strManipulation
+#ifdef utils_StrManipulation
 #define StringCopy strcpy
 #define StringCopyN strncpy
 #define CalculateCStringLength(s) ((uint32_t)strlen(s))
@@ -1888,7 +1888,7 @@ static float randf()
 }
 #endif
 
-#ifdef perlinNoise
+#ifdef utils_PerlinNoise
 static int32_t global_perlin_noise_seed = 0;
 static int32_t global_perlin_noise_hash[] = {
     208, 34, 231, 213, 32, 248, 233, 56, 161, 78, 24, 140, 71, 48, 140, 254, 245, 255, 247, 247, 40,

@@ -16,3 +16,6 @@
 [submodule "extern/freetype"]
 	path = extern/freetype
 	url = https://github.com/freetype/freetype.git
+[submodule "extern/FreeGLUT"]
+	path = extern/FreeGLUT
+	url = https://github.com/dcnieho/FreeGLUT.git

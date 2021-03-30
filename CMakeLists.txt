@@ -16,12 +16,15 @@ else()
   )
 endif()
 
-option(kRenderer_HEADER_ONLY "sets if you link kRenderer" OFF)
+option(kRenderer_GLFW "sets if you link kRenderer GLFW" ON)
+option(kRenderer_GLUT "sets if you link kRenderer GLUT (glut has problems on macos)" OFF)
 
-if(kRenderer_HEADER_ONLY)
-set(kRendererSource "")
-else()
+if(kRenderer_GLFW)
 set(kRendererSource "src/kFramework/kRendererGLFW.c")
+elseif(kRenderer_GLUT)
+set(kRendererSource "src/kFramework/kRendererGLUT.cpp")
+else()
+set(kRendererSource "src/kFramework/kRendererSoftwareRenderer.c")
 endif()
 
 set(KNGINEFRAMEWORK_HEADER_FILES 
@@ -69,6 +72,8 @@ add_library(kNgine
   ${KNGINE_HEADER_FILES}
 )
 
+
+if(kRenderer_GLFW)
 add_subdirectory(extern/glad/)
 target_link_libraries(kNgineFramework PRIVATE glad)
 target_link_libraries(kNgine PRIVATE glad)
@@ -76,6 +81,22 @@ target_link_libraries(kNgine PRIVATE glad)
 add_subdirectory(extern/glfw)
 target_link_libraries(kNgineFramework PRIVATE glfw)
 target_link_libraries(kNgine PRIVATE glfw)
+
+elseif(kRenderer_GLUT)
+add_subdirectory(extern/glad/)
+target_link_libraries(kNgineFramework PRIVATE glad)
+target_link_libraries(kNgine PRIVATE glad)
+
+if(APPLE)
+target_link_libraries(kNgine PRIVATE "-framework OpenGL -framework GLUT")
+else()
+add_subdirectory(extern/FreeGlut/freeglut/freeglut)
+target_link_libraries(kNgineFramework PRIVATE freeglut)
+target_link_libraries(kNgine PRIVATE freeglut)
+endif()
+
+else()
+endif()
 
 add_subdirectory(extern/freetype/)
 target_link_libraries(kNgineFramework PRIVATE freetype)
