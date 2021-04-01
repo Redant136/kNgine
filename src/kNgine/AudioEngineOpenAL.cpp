@@ -15,6 +15,8 @@
 #include <wave/file.h>
 #endif
 
+#include <iostream>
+
 bool check_alc_errors(const std::string &filename, const std::uint_fast32_t line, ALCdevice *device)
 {
   ALCenum error = alcGetError(device);

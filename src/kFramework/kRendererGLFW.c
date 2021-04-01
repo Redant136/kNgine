@@ -105,17 +105,17 @@ static i32 KeyToGLFW(Key k)
 {
   switch (k)
   {
-  case SPACE:
+  case KEY_SPACE:
     return GLFW_KEY_SPACE;
-  case APOSTROPHE:
+  case KEY_APOSTROPHE:
     return GLFW_KEY_APOSTROPHE /* ' */;
-  case COMMA:
+  case KEY_COMMA:
     return GLFW_KEY_COMMA /* , */;
-  case MINUS:
+  case KEY_MINUS:
     return GLFW_KEY_MINUS /* - */;
-  case PERIOD:
+  case KEY_PERIOD:
     return GLFW_KEY_PERIOD /* . */;
-  case SLASH:
+  case KEY_SLASH:
     return GLFW_KEY_SLASH /* / */;
   case KEY_0:
     return GLFW_KEY_0;
@@ -137,9 +137,9 @@ static i32 KeyToGLFW(Key k)
     return GLFW_KEY_8;
   case KEY_9:
     return GLFW_KEY_9;
-  case SEMICOLON:
+  case KEY_SEMICOLON:
     return GLFW_KEY_SEMICOLON /* ; */;
-  case EQUAL:
+  case KEY_EQUAL:
     return GLFW_KEY_EQUAL /* = */;
   case KEY_A:
     return GLFW_KEY_A;
@@ -193,22 +193,26 @@ static i32 KeyToGLFW(Key k)
     return GLFW_KEY_Y;
   case KEY_Z:
     return GLFW_KEY_Z;
-  case LEFT_BRACKET:
+  case KEY_LEFT_BRACKET:
     return GLFW_KEY_LEFT_BRACKET /* [ */;
-  case BACKSLASH:
+  case KEY_BACKSLASH:
     return GLFW_KEY_BACKSLASH /* \ */;
-  case RIGHT_BRACKET:
+  case KEY_RIGHT_BRACKET:
     return GLFW_KEY_RIGHT_BRACKET /* ] */;
-  case GRAVE_ACCENT:
+  case KEY_GRAVE_ACCENT:
     return GLFW_KEY_GRAVE_ACCENT /* ` */;
-  case ESCAPE:
+  case KEY_ESCAPE:
     return GLFW_KEY_ESCAPE;
-  case ENTER:
+  case KEY_ENTER:
     return GLFW_KEY_ENTER;
-  case TAB:
+  case KEY_TAB:
     return GLFW_KEY_TAB;
-  case BACKSPACE:
+  case KEY_BACKSPACE:
     return GLFW_KEY_BACKSPACE;
+  case KEY_INSERT:
+    return GLFW_KEY_INSERT;
+  case KEY_DELETE:
+    return GLFW_KEY_DELETE;
   case KEY_RIGHT:
     return GLFW_KEY_RIGHT;
   case KEY_LEFT:
@@ -217,69 +221,69 @@ static i32 KeyToGLFW(Key k)
     return GLFW_KEY_DOWN;
   case KEY_UP:
     return GLFW_KEY_UP;
-  case F1:
+  case KEY_F1:
     return GLFW_KEY_F1;
-  case F2:
+  case KEY_F2:
     return GLFW_KEY_F2;
-  case F3:
+  case KEY_F3:
     return GLFW_KEY_F3;
-  case F4:
+  case KEY_F4:
     return GLFW_KEY_F4;
-  case F5:
+  case KEY_F5:
     return GLFW_KEY_F5;
-  case F6:
+  case KEY_F6:
     return GLFW_KEY_F6;
-  case F7:
+  case KEY_F7:
     return GLFW_KEY_F7;
-  case F8:
+  case KEY_F8:
     return GLFW_KEY_F8;
-  case F9:
+  case KEY_F9:
     return GLFW_KEY_F9;
-  case F10:
+  case KEY_F10:
     return GLFW_KEY_F10;
-  case F11:
+  case KEY_F11:
     return GLFW_KEY_F11;
-  case F12:
+  case KEY_F12:
     return GLFW_KEY_F12;
-  case F13:
+  case KEY_F13:
     return GLFW_KEY_F13;
-  case F14:
+  case KEY_F14:
     return GLFW_KEY_F14;
-  case F15:
+  case KEY_F15:
     return GLFW_KEY_F15;
-  case F16:
+  case KEY_F16:
     return GLFW_KEY_F16;
-  case F17:
+  case KEY_F17:
     return GLFW_KEY_F17;
-  case F18:
+  case KEY_F18:
     return GLFW_KEY_F18;
-  case F19:
+  case KEY_F19:
     return GLFW_KEY_F19;
-  case F20:
+  case KEY_F20:
     return GLFW_KEY_F20;
-  case F21:
+  case KEY_F21:
     return GLFW_KEY_F21;
-  case F22:
+  case KEY_F22:
     return GLFW_KEY_F22;
-  case F23:
+  case KEY_F23:
     return GLFW_KEY_F23;
-  case F24:
+  case KEY_F24:
     return GLFW_KEY_F24;
-  case F25:
+  case KEY_F25:
     return GLFW_KEY_F25;
-  case LEFT_SHIFT:
+  case KEY_LEFT_SHIFT:
     return GLFW_KEY_LEFT_SHIFT;
-  case LEFT_CONTROL:
+  case KEY_LEFT_CONTROL:
     return GLFW_KEY_LEFT_CONTROL;
-  case LEFT_ALT:
+  case KEY_LEFT_ALT:
     return GLFW_KEY_LEFT_ALT;
-  case LEFT_SUPER:
+  case KEY_LEFT_SUPER:
     return GLFW_KEY_LEFT_SUPER;
-  case RIGHT_SHIFT:
+  case KEY_RIGHT_SHIFT:
     return GLFW_KEY_RIGHT_SHIFT;
-  case RIGHT_CONTROL:
+  case KEY_RIGHT_CONTROL:
     return GLFW_KEY_RIGHT_CONTROL;
-  case RIGHT_ALT:
+  case KEY_RIGHT_ALT:
     return GLFW_KEY_RIGHT_ALT;
   default:
     return GLFW_KEY_UNKNOWN;
@@ -289,21 +293,21 @@ static i32 MouseToGLFW(Key k)
 {
   switch (k)
   {
-  case MOUSE1:
+  case MOUSE_BUTTON1:
     return GLFW_MOUSE_BUTTON_1;
-  case MOUSE2:
+  case MOUSE_BUTTON2:
     return GLFW_MOUSE_BUTTON_2;
-  case MOUSE3:
+  case MOUSE_BUTTON3:
     return GLFW_MOUSE_BUTTON_3;
-  case MOUSE4:
+  case MOUSE_BUTTON4:
     return GLFW_MOUSE_BUTTON_4;
-  case MOUSE5:
+  case MOUSE_BUTTON5:
     return GLFW_MOUSE_BUTTON_5;
-  case MOUSE6:
+  case MOUSE_BUTTON6:
     return GLFW_MOUSE_BUTTON_6;
-  case MOUSE7:
+  case MOUSE_BUTTON7:
     return GLFW_MOUSE_BUTTON_7;
-  case MOUSE8:
+  case MOUSE_BUTTON8:
     return GLFW_MOUSE_BUTTON_8;
   default:
     return GLFW_MOUSE_BUTTON_1;
@@ -1102,7 +1106,9 @@ v2 kRenderer_cursorPosition()
 {
   f64 xpos, ypos;
   glfwGetCursorPos(kRenderer_WindowsContexts.windows[currentContext].window, &xpos, &ypos);
-  return v2((f32)xpos, (f32)ypos);
+  v4 v=v4(xpos,ypos,0,1);
+  v=V4MultiplyM4(v, M4Mapper(v3(0,kRenderer_getWindowHeight(),0),v3(kRenderer_getWindowWidth(),0,0),kRenderer_WindowsContexts.windows[currentContext].min,v3(0,0,0)));
+  return v2(v.x,v.y);
 }
 bool kRenderer_mouseStatusPressed(Key e)
 {

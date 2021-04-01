@@ -1760,12 +1760,12 @@ static rgbcolor HSVToRGBColor(v3 hsv)
 
 typedef enum Key
 {
-  SPACE,
-  APOSTROPHE,
-  COMMA,
-  MINUS,
-  PERIOD,
-  SLASH,
+  KEY_SPACE,
+  KEY_APOSTROPHE,
+  KEY_COMMA,
+  KEY_MINUS,
+  KEY_PERIOD,
+  KEY_SLASH,
   KEY_0,
   KEY_1,
   KEY_2,
@@ -1776,8 +1776,8 @@ typedef enum Key
   KEY_7,
   KEY_8,
   KEY_9,
-  SEMICOLON,
-  EQUAL,
+  KEY_SEMICOLON,
+  KEY_EQUAL,
   KEY_A,
   KEY_B,
   KEY_C,
@@ -1804,65 +1804,294 @@ typedef enum Key
   KEY_X,
   KEY_Y,
   KEY_Z,
-  LEFT_BRACKET,
-  BACKSLASH,
-  RIGHT_BRACKET,
-  GRAVE_ACCENT,
-  ESCAPE,
-  ENTER,
-  TAB,
-  BACKSPACE,
+  KEY_LEFT_BRACKET,
+  KEY_BACKSLASH,
+  KEY_RIGHT_BRACKET,
+  KEY_GRAVE_ACCENT,
+  KEY_ESCAPE,
+  KEY_ENTER,
+  KEY_TAB,
+  KEY_BACKSPACE,
+  KEY_INSERT,
+  KEY_DELETE,
   KEY_RIGHT,
   KEY_LEFT,
   KEY_DOWN,
   KEY_UP,
-  F1,
-  F2,
-  F3,
-  F4,
-  F5,
-  F6,
-  F7,
-  F8,
-  F9,
-  F10,
-  F11,
-  F12,
-  F13,
-  F14,
-  F15,
-  F16,
-  F17,
-  F18,
-  F19,
-  F20,
-  F21,
-  F22,
-  F23,
-  F24,
-  F25,
-  LEFT_SHIFT,
-  LEFT_CONTROL,
-  LEFT_ALT,
-  LEFT_SUPER,
-  RIGHT_SHIFT,
-  RIGHT_CONTROL,
-  RIGHT_ALT,
+  KEY_F1,
+  KEY_F2,
+  KEY_F3,
+  KEY_F4,
+  KEY_F5,
+  KEY_F6,
+  KEY_F7,
+  KEY_F8,
+  KEY_F9,
+  KEY_F10,
+  KEY_F11,
+  KEY_F12,
+  KEY_F13,
+  KEY_F14,
+  KEY_F15,
+  KEY_F16,
+  KEY_F17,
+  KEY_F18,
+  KEY_F19,
+  KEY_F20,
+  KEY_F21,
+  KEY_F22,
+  KEY_F23,
+  KEY_F24,
+  KEY_F25,
+  KEY_LEFT_SHIFT,
+  KEY_LEFT_CONTROL,
+  KEY_LEFT_ALT,
+  KEY_LEFT_SUPER,
+  KEY_RIGHT_SHIFT,
+  KEY_RIGHT_CONTROL,
+  KEY_RIGHT_ALT,
   UNREGISTERED_KEY,
   KEY_LAST,
-  MOUSE1,
-  MOUSE_LEFT = MOUSE1,
-  MOUSE2,
-  MOUSE_RIGHT = MOUSE2,
-  MOUSE3,
-  MOUSE_MIDDLE = MOUSE3,
-  MOUSE4,
-  MOUSE5,
-  MOUSE6,
-  MOUSE7,
-  MOUSE8,
+  MOUSE_BUTTON1,
+  MOUSE_LEFT = MOUSE_BUTTON1,
+  MOUSE_BUTTON2,
+  MOUSE_RIGHT = MOUSE_BUTTON2,
+  MOUSE_BUTTON3,
+  MOUSE_MIDDLE = MOUSE_BUTTON3,
+  MOUSE_BUTTON4,
+  MOUSE_BUTTON5,
+  MOUSE_BUTTON6,
+  MOUSE_BUTTON7,
+  MOUSE_BUTTON8,
   MOUSE_LAST
 } Key;
+
+static char KeyToChar(Key k){
+  switch (k)
+  {
+  case KEY_SPACE:
+    return ' ';
+  case KEY_APOSTROPHE:
+    return '\'' /* ' */;
+  case KEY_COMMA:
+    return ',' /* , */;
+  case KEY_MINUS:
+    return '-' /* - */;
+  case KEY_PERIOD:
+    return '.' /* . */;
+  case KEY_SLASH:
+    return '/' /* / */;
+  case KEY_0:
+    return '0';
+  case KEY_1:
+    return '1';
+  case KEY_2:
+    return '2';
+  case KEY_3:
+    return '3';
+  case KEY_4:
+    return '4';
+  case KEY_5:
+    return '5';
+  case KEY_6:
+    return '6';
+  case KEY_7:
+    return '7';
+  case KEY_8:
+    return '8';
+  case KEY_9:
+    return '9';
+  case KEY_SEMICOLON:
+    return ';' /* ; */;
+  case KEY_EQUAL:
+    return '=' /* = */;
+  case KEY_A:
+    return 'a';
+  case KEY_B:
+    return 'b';
+  case KEY_C:
+    return 'c';
+  case KEY_D:
+    return 'd';
+  case KEY_E:
+    return 'e';
+  case KEY_F:
+    return 'f';
+  case KEY_G:
+    return 'g';
+  case KEY_H:
+    return 'h';
+  case KEY_I:
+    return 'i';
+  case KEY_J:
+    return 'j';
+  case KEY_K:
+    return 'k';
+  case KEY_L:
+    return 'l';
+  case KEY_M:
+    return 'm';
+  case KEY_N:
+    return 'n';
+  case KEY_O:
+    return 'o';
+  case KEY_P:
+    return 'p';
+  case KEY_Q:
+    return 'q';
+  case KEY_R:
+    return 'r';
+  case KEY_S:
+    return 's';
+  case KEY_T:
+    return 't';
+  case KEY_U:
+    return 'u';
+  case KEY_V:
+    return 'v';
+  case KEY_W:
+    return 'w';
+  case KEY_X:
+    return 'x';
+  case KEY_Y:
+    return 'y';
+  case KEY_Z:
+    return 'z';
+  case KEY_LEFT_BRACKET:
+    return '[' /* [ */;
+  case KEY_BACKSLASH:
+    return '\\' /* \ */;
+  case KEY_RIGHT_BRACKET:
+    return ']' /* ] */;
+  case KEY_GRAVE_ACCENT:
+    return '`' /* ` */;
+  case KEY_ESCAPE:
+    return 27;
+  case KEY_BACKSPACE:
+    return 8;
+  case KEY_DELETE:
+    return 127;
+  case KEY_TAB:
+    return '\t';
+  case KEY_ENTER:
+    return '\n';
+  default:
+    return 0;
+  }
+}
+static Key CharToKey(char c){
+  switch (c)
+  {
+    case ' ':
+      return KEY_SPACE;
+    case '\'':
+      return KEY_APOSTROPHE /* ' */;
+    case ',':
+      return KEY_COMMA /* , */;
+    case '-':
+      return KEY_MINUS /* - */;
+    case '.':
+      return KEY_PERIOD /* . */;
+    case '/':
+      return KEY_SLASH /* / */;
+    case '0':
+      return KEY_0;
+    case '1':
+      return KEY_1;
+    case '2':
+      return KEY_2;
+    case '3':
+      return KEY_3;
+    case '4':
+      return KEY_4;
+    case '5':
+      return KEY_5;
+    case '6':
+      return KEY_6;
+    case '7':
+      return KEY_7;
+    case '8':
+      return KEY_8;
+    case '9':
+      return KEY_9;
+    case ';':
+      return KEY_SEMICOLON /* ; */;
+    case '=':
+      return KEY_EQUAL /* = */;
+    case 'a':
+      return KEY_A;
+    case 'b':
+      return KEY_B;
+    case 'c':
+      return KEY_C;
+    case 'd':
+      return KEY_D;
+    case 'e':
+      return KEY_E;
+    case 'f':
+      return KEY_F;
+    case 'g':
+      return KEY_G;
+    case 'h':
+      return KEY_H;
+    case 'i':
+      return KEY_I;
+    case 'J':
+      return KEY_J;
+    case 'k':
+      return KEY_K;
+    case 'l':
+      return KEY_L;
+    case 'm':
+      return KEY_M;
+    case 'n':
+      return KEY_N;
+    case 'o':
+      return KEY_O;
+    case 'p':
+      return KEY_P;
+    case 'q':
+      return KEY_Q;
+    case 'r':
+      return KEY_R;
+    case 's':
+      return KEY_S;
+    case 't':
+      return KEY_T;
+    case 'u':
+      return KEY_U;
+    case 'v':
+      return KEY_V;
+    case 'w':
+      return KEY_W;
+    case 'x':
+      return KEY_X;
+    case 'y':
+      return KEY_Y;
+    case 'z':
+      return KEY_Z;
+    case '[':
+      return KEY_LEFT_BRACKET /* [ */;
+    case '\\':
+      return KEY_BACKSLASH /* \ */;
+    case ']':
+      return KEY_RIGHT_BRACKET /* ] */;
+    case '`':
+      return KEY_GRAVE_ACCENT /* ` */;
+    case 27:
+      return KEY_ESCAPE;
+    case 8:
+      return KEY_BACKSPACE;
+    case 127:
+      return KEY_DELETE;
+    case '\t':
+      return KEY_TAB;
+    case '\n':
+      return KEY_ENTER;
+    default:
+      return UNREGISTERED_KEY;
+  }
+}
 
 typedef enum cardinal8dir
 {

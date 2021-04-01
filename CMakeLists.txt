@@ -89,10 +89,17 @@ target_link_libraries(kNgine PRIVATE glad)
 
 if(APPLE)
 target_link_libraries(kNgine PRIVATE "-framework OpenGL -framework GLUT")
+
 else()
+
 add_subdirectory(extern/FreeGlut/freeglut/freeglut)
-target_link_libraries(kNgineFramework PRIVATE freeglut)
-target_link_libraries(kNgine PRIVATE freeglut)
+
+target_include_directories(kNgineFramework PRIVATE extern/FreeGlut/freeglut/freeglut/include)
+target_include_directories(kNgine PRIVATE extern/FreeGlut/freeglut/freeglut/include)
+
+target_link_libraries(kNgineFramework PRIVATE ${OPENGL_LIBRARIES} freeglut})
+# target_link_libraries(kNgine PRIVATE freeglut)
+target_link_libraries(kNgine PRIVATE ${OPENGL_LIBRARIES} freeglut)
 endif()
 
 else()
@@ -122,8 +129,6 @@ if(APPLE)
 elseif(WIN32)
   add_subdirectory(extern/openal-soft)
   target_link_libraries(kNgine PRIVATE OpenAL)
-   
-  target_link_libraries(kNgine PRIVATE "-lGL -ldl")
 elseif(UNIX)
   add_subdirectory(extern/openal-soft)
   target_link_libraries(kNgine PRIVATE OpenAL)

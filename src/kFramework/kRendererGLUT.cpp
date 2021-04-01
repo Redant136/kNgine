@@ -8,9 +8,6 @@
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
 #endif
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -64,20 +61,6 @@
 // void launch()
 // {
 //   glutMainLoop();
-// }
-
-// void setDrawColor(double r, double g, double b, double a)
-// {
-//   glColor4d(r, g, b, a);
-// }
-// void clear(double r, double g, double b, double a)
-// {
-//   glClearColor(r, g, b, a);
-//   glClear(GL_COLOR_BUFFER_BIT);
-// }
-// void clear()
-// {
-//   clear(1, 1, 1, 0);
 // }
 
 // void drawRect(v2 points[4])
@@ -206,6 +189,9 @@ static u32 currentContext = 0;
 static i32 defaultShader;
 static u32 defaultVAO = 0;
 
+bool keysPressed[MOUSE_LAST];
+iv2 mousePos;
+
 static f64 lastTime = 0;
 
 static const char *vertexShaderSource =
@@ -256,191 +242,6 @@ static const char *fragmentShaderSource =
 //   glViewport(0, 0, width, height);
 // }
 
-// static i32 KeyToGLFW(Key k)
-// {
-//   switch (k)
-//   {
-//   case SPACE:
-//     return GLFW_KEY_SPACE;
-//   case APOSTROPHE:
-//     return GLFW_KEY_APOSTROPHE /* ' */;
-//   case COMMA:
-//     return GLFW_KEY_COMMA /* , */;
-//   case MINUS:
-//     return GLFW_KEY_MINUS /* - */;
-//   case PERIOD:
-//     return GLFW_KEY_PERIOD /* . */;
-//   case SLASH:
-//     return GLFW_KEY_SLASH /* / */;
-//   case KEY_0:
-//     return GLFW_KEY_0;
-//   case KEY_1:
-//     return GLFW_KEY_1;
-//   case KEY_2:
-//     return GLFW_KEY_2;
-//   case KEY_3:
-//     return GLFW_KEY_3;
-//   case KEY_4:
-//     return GLFW_KEY_4;
-//   case KEY_5:
-//     return GLFW_KEY_5;
-//   case KEY_6:
-//     return GLFW_KEY_6;
-//   case KEY_7:
-//     return GLFW_KEY_7;
-//   case KEY_8:
-//     return GLFW_KEY_8;
-//   case KEY_9:
-//     return GLFW_KEY_9;
-//   case SEMICOLON:
-//     return GLFW_KEY_SEMICOLON /* ; */;
-//   case EQUAL:
-//     return GLFW_KEY_EQUAL /* = */;
-//   case KEY_A:
-//     return GLFW_KEY_A;
-//   case KEY_B:
-//     return GLFW_KEY_B;
-//   case KEY_C:
-//     return GLFW_KEY_C;
-//   case KEY_D:
-//     return GLFW_KEY_D;
-//   case KEY_E:
-//     return GLFW_KEY_E;
-//   case KEY_F:
-//     return GLFW_KEY_F;
-//   case KEY_G:
-//     return GLFW_KEY_G;
-//   case KEY_H:
-//     return GLFW_KEY_H;
-//   case KEY_I:
-//     return GLFW_KEY_I;
-//   case KEY_J:
-//     return GLFW_KEY_J;
-//   case KEY_K:
-//     return GLFW_KEY_K;
-//   case KEY_L:
-//     return GLFW_KEY_L;
-//   case KEY_M:
-//     return GLFW_KEY_M;
-//   case KEY_N:
-//     return GLFW_KEY_N;
-//   case KEY_O:
-//     return GLFW_KEY_O;
-//   case KEY_P:
-//     return GLFW_KEY_P;
-//   case KEY_Q:
-//     return GLFW_KEY_Q;
-//   case KEY_R:
-//     return GLFW_KEY_R;
-//   case KEY_S:
-//     return GLFW_KEY_S;
-//   case KEY_T:
-//     return GLFW_KEY_T;
-//   case KEY_U:
-//     return GLFW_KEY_U;
-//   case KEY_V:
-//     return GLFW_KEY_V;
-//   case KEY_W:
-//     return GLFW_KEY_W;
-//   case KEY_X:
-//     return GLFW_KEY_X;
-//   case KEY_Y:
-//     return GLFW_KEY_Y;
-//   case KEY_Z:
-//     return GLFW_KEY_Z;
-//   case LEFT_BRACKET:
-//     return GLFW_KEY_LEFT_BRACKET /* [ */;
-//   case BACKSLASH:
-//     return GLFW_KEY_BACKSLASH /* \ */;
-//   case RIGHT_BRACKET:
-//     return GLFW_KEY_RIGHT_BRACKET /* ] */;
-//   case GRAVE_ACCENT:
-//     return GLFW_KEY_GRAVE_ACCENT /* ` */;
-//   case ESCAPE:
-//     return GLFW_KEY_ESCAPE;
-//   case ENTER:
-//     return GLFW_KEY_ENTER;
-//   case TAB:
-//     return GLFW_KEY_TAB;
-//   case BACKSPACE:
-//     return GLFW_KEY_BACKSPACE;
-//   case KEY_RIGHT:
-//     return GLFW_KEY_RIGHT;
-//   case KEY_LEFT:
-//     return GLFW_KEY_LEFT;
-//   case KEY_DOWN:
-//     return GLFW_KEY_DOWN;
-//   case KEY_UP:
-//     return GLFW_KEY_UP;
-//   case F1:
-//     return GLFW_KEY_F1;
-//   case F2:
-//     return GLFW_KEY_F2;
-//   case F3:
-//     return GLFW_KEY_F3;
-//   case F4:
-//     return GLFW_KEY_F4;
-//   case F5:
-//     return GLFW_KEY_F5;
-//   case F6:
-//     return GLFW_KEY_F6;
-//   case F7:
-//     return GLFW_KEY_F7;
-//   case F8:
-//     return GLFW_KEY_F8;
-//   case F9:
-//     return GLFW_KEY_F9;
-//   case F10:
-//     return GLFW_KEY_F10;
-//   case F11:
-//     return GLFW_KEY_F11;
-//   case F12:
-//     return GLFW_KEY_F12;
-//   case F13:
-//     return GLFW_KEY_F13;
-//   case F14:
-//     return GLFW_KEY_F14;
-//   case F15:
-//     return GLFW_KEY_F15;
-//   case F16:
-//     return GLFW_KEY_F16;
-//   case F17:
-//     return GLFW_KEY_F17;
-//   case F18:
-//     return GLFW_KEY_F18;
-//   case F19:
-//     return GLFW_KEY_F19;
-//   case F20:
-//     return GLFW_KEY_F20;
-//   case F21:
-//     return GLFW_KEY_F21;
-//   case F22:
-//     return GLFW_KEY_F22;
-//   case F23:
-//     return GLFW_KEY_F23;
-//   case F24:
-//     return GLFW_KEY_F24;
-//   case F25:
-//     return GLFW_KEY_F25;
-//   case LEFT_SHIFT:
-//     return GLFW_KEY_LEFT_SHIFT;
-//   case LEFT_CONTROL:
-//     return GLFW_KEY_LEFT_CONTROL;
-//   case LEFT_ALT:
-//     return GLFW_KEY_LEFT_ALT;
-//   case LEFT_SUPER:
-//     return GLFW_KEY_LEFT_SUPER;
-//   case RIGHT_SHIFT:
-//     return GLFW_KEY_RIGHT_SHIFT;
-//   case RIGHT_CONTROL:
-//     return GLFW_KEY_RIGHT_CONTROL;
-//   case RIGHT_ALT:
-//     return GLFW_KEY_RIGHT_ALT;
-//   default:
-//     return GLFW_KEY_UNKNOWN;
-//   }
-// }
-
 // static i32 MouseToGLFW(Key k)
 // {
 //   switch (k)
@@ -465,6 +266,130 @@ static const char *fragmentShaderSource =
 //     return GLFW_MOUSE_BUTTON_1;
 //   }
 // }
+
+static u32 KeyToGlutSpecial(Key k){
+  switch (k)
+  {
+    case KEY_RIGHT:
+      return GLUT_KEY_RIGHT;
+    case KEY_LEFT:
+      return GLUT_KEY_LEFT;
+    case KEY_DOWN:
+      return GLUT_KEY_DOWN;
+    case KEY_UP:
+      return GLUT_KEY_UP;
+    case KEY_F1:
+      return GLUT_KEY_F1;
+    case KEY_F2:
+      return GLUT_KEY_F2;
+    case KEY_F3:
+      return GLUT_KEY_F3;
+    case KEY_F4:
+      return GLUT_KEY_F4;
+    case KEY_F5:
+      return GLUT_KEY_F5;
+    case KEY_F6:
+      return GLUT_KEY_F6;
+    case KEY_F7:
+      return GLUT_KEY_F7;
+    case KEY_F8:
+      return GLUT_KEY_F8;
+    case KEY_F9:
+      return GLUT_KEY_F9;
+    case KEY_F10:
+      return GLUT_KEY_F10;
+    case KEY_F11:
+      return GLUT_KEY_F11;
+    case KEY_F12:
+      return GLUT_KEY_F12;
+    default:
+      return 0;
+  }
+}
+static Key GlutKeyToKey(i32 k){
+    switch (k)
+  {
+    case GLUT_KEY_RIGHT:
+      return KEY_RIGHT;
+    case GLUT_KEY_LEFT:
+      return KEY_LEFT;
+    case GLUT_KEY_DOWN:
+      return KEY_DOWN;
+    case GLUT_KEY_UP:
+      return KEY_UP;
+    case GLUT_KEY_F1:
+      return KEY_F1;
+    case GLUT_KEY_F2:
+      return KEY_F2;
+    case GLUT_KEY_F3:
+      return KEY_F3;
+    case GLUT_KEY_F4:
+      return KEY_F4;
+    case GLUT_KEY_F5:
+      return KEY_F5;
+    case GLUT_KEY_F6:
+      return KEY_F6;
+    case GLUT_KEY_F7:
+      return KEY_F7;
+    case GLUT_KEY_F8:
+      return KEY_F8;
+    case GLUT_KEY_F9:
+      return KEY_F9;
+    case GLUT_KEY_F10:
+      return KEY_F10;
+    case GLUT_KEY_F11:
+      return KEY_F11;
+    case GLUT_KEY_F12:
+      return KEY_F12;
+    default:
+      return UNREGISTERED_KEY;
+  }
+}
+static i32 KeyToGlutKeyModifier(Key k){
+  switch(k){
+    case KEY_LEFT_SHIFT:
+      return GLUT_ACTIVE_SHIFT;
+    case KEY_LEFT_CONTROL:
+      return GLUT_ACTIVE_CTRL;
+    case KEY_LEFT_ALT:
+      return GLUT_ACTIVE_ALT;
+    case KEY_LEFT_SUPER: // glut doesnt have a super key
+      return 0;
+    case KEY_RIGHT_SHIFT:
+      return GLUT_ACTIVE_SHIFT;
+    case KEY_RIGHT_CONTROL:
+      return GLUT_ACTIVE_CTRL;
+    case KEY_RIGHT_ALT:
+      return GLUT_ACTIVE_ALT;
+    default:
+      return 0;
+  }
+}
+static Key GlutModifierKeyToKey(i32 k){
+  switch(k){
+    case GLUT_ACTIVE_SHIFT:
+      return KEY_LEFT_SHIFT;
+    case GLUT_ACTIVE_CTRL:
+      return KEY_LEFT_CONTROL;
+    case GLUT_ACTIVE_ALT:
+      return KEY_LEFT_ALT;
+    default:
+      return UNREGISTERED_KEY;
+  }
+}
+static Key GlutMouseToKey(i32 k){
+  switch (k)
+  {
+  case GLUT_LEFT_BUTTON:
+    return MOUSE_LEFT;
+  case GLUT_MIDDLE_BUTTON:
+    return MOUSE_MIDDLE;
+  case GLUT_RIGHT_BUTTON:
+    return MOUSE_RIGHT;
+  default:
+    return UNREGISTERED_KEY;
+  }
+}
 
 static void compileShaders()
 {
@@ -633,6 +558,25 @@ i32 kRenderer_createWindow(kRenderer_WindowContext *context)
     }
   }
 
+  glutKeyboardFunc([](unsigned char c,i32 x,i32 y){
+    keysPressed[CharToKey(c)]=true;
+  });
+  glutKeyboardUpFunc([](unsigned char c,i32 x,i32 y){
+    keysPressed[CharToKey(c)]=false;
+  });
+  glutSpecialFunc([](i32 c,i32 x,i32 y){
+    keysPressed[GlutKeyToKey(c)]=true;
+  });
+  glutSpecialUpFunc([](i32 c,i32 x,i32 y){
+    keysPressed[GlutKeyToKey(c)]=false;
+  });
+  glutMouseFunc([](i32 button,i32 state,i32 x,i32 y){
+    keysPressed[GlutMouseToKey(button)]=state==GLUT_DOWN;
+  });
+  glutPassiveMotionFunc([](i32 x,i32 y){
+    mousePos=iv2(x,y);
+  });
+
   // if (defaultVAO == 0)
   // {
   //   glGenVertexArrays(1, &defaultVAO);
@@ -704,6 +648,9 @@ void kRenderer_launch()
     });
     glutIdleFunc([]() {
       glClear(GL_COLOR_BUFFER_BIT);
+      for(u32 i=KEY_LEFT_SHIFT;i<KEY_LAST;i++){
+        keysPressed[i]=glutGetModifiers()&KeyToGlutKeyModifier((Key)i);
+      }
       kRenderer_WindowsContexts.windows[currentContext].context->draw();
       glutSwapBuffers();
     });
@@ -1262,7 +1209,7 @@ void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale
 // key input
 bool kRenderer_keyStatusPressed(Key e)
 {
-  // return glfwGetKey(kRenderer_WindowsContexts.windows[currentContext].window, KeyToGLFW(e)) == GLFW_PRESS;
+  return keysPressed[e];
 }
 v2 kRenderer_cursorPosition()
 {
@@ -1272,28 +1219,23 @@ v2 kRenderer_cursorPosition()
 }
 bool kRenderer_mouseStatusPressed(Key e)
 {
-  // return glfwGetMouseButton(kRenderer_WindowsContexts.windows[currentContext].window, MouseToGLFW(e)) == GLFW_PRESS;
+  return keysPressed[e];
 }
 
 i32 kRenderer_getWindowWidth()
 {
-  i32 width, height;
-  // glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
-  return width;
+  return glutGet(GLUT_WINDOW_WIDTH);
 }
 i32 kRenderer_getWindowHeight()
 {
-  i32 width, height;
-  // glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
-  return height;
+  return glutGet(GLUT_WINDOW_HEIGHT);
 }
 iv2 kRenderer_getWindowSize()
 {
-  i32 width, height;
-  // glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
-  return iv2(width, height);
+  return iv2(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 }
 f64 kRenderer_getTimeSinceLastFrame()
 {
   // return glfwGetTime() - lastTime;
+  return 0;
 }
