@@ -3,14 +3,11 @@
 # main branch
 
 ## currently working on
-- [x] make key message bit manipulation
-- [x] display debug info such as fps
-- [x] custom shader in renderer
 ## testing
-- [x] text in renderer
 - [ ] test custom shader in renderer
 - [ ] test openal on linux to see if bug is windows only
 ## next step
+- [ ] use audiofile lib (https://github.com/adamstark/AudioFile.git)
 - [ ] object info tool
 - [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf, glfw opengl ES)
 - [ ] openal audio engine
