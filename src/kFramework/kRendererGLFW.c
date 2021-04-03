@@ -1,8 +1,10 @@
 #include <math.h>
+#include <glad/glad.h>
 #define utils_StrManipulation
 #include "utils.h"
+#ifndef kRenderer_HeaderOnly
 #include "kRenderer.h"
-#include <glad/glad.h>
+#endif
 #ifdef __unix__
 #define GLFW_INCLUDE_GLCOREARB
 #endif
@@ -12,10 +14,10 @@
 
 #include <stdio.h>
 
-FT_Library ft;
-
 static v3 rotation = {0, 0, 0};
 
+// fonts
+static FT_Library ft;
 static struct
 {
   u32 currentFont;
@@ -35,6 +37,7 @@ static struct
   } fonts[kRenderer_maxFonts];
 } fontMaps;
 
+// window info
 static struct
 {
   size_t length;
@@ -369,6 +372,23 @@ static void compileShaders()
       {
         i32 shader;
         GLenum shaderType;
+#ifdef __cplusplus
+        switch (kRenderer_WindowsContexts.windows[i].context->windowShaders.programs[j].shaders[s].shaderType)
+        {
+        case kRenderer_WindowContext::kRenderer_SHADER_Vertex:
+          shaderType = GL_VERTEX_SHADER;
+          break;
+        case kRenderer_WindowContext::kRenderer_SHADER_Fragment:
+          shaderType = GL_FRAGMENT_SHADER;
+          break;
+        case kRenderer_WindowContext::kRenderer_SHADER_Geometry:
+          shaderType = GL_GEOMETRY_SHADER;
+          break;
+        default:
+          shaderType = GL_VERTEX_SHADER;
+          break;
+        }
+#else
         switch (kRenderer_WindowsContexts.windows[i].context->windowShaders.programs[j].shaders[s].shaderType)
         {
         case kRenderer_SHADER_Vertex:
@@ -384,6 +404,7 @@ static void compileShaders()
           shaderType = GL_VERTEX_SHADER;
           break;
         }
+#endif
         shader = glCreateShader(shaderType);
         glShaderSource(shader, 1, &kRenderer_WindowsContexts.windows[i].context->windowShaders.programs[j].shaders[s].shader, NULL);
         glCompileShader(shader);
@@ -411,15 +432,6 @@ static void compileShaders()
     }
   }
 }
-static m4 getMapper()
-{
-  m4 mapper = M4InitDiagonal(1);
-  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.x, v3(1, 0, 0)));
-  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.y, v3(0, 1, 0)));
-  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.z, v3(0, 0, 1)));
-  mapper = M4MultiplyM4(mapper, M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max, v3(-1, -1, -1), v3(1, 1, 1)));
-  return mapper;
-}
 
 i32 kRenderer_init(i32 argc, const char **argv)
 {
@@ -438,7 +450,11 @@ i32 kRenderer_init(i32 argc, const char **argv)
 }
 i32 kRenderer_createContext(kRenderer_WindowContext *context)
 {
-  kRenderer_WindowContext c = {"kRenderer", v4(1, 1, 1, 1), iv2(1920, 1080), true, {1, {{{3, {kTYPE_v3, kTYPE_BOOL, kTYPE_v4}}, 2, {{kRenderer_SHADER_Vertex, vertexShaderSource}, {kRenderer_SHADER_Fragment, fragmentShaderSource}}}}}, NULL, NULL};
+#ifdef __cplusplus
+  kRenderer_WindowContext c = {"kRenderer", v4(1, 1, 1, 1), iv2(1920, 1080), true, {1, {{{3, {kTYPE_v3, kTYPE_bool, kTYPE_v4}}, 2, {{kRenderer_WindowContext::kRenderer_SHADER_Vertex, vertexShaderSource}, {kRenderer_WindowContext::kRenderer_SHADER_Fragment, fragmentShaderSource}}}}}, NULL, NULL};
+#else
+  kRenderer_WindowContext c = {"kRenderer", v4(1, 1, 1, 1), iv2(1920, 1080), true, {1, {{{3, {kTYPE_v3, kTYPE_bool, kTYPE_v4}}, 2, {{kRenderer_SHADER_Vertex, vertexShaderSource}, {kRenderer_SHADER_Fragment, fragmentShaderSource}}}}}, NULL, NULL};
+#endif
   *context = c;
   assert(kRenderer_WindowsContexts.length < kRenderer_maxWindows);
   currentContext = (u32)kRenderer_WindowsContexts.length;
@@ -483,11 +499,12 @@ i32 kRenderer_createWindow(kRenderer_WindowContext *context)
     {
       kRenderer_WindowsContexts.windows[i].window = window;
       if (fCompare(kRenderer_WindowsContexts.windows[currentContext].min.y, kRenderer_WindowsContexts.windows[currentContext].context->height) &&
-          fCompare(kRenderer_WindowsContexts.windows[currentContext].max.x, kRenderer_WindowsContexts.windows[currentContext].context->width)){
+          fCompare(kRenderer_WindowsContexts.windows[currentContext].max.x, kRenderer_WindowsContexts.windows[currentContext].context->width))
+      {
         kRenderer_WindowsContexts.windows[i].min = v3(0.f, (f32)kRenderer_getWindowHeight(), 0.f);
         kRenderer_WindowsContexts.windows[i].max = v3((f32)kRenderer_getWindowWidth(), 0.f, 1.f);
       }
-      kRenderer_WindowsContexts.windows[currentContext].context->windowSize=kRenderer_getWindowSize();
+      kRenderer_WindowsContexts.windows[currentContext].context->windowSize = kRenderer_getWindowSize();
     }
   }
   if (defaultVAO == 0)
@@ -510,7 +527,6 @@ void kRenderer_setWindowSize(i32 width, i32 height)
   {
     kRenderer_WindowsContexts.windows[currentContext].max.x = (f32)width;
     kRenderer_WindowsContexts.windows[currentContext].min.y = (f32)height;
-    
   }
   kRenderer_WindowsContexts.windows[currentContext].context->windowSize = iv2(width, height);
   if (kRenderer_WindowsContexts.windows[currentContext].window != NULL)
@@ -571,7 +587,7 @@ void kRenderer_launch()
       glClear(GL_COLOR_BUFFER_BIT);
       currentContext = i;
       kRenderer_WindowsContexts.windows[i].context->draw();
-      glfwSwapInterval(kRenderer_WindowsContexts.windows[i].context->gSync ? 1 : 0);
+      glfwSwapInterval(kRenderer_WindowsContexts.windows[i].context->vSync ? 1 : 0);
       glfwSwapBuffers(kRenderer_WindowsContexts.windows[i].window);
       glfwPollEvents();
       running |= !glfwWindowShouldClose(kRenderer_WindowsContexts.windows[i].window);
@@ -613,7 +629,7 @@ void kRenderer_loadFont(const char *fontPath, const char *fontName)
         return;
       }
       // generate texture
-      u8 *grayScaleBuffer = malloc(sizeof(u8) * face->glyph->bitmap.width * face->glyph->bitmap.rows * 4);
+      u8 *grayScaleBuffer = (u8 *)malloc(sizeof(u8) * face->glyph->bitmap.width * face->glyph->bitmap.rows * 4);
       for (u32 y = 0; y < face->glyph->bitmap.rows; y++)
       {
         for (u32 x = 0; x < face->glyph->bitmap.width; x++)
@@ -621,7 +637,7 @@ void kRenderer_loadFont(const char *fontPath, const char *fontName)
           grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4] = 255;
           grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 1] = 255;
           grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 2] = 255;
-          grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 3] = face->glyph->bitmap.buffer[y * face->glyph->bitmap.width+x];
+          grayScaleBuffer[(y * face->glyph->bitmap.width + x) * 4 + 3] = face->glyph->bitmap.buffer[y * face->glyph->bitmap.width + x];
         }
       }
       u32 texture;
@@ -663,7 +679,7 @@ void kRenderer_drawRect(v2 points[4])
 }
 void kRenderer_drawRectV4(v4 rect)
 {
-  v2 points[4] = {toV2(rect), 
+  v2 points[4] = {toV2(rect),
                   v2(rect.x, rect.y + rect.height),
                   v2(rect.x + rect.width, rect.y),
                   v2(rect.x + rect.width, rect.y + rect.height)};
@@ -681,7 +697,7 @@ void kRenderer_drawTriangle(v2 points[3])
   for (u32 i = 0; i < 3; i++)
   {
     v4 rP = {points[i].x, points[i].y, 0.0f, 1.0f};
-    rP = V4MultiplyM4(rP, getMapper());
+    rP = V4MultiplyM4(rP, kRenderer_getMapper());
     struct corner a = {v3(rP.x, rP.y, rP.z),
                        0.0f,
                        kRenderer_WindowsContexts.windows[currentContext].context->currentColor};
@@ -720,7 +736,7 @@ void kRenderer_drawLine(v2 points[2])
   for (u32 i = 0; i < 2; i++)
   {
     v4 rP = {points[i].x, points[i].y, 0.0f, 1.0f};
-    rP = V4MultiplyM4(rP, getMapper());
+    rP = V4MultiplyM4(rP, kRenderer_getMapper());
     struct corner a = {v3(rP.x, rP.y, 0.0f),
                        false,
                        kRenderer_WindowsContexts.windows[currentContext].context->currentColor};
@@ -780,11 +796,11 @@ void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferH
   kRenderer_unbindTexture(texture);
 }
 void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-                          v3 position, i32 width, i32 height, v3 rotation, void *args[kRenderer_maxShaderPrograms]) // TODO
+                          void *args[kRenderer_maxShaderPrograms][4]) // TODO
 {
   u32 texture;
   kRenderer_bindTexture(&texture, buffer, bufferWidth, bufferHeight, numChannels);
-  kRenderer_drawStoredTexture(texture, position, width, height, rotation, args);
+  kRenderer_drawStoredTexture(texture, args);
   kRenderer_unbindTexture(texture);
 }
 
@@ -825,7 +841,7 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i3
   struct corner corners[4];
 
   m4 mat = M4InitDiagonal(1.0f);
-  mat = M4MultiplyM4(mat, getMapper());
+  mat = M4MultiplyM4(mat, kRenderer_getMapper());
 
   mat = M4MultiplyM4(mat, M4TranslateV3(position));
   mat = M4MultiplyM4(mat, M4TranslateV3(v3(width / 2.f, height / 2.f, 0.f)));
@@ -875,101 +891,104 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i3
   glUniform4f(glGetUniformLocation(defaultShader, "colorScale"), 1.0, 1.0, 1.0, 1.0);
   glDeleteBuffers(1, &VBO);
 }
-void kRenderer_drawStoredTexture(u32 textureIndex, v3 position, i32 width, i32 height,
-                                 v3 rotation, void *args[kRenderer_maxShaderPrograms]) // TODO
+void kRenderer_drawStoredTexture(u32 textureIndex, void *args[kRenderer_maxShaderPrograms][4]) // TODO
 {
+  kRenderer_WindowContext *current = kRenderer_WindowsContexts.windows[currentContext].context;
+  for (u32 i = 0; i < current->windowShaders.length; i++)
+  {
+    u32 VBO, VAO;
+    glBindTexture(GL_TEXTURE_2D, textureIndex);
 
-  // struct corner {v3 pos;f32 b;v4 color;};
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-  // f32 vertices[] = {0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-  //                   0.5, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-  //                   -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-  //                   -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-  // u32 indices[] = {0, 1, 3, 0, 2, 3};
-  // u32 VBO, VAO, EBO;
-  // glGenVertexArrays(1, &VAO);
-  // glGenBuffers(1, &VBO);
-  // glBindVertexArray(VAO); // setup variables in gpu memory
-  // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
-  //              GL_STATIC_DRAW); // initialise value VBO
-  // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float),
-  //                       (void *)0); // 3 values xyz,size for one point
-  // glEnableVertexAttribArray(0);
-  // glVertexAttribPointer(
-  //     1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float),
-  //     (void *)(3 * sizeof(float))); // 4 values rgba,size for one point
-  // glEnableVertexAttribArray(1);     // set values of VAO to pass to shader
-  // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float),
-  //                       (void *)(7 * sizeof(float)));
-  // glEnableVertexAttribArray(2);
-  // glGenBuffers(1, &EBO);
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-  //              GL_STATIC_DRAW);
+    struct shaderElement
+    {
+      u32 numElements;
+      f32 elements[kStruct_arg_def_max_length * 4]; // times 4 because v4
+    };
+    struct shaderElement formatedArgs[4];
+    for (u32 e = 0; e < 4; e++)
+    {
+      formatedArgs[e].numElements = 0;
+      for (u32 j = 0; j < current->windowShaders.programs[i].argsDef.length; j++)
+      {
+#ifdef __cplusplus
+        if (current->windowShaders.programs[i].argsDef.args[j] >= kTypes::kTYPE_v2)
+#else
+        if (current->windowShaders.programs[i].argsDef.args[j] >= kTYPE_v2)
+#endif
+        {
+          if(kTypeSizeByte(current->windowShaders.programs[i].argsDef.args[j])==8){
+            v2 v;
+            kCastType(v2, v, getElementOfObjectAtIndex(j, current->windowShaders.programs[i].argsDef, args), current->windowShaders.programs[i].argsDef.args[j]);
+            formatedArgs[e].elements[formatedArgs[e].numElements]=v.x;
+            formatedArgs[e].elements[formatedArgs[e].numElements+1] = v.y;
+            formatedArgs[e].numElements+=2;
+          }
+          else if (kTypeSizeByte(current->windowShaders.programs[i].argsDef.args[j]) == 12)
+          {
+            v3 v;
+            kCastType(v3, v, getElementOfObjectAtIndex(j, current->windowShaders.programs[i].argsDef, args), current->windowShaders.programs[i].argsDef.args[j]);
+            formatedArgs[e].elements[formatedArgs[e].numElements]=v.x;
+            formatedArgs[e].elements[formatedArgs[e].numElements+1] = v.y;
+            formatedArgs[e].elements[formatedArgs[e].numElements + 2] = v.z;
+            formatedArgs[e].numElements+=3;
+          }
+          else if (kTypeSizeByte(current->windowShaders.programs[i].argsDef.args[j]) == 16)
+          {
+            v4 v;
+            kCastType(v4, v, getElementOfObjectAtIndex(j, current->windowShaders.programs[i].argsDef, args), current->windowShaders.programs[i].argsDef.args[j]);
+            formatedArgs[e].elements[formatedArgs[e].numElements] = v.x;
+            formatedArgs[e].elements[formatedArgs[e].numElements + 1] = v.y;
+            formatedArgs[e].elements[formatedArgs[e].numElements + 2] = v.z;
+            formatedArgs[e].elements[formatedArgs[e].numElements + 3] = v.w;
+            formatedArgs[e].numElements += 4;
+          }
+        }
+        else
+        {
+          kCastType(f32, formatedArgs[e].elements[formatedArgs[e].numElements], getElementOfObjectAtIndex(j, current->windowShaders.programs[i].argsDef, args), current->windowShaders.programs[i].argsDef.args[j]);
+          formatedArgs[e].numElements++;
+        }
+      }
+    }
 
-  // u32 texture;
-  // glGenTextures(1, &texture);
-  // glBindTexture(GL_TEXTURE_2D, texture);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  // glActiveTexture(GL_TEXTURE0);
-  // glBindTexture(GL_TEXTURE_2D, texture);
-  // if (numChannels == 3)
-  // {
-  //   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, realWidth, realHeight, 0, GL_RGB,
-  //                GL_UNSIGNED_BYTE, colors);
-  // }
-  // else
-  // {
-  //   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, realWidth, realHeight, 0, GL_RGBA,
-  //                GL_UNSIGNED_BYTE, colors);
-  // }
-  // glGenerateMipmap(GL_TEXTURE_2D);
+    struct shaderElement corners[6] = {formatedArgs[0], formatedArgs[1], formatedArgs[3], formatedArgs[0], formatedArgs[2], formatedArgs[3]};
+    glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 6 * formatedArgs[0].numElements, corners, GL_STATIC_DRAW);
+    u32 currentElementsIndex;
+    for (u32 j = 0; j < current->windowShaders.programs[i].argsDef.length; j++)
+    {
+#ifdef __cplusplus
+      if (current->windowShaders.programs[i].argsDef.args[j] >= kTypes::kTYPE_v2)
+#else
+      if (current->windowShaders.programs[i].argsDef.args[j] >= kTYPE_v2)
+#endif
+      {
+        u8 offset=kTypeSizeByte(current->windowShaders.programs[i].argsDef.args[j])/4;
+        glVertexAttribPointer(j, offset, GL_FLOAT, GL_FALSE, sizeof(f32) * formatedArgs[0].numElements, (void *)(sizeof(f32) * currentElementsIndex));
+        currentElementsIndex += offset;
+      }
+      else
+      {
+        glVertexAttribPointer(j, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * formatedArgs[0].numElements, (void *)(sizeof(f32) * currentElementsIndex));
+        currentElementsIndex++;
+      }
+      glEnableVertexAttribArray(j);
+    }
 
-  // // draw------
-  // glEnable(GL_BLEND);
-  // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  // iv2 windowSize = kRenderer_getWindowSize();
-  // glActiveTexture(GL_TEXTURE0);
-  // glBindTexture(GL_TEXTURE_2D, texture);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindVertexArray(VAO);
 
-  // glm::mat4 transform = glm::mat4(1.0f);
-  // transform = glm::translate(
-  //     transform,
-  //     glm::vec3(
-  //         (float)((position.x + width / 2) / kRenderer_getWindowWidth()) *
-  //                 2.0f -
-  //             1.0f,
-  //         (float)-((position.y + height / 2) / kRenderer_getWindowHeight()) *
-  //                 2.0f +
-  //             1.0f,
-  //         0.0f));
-  // transform = glm::scale(
-  //     transform,
-  //     glm::vec3((float)(((float)width) / windowSize.x) * 2.0f,
-  //               (float)-(((float)height) / windowSize.y) * 2.0f, 1.0f));
-  // transform = glm::rotate(transform, -rotation.x,
-  //                         glm::vec3(1.0f, 0.0f, 0.0f));
-  // transform = glm::rotate(transform, -rotation.y,
-  //                         glm::vec3(0.0f, 1.0f, 0.0f));
-  // transform = glm::rotate(transform, -rotation.z,
-  //                         glm::vec3(0.0f, 0.0f, 1.0f));
-
-  // glUseProgram(shaderProgram);
-  // u32 transformLoc = glGetUniformLocation(shaderProgram, "transform");
-  // // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  // glBindVertexArray(VAO);
-  // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-  // // transform = glm::mat4(1.0f);
-  // // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-  // glDeleteTextures(1, &texture);
-  // glDeleteVertexArrays(1, &VAO);
-  // glDeleteBuffers(1, &VBO);
-  // glDeleteBuffers(1, &EBO);
+    glUseProgram(kRenderer_WindowsContexts.windows[currentContext].shaderPrograms[i]);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+  }
 }
 void kRenderer_unbindTexture(u32 textureIndex)
 {
@@ -1031,7 +1050,7 @@ void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale
   mat = M4MultiplyM4(mat, M4Rotate(rotation.y, v3(0.f, 1.f, 0.f)));
   mat = M4MultiplyM4(mat, M4Rotate(rotation.z, v3(0.f, 0.f, 1.f)));
   mat = M4MultiplyM4(mat, M4TranslateV3(v3(-(pixWidth / 2.f), -(pixHeight / 2.f), 0)));
-  mat = M4MultiplyM4(mat, M4TranslateV3(V3MultiplyF32(toV3(pixelPos),-1.f)));
+  mat = M4MultiplyM4(mat, M4TranslateV3(V3MultiplyF32(toV3(pixelPos), -1.f)));
 
   u32 widthOffset = 0;
   struct corner
@@ -1073,7 +1092,7 @@ void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale
 
       glGenBuffers(1, &VBO);
       glBindBuffer(GL_ARRAY_BUFFER, VBO);
-      glBindVertexArray(defaultVAO); // setup variables in gpu memory
+      glBindVertexArray(defaultVAO);                                                      // setup variables in gpu memory
       glBufferData(GL_ARRAY_BUFFER, sizeof(struct corner) * 6, corners1, GL_STATIC_DRAW); // initialise value VBO
 
       glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
@@ -1106,9 +1125,9 @@ v2 kRenderer_cursorPosition()
 {
   f64 xpos, ypos;
   glfwGetCursorPos(kRenderer_WindowsContexts.windows[currentContext].window, &xpos, &ypos);
-  v4 v=v4(xpos,ypos,0,1);
-  v=V4MultiplyM4(v, M4Mapper(v3(0,kRenderer_getWindowHeight(),0),v3(kRenderer_getWindowWidth(),0,0),kRenderer_WindowsContexts.windows[currentContext].min,v3(0,0,0)));
-  return v2(v.x,v.y);
+  v4 v = v4(xpos, ypos, 0, 1);
+  v = V4MultiplyM4(v, M4Mapper(v3(0, kRenderer_getWindowHeight(), 0), v3(kRenderer_getWindowWidth(), 0, 1), kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max));
+  return v2(v.x, v.y);
 }
 bool kRenderer_mouseStatusPressed(Key e)
 {
@@ -1136,4 +1155,13 @@ iv2 kRenderer_getWindowSize()
 f64 kRenderer_getTimeSinceLastFrame()
 {
   return glfwGetTime() - lastTime;
+}
+m4 kRenderer_getMapper()
+{
+  m4 mapper = M4InitDiagonal(1);
+  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.x, v3(1, 0, 0)));
+  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.y, v3(0, 1, 0)));
+  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.z, v3(0, 0, 1)));
+  mapper = M4MultiplyM4(mapper, M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max, v3(-1, -1, -1), v3(1, 1, 1)));
+  return mapper;
 }

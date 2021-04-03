@@ -1,5 +1,6 @@
 #pragma once
 
+#define utils_StrManipulation
 #include "utils.h"
 #include "kStruct_def.h"
 
@@ -26,7 +27,7 @@ extern "C"
         u32 height;
       };
     };
-    bool gSync;
+    bool vSync;
     enum shaderTypes
     {
       kRenderer_SHADER_Vertex,
@@ -87,10 +88,10 @@ extern "C"
   void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
                                           v3 position, i32 width, i32 height, v3 rotation);
   void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-                            v3 position, i32 width, i32 height, v3 rotation, void *args[kRenderer_maxShaderPrograms]);
+                            void *args[kRenderer_maxShaderPrograms][4]);
   void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer, i32 bufferWidth, i32 bufferHeight, i32 numChannels);
   void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation);
-  void kRenderer_drawStoredTexture(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation, void *args[kRenderer_maxShaderPrograms]);
+  void kRenderer_drawStoredTexture(u32 textureIndex, void *args[kRenderer_maxShaderPrograms][4]);
   void kRenderer_unbindTexture(u32 textureIndex);
 
   void kRenderer_setFont(const char*fontName);
@@ -106,6 +107,12 @@ extern "C"
   i32 kRenderer_getWindowHeight();
   iv2 kRenderer_getWindowSize();
   f64 kRenderer_getTimeSinceLastFrame();
+  m4 kRenderer_getMapper();
+
+// this is not precompiled, as such the user will have to provide their own glad, glfw and freetype lib
+#ifdef kRenderer_HeaderOnly
+#include "kRendererGLFW.c"
+#endif
 
 #ifdef __cplusplus
 }

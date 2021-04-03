@@ -17,10 +17,6 @@
 
 #define ArrayCount(a) (sizeof(a) / sizeof((a)[0]))
 
-#define Bytes(n) (n)
-#define Kilobytes(n) (Bytes(n) * 1024)
-#define Megabytes(n) (Kilobytes(n) * 1024)
-
 #define PIf 3.1415926535897f
 #define ONE_OVER_SQUARE_ROOT_OF_TWO_PI 0.3989422804
 #define ONE_OVER_SQUARE_ROOT_OF_TWO_PIf 0.3989422804f
@@ -45,10 +41,13 @@ typedef double f64;
 #endif
 
 
-typedef struct v2
+typedef union v2
 {
-  float x;
-  float y;
+  struct{
+    float x;
+    float y;
+  };
+  float elements[2];
 } v2;
 typedef union v3
 {
@@ -131,10 +130,13 @@ static v4 V4Init(float x, float y, float z, float w)
 #define v4(x, y, z, w) V4Init(x, y, z, w)
 #define v4u(x) v4(x, x, x, x)
 
-typedef struct iv2
+typedef union iv2
 {
-  int32_t x;
-  int32_t y;
+  struct{
+    int32_t x;
+    int32_t y;
+  };
+  int32_t elements[2];
 } iv2;
 typedef union iv3
 {
@@ -839,12 +841,12 @@ inline kv4::kv4(const kiv4 &base)
 
 #endif
 
-#define toV2(v) v2(v.x, v.y)
-#define toV3(v) v3(v.x, v.y, v.z)
-#define toV4(v) v4(v.x, v.y, v.z,v.w)
-#define toIV2(v) iv2(v.x, v.y)
-#define toIV3(v) iv3(v.x, v.y, v.z)
-#define toIV4(v) iv3(v.x, v.y, v.z, v.w)
+#define toV2(v) v2((v).x, (v).y)
+#define toV3(v) v3((v).x, (v).y, (v).z)
+#define toV4(v) v4((v).x, (v).y, (v).z,(v).w)
+#define toIV2(v) iv2((v).x, (v).y)
+#define toIV3(v) iv3((v).x, (v).y, (v).z)
+#define toIV4(v) iv3((v).x, (v).y, (v).z, (v).w)
 
 static float V2Dot(v2 a, v2 b)
 {
@@ -1254,16 +1256,9 @@ static m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
 }
 
 
-#define fCompare(a,b) (fabsf(a-b)<0.0001)
+#define fCompare(a,b) (fabsf(a - b) < 0.0001)
 #define fCompareN(a,b,n) (fabsf(a - b) < n)
 
-#ifdef utils_StrManipulation
-#define StringCopy strcpy
-#define StringCopyN strncpy
-#define CalculateCStringLength(s) ((uint32_t)strlen(s))
-#define CStringToint32_t(s) ((int32_t)atoi(s))
-#define CStringToI16(s) ((int16_t)atoi(s))
-#define CStringToF32(s) ((float)atof(s))
 static bool CharIsSpace(char c)
 {
   return c <= 32;
@@ -1293,6 +1288,65 @@ static int32_t CharToUpper(int32_t c)
   }
   return c;
 }
+static bool CStringMatchCaseInsensitive(const char *str1, const char *str2)
+{
+  bool result = 1;
+
+  if (str1 && str2)
+  {
+    for (uint32_t i = 0;; ++i)
+    {
+      if (CharToLower(str1[i]) != CharToLower(str2[i]))
+      {
+        result = 0;
+        break;
+      }
+      if (str1[i] == 0 && str2[i] == 0)
+      {
+        break;
+      }
+    }
+  }
+  else if (str1 || str2)
+  {
+    result = 0;
+  }
+
+  return result;
+}
+static bool CStringMatchCaseSensitive(const char *str1, const char *str2)
+{
+  bool result = 1;
+
+  if (str1 && str2)
+  {
+    for (uint32_t i = 0;; ++i)
+    {
+      if (str1[i] != str2[i])
+      {
+        result = 0;
+        break;
+      }
+      if (str1[i] == 0 && str2[i] == 0)
+      {
+        break;
+      }
+    }
+  }
+  else if (str1 || str2)
+  {
+    result = 0;
+  }
+
+  return result;
+}
+#ifdef utils_StrManipulation
+#define stringCopy strcpy
+#define stringCopyN strncpy
+#define calculateCStringLength(s) ((uint32_t)strlen(s))
+#define CStringToint32_t(s) ((int32_t)atoi(s))
+#define CStringToI16(s) ((int16_t)atoi(s))
+#define CStringToF32(s) ((float)atof(s))
 static uint32_t HashCString(char *string)
 {
   uint32_t hash = 5381;
@@ -1329,32 +1383,6 @@ static bool CStringMatchCaseInsensitiveN(const char *str1, const char *str2, uin
 
   return result;
 }
-static bool CStringMatchCaseInsensitive(const char *str1, const char *str2)
-{
-  bool result = 1;
-
-  if (str1 && str2)
-  {
-    for (uint32_t i = 0;; ++i)
-    {
-      if (CharToLower(str1[i]) != CharToLower(str2[i]))
-      {
-        result = 0;
-        break;
-      }
-      if (str1[i] == 0 && str2[i] == 0)
-      {
-        break;
-      }
-    }
-  }
-  else if (str1 || str2)
-  {
-    result = 0;
-  }
-
-  return result;
-}
 static bool CStringMatchCaseSensitiveN(const char *str1, const char *str2, uint32_t n)
 {
   bool result = 1;
@@ -1362,32 +1390,6 @@ static bool CStringMatchCaseSensitiveN(const char *str1, const char *str2, uint3
   if (str1 && str2)
   {
     for (uint32_t i = 0; i < n; ++i)
-    {
-      if (str1[i] != str2[i])
-      {
-        result = 0;
-        break;
-      }
-      if (str1[i] == 0 && str2[i] == 0)
-      {
-        break;
-      }
-    }
-  }
-  else if (str1 || str2)
-  {
-    result = 0;
-  }
-
-  return result;
-}
-static bool CStringMatchCaseSensitive(const char *str1, const char *str2)
-{
-  bool result = 1;
-
-  if (str1 && str2)
-  {
-    for (uint32_t i = 0;; ++i)
     {
       if (str1[i] != str2[i])
       {
@@ -1491,9 +1493,9 @@ static uint32_t CStringIndexAfterSubstring(char *str, char *substr)
   {
     if (str[i] == substr[0])
     {
-      if (CStringMatchCaseInsensitiveN(str + i, substr, CalculateCStringLength(substr)))
+      if (CStringMatchCaseInsensitiveN(str + i, substr, calculateCStringLength(substr)))
       {
-        result = i + CalculateCStringLength(substr);
+        result = i + calculateCStringLength(substr);
       }
     }
   }
@@ -1506,9 +1508,9 @@ static uint32_t CStringFirstIndexAfterSubstring(char *str, char *substr)
   {
     if (str[i] == substr[0])
     {
-      if (CStringMatchCaseInsensitiveN(str + i, substr, CalculateCStringLength(substr)))
+      if (CStringMatchCaseInsensitiveN(str + i, substr, calculateCStringLength(substr)))
       {
-        result = i + CalculateCStringLength(substr);
+        result = i + calculateCStringLength(substr);
         break;
       }
     }
@@ -1808,12 +1810,14 @@ typedef enum Key
   KEY_BACKSLASH,
   KEY_RIGHT_BRACKET,
   KEY_GRAVE_ACCENT,
-  KEY_ESCAPE,
   KEY_ENTER,
   KEY_TAB,
   KEY_BACKSPACE,
-  KEY_INSERT,
+  KEY_ESCAPE,
   KEY_DELETE,
+  ASCII_KEY_LAST,
+// end of ascii characters
+  KEY_INSERT=ASCII_KEY_LAST,
   KEY_RIGHT,
   KEY_LEFT,
   KEY_DOWN,
@@ -1852,7 +1856,8 @@ typedef enum Key
   KEY_RIGHT_ALT,
   UNREGISTERED_KEY,
   KEY_LAST,
-  MOUSE_BUTTON1,
+  // mouse buttons
+  MOUSE_BUTTON1=KEY_LAST,
   MOUSE_LEFT = MOUSE_BUTTON1,
   MOUSE_BUTTON2,
   MOUSE_RIGHT = MOUSE_BUTTON2,
@@ -1865,7 +1870,6 @@ typedef enum Key
   MOUSE_BUTTON8,
   MOUSE_LAST
 } Key;
-
 static char KeyToChar(Key k){
   switch (k)
   {
@@ -2090,6 +2094,13 @@ static Key CharToKey(char c){
       return KEY_ENTER;
     default:
       return UNREGISTERED_KEY;
+  }
+}
+static u64 KeyBitmap(Key k){
+  if(k<ASCII_KEY_LAST){
+    return 1ULL<<k;
+  }else{
+    return 1ULL<<(k-ASCII_KEY_LAST);
   }
 }
 

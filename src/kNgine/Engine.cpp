@@ -10,7 +10,6 @@
 #include "SpriteUtils.hpp"
 #include "Engine.hpp"
 
-#include <iostream>
 namespace kNgine
 {
   std::vector<EngineObject *> objects = std::vector<EngineObject *>();
@@ -19,5 +18,6 @@ namespace kNgine
   EngineObject **workingObjects;
   std::string window_name = "Game";
   v2 window_size = {1920.0f, 1080.0f};
-  LayerOrder renderingLayerOrder = LayerOrder(); // layer order must have a DEFAULT_LAYER layer at index 0
+  LayerOrder renderingLayerOrder = LayerOrder();
+  bool DEBUG = false;
 } // namespace kNgine

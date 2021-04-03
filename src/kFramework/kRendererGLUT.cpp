@@ -224,49 +224,6 @@ static const char *fragmentShaderSource =
     "  }\n"
     "}\0";
 
-// static void framebuffer_size_callback(GLFWwindow *window, i32 width, i32 height)
-// {
-//   for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
-//   {
-//     if (kRenderer_WindowsContexts.windows[i].window == window)
-//     {
-//       if (fCompare(kRenderer_WindowsContexts.windows[i].min.y, kRenderer_WindowsContexts.windows[i].context->height) &&
-//           fCompare(kRenderer_WindowsContexts.windows[i].max.x, kRenderer_WindowsContexts.windows[i].context->width))
-//       {
-//         kRenderer_WindowsContexts.windows[i].min.y = (f32)height;
-//         kRenderer_WindowsContexts.windows[i].max.x = (f32)width;
-//       }
-//       kRenderer_WindowsContexts.windows[i].context->windowSize = iv2(width, height);
-//     }
-//   }
-//   glViewport(0, 0, width, height);
-// }
-
-// static i32 MouseToGLFW(Key k)
-// {
-//   switch (k)
-//   {
-//   case MOUSE1:
-//     return GLFW_MOUSE_BUTTON_1;
-//   case MOUSE2:
-//     return GLFW_MOUSE_BUTTON_2;
-//   case MOUSE3:
-//     return GLFW_MOUSE_BUTTON_3;
-//   case MOUSE4:
-//     return GLFW_MOUSE_BUTTON_4;
-//   case MOUSE5:
-//     return GLFW_MOUSE_BUTTON_5;
-//   case MOUSE6:
-//     return GLFW_MOUSE_BUTTON_6;
-//   case MOUSE7:
-//     return GLFW_MOUSE_BUTTON_7;
-//   case MOUSE8:
-//     return GLFW_MOUSE_BUTTON_8;
-//   default:
-//     return GLFW_MOUSE_BUTTON_1;
-//   }
-// }
-
 static u32 KeyToGlutSpecial(Key k){
   switch (k)
   {
@@ -487,7 +444,7 @@ static void compileShaders()
   }
 }
 
-static m4 getMapper()
+static m4 kRenderer_getMapper()
 {
   m4 mapper = M4InitDiagonal(1);
   mapper = M4MultiplyM4(mapper, M4Rotate(rotation.x, v3(1, 0, 0)));
@@ -560,12 +517,20 @@ i32 kRenderer_createWindow(kRenderer_WindowContext *context)
 
   glutKeyboardFunc([](unsigned char c,i32 x,i32 y){
     keysPressed[CharToKey(c)]=true;
+    for (u32 i = KEY_LEFT_SHIFT; i < KEY_LAST; i++)
+    {
+      keysPressed[i] = glutGetModifiers() & KeyToGlutKeyModifier((Key)i);
+    }
   });
   glutKeyboardUpFunc([](unsigned char c,i32 x,i32 y){
     keysPressed[CharToKey(c)]=false;
   });
   glutSpecialFunc([](i32 c,i32 x,i32 y){
     keysPressed[GlutKeyToKey(c)]=true;
+    for (u32 i = KEY_LEFT_SHIFT; i < KEY_LAST; i++)
+    {
+      keysPressed[i] = glutGetModifiers() & KeyToGlutKeyModifier((Key)i);
+    }
   });
   glutSpecialUpFunc([](i32 c,i32 x,i32 y){
     keysPressed[GlutKeyToKey(c)]=false;
@@ -648,9 +613,6 @@ void kRenderer_launch()
     });
     glutIdleFunc([]() {
       glClear(GL_COLOR_BUFFER_BIT);
-      for(u32 i=KEY_LEFT_SHIFT;i<KEY_LAST;i++){
-        keysPressed[i]=glutGetModifiers()&KeyToGlutKeyModifier((Key)i);
-      }
       kRenderer_WindowsContexts.windows[currentContext].context->draw();
       glutSwapBuffers();
     });
@@ -777,7 +739,7 @@ void kRenderer_drawTriangle(v2 points[3])
   for (u32 i = 0; i < 3; i++)
   {
     v4 rP = {points[i].x, points[i].y, 0.0f, 1.0f};
-    rP = V4MultiplyM4(rP, getMapper());
+    rP = V4MultiplyM4(rP, kRenderer_getMapper());
     struct corner a = {v3(rP.x, rP.y, rP.z),
                        0.0f,
                        kRenderer_WindowsContexts.windows[currentContext].context->currentColor};
@@ -816,7 +778,7 @@ void kRenderer_drawLine(v2 points[2])
   for (u32 i = 0; i < 2; i++)
   {
     v4 rP = {points[i].x, points[i].y, 0.0f, 1.0f};
-    rP = V4MultiplyM4(rP, getMapper());
+    rP = V4MultiplyM4(rP, kRenderer_getMapper());
     struct corner a = {v3(rP.x, rP.y, 0.0f),
                        false,
                        kRenderer_WindowsContexts.windows[currentContext].context->currentColor};
@@ -876,11 +838,11 @@ void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferH
   kRenderer_unbindTexture(texture);
 }
 void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-                          v3 position, i32 width, i32 height, v3 rotation, void *args[kRenderer_maxShaderPrograms]) // TODO
+                          void *args[kRenderer_maxShaderPrograms]) // TODO
 {
   u32 texture;
   kRenderer_bindTexture(&texture, buffer, bufferWidth, bufferHeight, numChannels);
-  kRenderer_drawStoredTexture(texture, position, width, height, rotation, args);
+  kRenderer_drawStoredTexture(texture, args);
   kRenderer_unbindTexture(texture);
 }
 
@@ -921,7 +883,7 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i3
   struct corner corners[4];
 
   m4 mat = M4InitDiagonal(1.0f);
-  mat = M4MultiplyM4(mat, getMapper());
+  mat = M4MultiplyM4(mat, kRenderer_getMapper());
 
   mat = M4MultiplyM4(mat, M4TranslateV3(position));
   mat = M4MultiplyM4(mat, M4TranslateV3(v3(width / 2.f, height / 2.f, 0.f)));
@@ -971,8 +933,7 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i3
   glUniform4f(glGetUniformLocation(defaultShader, "colorScale"), 1.0, 1.0, 1.0, 1.0);
   glDeleteBuffers(1, &VBO);
 }
-void kRenderer_drawStoredTexture(u32 textureIndex, v3 position, i32 width, i32 height,
-                                 v3 rotation, void *args[kRenderer_maxShaderPrograms]) // TODO
+void kRenderer_drawStoredTexture(u32 textureIndex, void *args[kRenderer_maxShaderPrograms][4]) // TODO
 {
 
   // struct corner {v3 pos;f32 b;v4 color;};
@@ -1213,9 +1174,9 @@ bool kRenderer_keyStatusPressed(Key e)
 }
 v2 kRenderer_cursorPosition()
 {
-  f64 xpos, ypos;
-  // glfwGetCursorPos(kRenderer_WindowsContexts.windows[currentContext].window, &xpos, &ypos);
-  return v2((f32)xpos, (f32)ypos);
+  v4 v = v4(mousePos.x, mousePos.y, 0, 1);
+  v = V4MultiplyM4(v, M4Mapper(v3(0, kRenderer_getWindowHeight(), 0), v3(kRenderer_getWindowWidth(), 0, 1), kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max));
+  return v2(v.x, v.y);
 }
 bool kRenderer_mouseStatusPressed(Key e)
 {
@@ -1237,5 +1198,5 @@ iv2 kRenderer_getWindowSize()
 f64 kRenderer_getTimeSinceLastFrame()
 {
   // return glfwGetTime() - lastTime;
-  return 0;
+  return 0.16;
 }

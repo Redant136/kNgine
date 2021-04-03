@@ -1,5 +1,8 @@
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED True)
+
 
 if(APPLE)
   include_directories ( /usr/local/include) 
@@ -125,7 +128,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/ressources/ DESTINATION ${CMAKE_BINARY
 
 if(APPLE)
   target_link_directories(kNgine PUBLIC "/usr/local/lib")
-  target_link_libraries(kNgine PRIVATE "-framework Foundation -framework AppKit -framework CoreAudio")
+  target_link_libraries(kNgine PRIVATE "-framework Foundation -framework AppKit -framework CoreAudio -pthread")
 elseif(WIN32)
   add_subdirectory(extern/openal-soft)
   target_link_libraries(kNgine PRIVATE OpenAL)
@@ -133,13 +136,14 @@ elseif(UNIX)
   add_subdirectory(extern/openal-soft)
   target_link_libraries(kNgine PRIVATE OpenAL)
 
-  target_link_libraries(kNgine PRIVATE "-lGL -ldl")
+  target_link_libraries(kNgine PRIVATE "-lGL -ldl -lpthread")
 endif()
 
 target_include_directories(kNgineFramework PUBLIC include/)
-target_include_directories(kNgineFramework PUBLIC src/)
+target_include_directories(kNgineFramework PUBLIC src/kFramework)
 
 target_include_directories(kNgine PUBLIC include/)
-target_include_directories(kNgine PUBLIC src/)
+target_include_directories(kNgine PUBLIC src/kFramework)
+target_include_directories(kNgine PUBLIC src/kNgine)
 
 

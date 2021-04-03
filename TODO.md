@@ -3,23 +3,25 @@
 # main branch
 
 ## currently working on
-- [ ] OpenGL glut 2.0
+- [x] make key message bit manipulation
+- [x] display debug info such as fps
+- [x] custom shader in renderer
 ## testing
-- [ ] header-only renderer
-- [ ] text in renderer
-## next step
-- [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf)
-- [ ] openal audio engine
+- [x] text in renderer
+- [ ] test custom shader in renderer
 - [ ] test openal on linux to see if bug is windows only
-- [ ] display debug info such as fps
-- [ ] make key message bit manipulation
+## next step
+- [ ] object info tool
+- [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf, glfw opengl ES)
+- [ ] openal audio engine
 ## research
 - [ ] metal
 - [ ] https://thebookofshaders.com/
+- [ ] glfw opengl ES
 ## procrastinating
-- [ ] custom shader in renderer
-- [ ] object info tool
 - [ ] map editor tool
+- [ ] stored objects in kRenderer
+- [ ] OpenGL glut 2.0
 - [ ] tileset auto mapping
 - [ ] tileset prejoin sprites (implement + test)
 - [ ] tileset round hitbox

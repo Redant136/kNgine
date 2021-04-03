@@ -22,6 +22,9 @@ namespace kNgine
   extern v2 window_size;
   extern LayerOrder renderingLayerOrder; // layer order must have a DEFAULT_LAYER layer at index 0
 
+  extern bool DEBUG;
+
+
   namespace{
     static void includeChildren()
     {
@@ -122,25 +125,36 @@ namespace kNgine
       m.cursorPos = rendPos;
       msgs.push_back(m);
     }
-    for (u32 i = 0; i < Key::KEY_LAST; i++)
-    {
-      if (kRenderer_keyStatusPressed((Key)i))
+    { // key msgs
+      u64 ascii_key=0;
+      u64 nonAscii_key=0;
+      for (u32 i = 0; i < Key::ASCII_KEY_LAST; i++)
       {
-        msg m = msg();
-        m.msgType = msg::KEY;
-        m.key = ((Key)i);
-        msgs.push_back(m);
+        if (kRenderer_keyStatusPressed((Key)i)){
+          ascii_key |= KeyBitmap((Key)i);
+        }
       }
-    }
-    for (u32 i = Key::KEY_LAST + 1; i < Key::MOUSE_LAST; i++)
-    {
-      if (kRenderer_mouseStatusPressed((Key)i))
+      msg ascii_msg;
+      ascii_msg.msgType = msg::ASCII_KEY;
+      ascii_msg.key = ascii_key;
+      msgs.push_back(ascii_msg);
+
+      for(u32 i=Key::ASCII_KEY_LAST;i<Key::KEY_LAST;i++){
+        if (kRenderer_keyStatusPressed((Key)i))
+        {
+          nonAscii_key |= KeyBitmap((Key)i);
+        }
+      }
+      for (u32 i = Key::KEY_LAST; i < Key::MOUSE_LAST; i++)
       {
-        msg m = msg();
-        m.msgType = msg::KEY;
-        m.key = ((Key)i);
-        msgs.push_back(m);
+        if (kRenderer_mouseStatusPressed((Key)i)){
+          nonAscii_key |= KeyBitmap((Key)i);
+        }
       }
+      msg non_ascii_msg;
+      non_ascii_msg.msgType = msg::NONASCII_KEY;
+      non_ascii_msg.key = nonAscii_key;
+      msgs.push_back(non_ascii_msg);
     }
     kRenderer_clear(v4(0, 0, 0, 0));
     for (u32 i = 0; i < workingObjectsLength; i++)
@@ -161,14 +175,11 @@ namespace kNgine
           r->render();
         }
       }
-      // 60fps ~= 0.016
-      // 1e-05 =  0.00001
-      // if (1/time<60) {
-      //   std::cout << 1/time << std::endl;
-      //   std::cout << "time1" << std::endl;
-      // }
     }
-    msgs = std::vector<msg>();
+    if(DEBUG){
+      std::string fps = std::to_string(1.0/time);
+      kRenderer_displayText(v3(0,0,0),v3(0,0,0),fps.c_str(),0.5);
+    }
   }
   static void frameStart(){
     reloadObjects();
@@ -178,9 +189,10 @@ namespace kNgine
   {
     seedRandomNumberGenerator();
     includeChildren();
-    kRenderer_WindowContext context;
     kRenderer_init(0, NULL);
+    kRenderer_WindowContext context;
     kRenderer_createContext(&context);
+    context.vSync=false;
     kRenderer_setWindowName(window_name.c_str());
     kRenderer_setWindowSize(window_size.x, window_size.y);
     kRenderer_createWindow(&context);

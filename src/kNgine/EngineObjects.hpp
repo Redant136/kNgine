@@ -13,13 +13,14 @@ namespace kNgine
     enum
     {
       TIME_ELAPSED,
-      KEY,
+      ASCII_KEY,
+      NONASCII_KEY,
       CURSOR
     } msgType;
     union
     {
       f32 time;
-      Key key;
+      u64 key;
       v2 cursorPos;
     };
   };
