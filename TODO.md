@@ -5,15 +5,14 @@
 ## currently working on
 ## testing
 - [ ] test custom shader in renderer
-- [ ] test openal on linux to see if bug is windows only
 ## next step
+- [ ] fix openal
 - [ ] use audiofile lib (https://github.com/adamstark/AudioFile.git)
 - [ ] object info tool
 - [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf, glfw opengl ES)
-- [ ] openal audio engine
 ## research
-- [ ] metal
 - [ ] https://thebookofshaders.com/
+- [ ] metal
 - [ ] glfw opengl ES
 ## procrastinating
 - [ ] map editor tool
