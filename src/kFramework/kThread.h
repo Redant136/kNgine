@@ -7,20 +7,23 @@
 #include <thread>
 struct kThread
 {
-  std::thread thread;
+  std::thread*thread;
 };
 static void kjoin(kThread &thread)
 {
-  thread.thread.join();
+  thread.thread->join();
 }
-static void threadDetach(std::function<void*(void*)> func,void*arg)
+static void kThreadDetach(std::function<void(void*)> func,void*arg)
 {
   std::thread t = std::thread(func,arg);
   t.detach();
 }
-static kThread threadLaunch(std::function<void*(void*)> func,void*arg)
+static kThread kThreadLaunch(std::function<void(void*)> func,void*arg)
 {
-  return {std::thread(func,arg)};
+  std::thread*thread=new std::thread(func,arg);
+  kThread t = {thread};
+  t.thread=thread;
+  return t;
 }
 class threaded_job final
 { // use "fflush(stdout)" if printing
@@ -28,14 +31,14 @@ private:
   bool jobStart = false, jobEnded = true, alive = true;
   void*arg=NULL;
   kThread thread;
-  std::function<void*(void*)> job;
+  std::function<void(void*)> job;
 
 public:
-  threaded_job(std::function<void*(void*)> job)
+  threaded_job(std::function<void(void*)> job)
   {
     this->job = job;
-    std::function<void*(void*)>f;
-    thread = threadLaunch([this](void*a)->void*{
+    std::function<void(void*)>f;
+    thread = kThreadLaunch([this](void*a)->void{
       while (alive)
       {
         if (jobStart)
@@ -47,7 +50,6 @@ public:
         }
         sleepMillis(1); // WHY DO I NEED THIS?!?!?
       }
-      return NULL;
     },NULL);
   }
   threaded_job(const threaded_job &base) : threaded_job(base.job) {}
@@ -81,7 +83,7 @@ public:
   {
     alive = false;
   }
-  void changeJob(std::function<void*(void*)> newJob) // changes the function called on job.start(), not tested
+  void changeJob(std::function<void(void*)> newJob) // changes the function called on job.start(), not tested
   {
     this->job = newJob;
   }
@@ -101,16 +103,16 @@ static void kjoin(kThread thread)
     CloseHandle(thread.threadHandle);
   }
 }
-static void threadDetach(void *(*function)(void *))
+static void kThreadDetach(void *(*function)(void *))
 {
   DWORD ThreadId;
-  HANDLE ThreadHandle = CreateThread(NULL, 0, threadLaunchFunction, function, 0, &ThreadId);
+  HANDLE ThreadHandle = CreateThread(NULL, 0, kThreadLaunchFunction, function, 0, &ThreadId);
   // TODO : detach thread
 }
-static kThread threadLaunch(void *(*function)(void *))
+static kThread kThreadLaunch(void *(*function)(void *))
 {
   DWORD ThreadId;
-  HANDLE ThreadHandle = CreateThread(NULL, 0, threadLaunchFunction, function, 0, &ThreadId);
+  HANDLE ThreadHandle = CreateThread(NULL, 0, kThreadLaunchFunction, function, 0, &ThreadId);
   kThread t = {ThreadHandle};
 }
 static DWORD WINAPI threaded_jobFunc(void *pJob)
@@ -153,13 +155,13 @@ static void kjoin(kThread thread)
 {
   pthread_join(thread.threadIndex, NULL);
 }
-static void threadDetach(void*(*function)(void*),void*arg)
+static void kThreadDetach(void*(*function)(void*),void*arg)
 {
   pthread_t thread;
   pthread_create(&thread, NULL, function, arg);
   pthread_detach(thread);
 }
-static kThread threadLaunch(void*(*function)(void*),void*arg)
+static kThread kThreadLaunch(void*(*function)(void*),void*arg)
 {
   pthread_t threadIndex;
   pthread_create(&threadIndex, NULL, function, arg);
