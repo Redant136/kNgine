@@ -118,9 +118,8 @@ set(BOX2D_BUILD_TESTBED OFF)
 add_subdirectory(extern/box2d)
 target_link_libraries(kNgine PRIVATE box2d)
 
-set(wave_enable_tests OFF)
-add_subdirectory(extern/wave)
-target_link_libraries(kNgine PRIVATE wave)
+add_subdirectory(extern/AudioFile)
+target_link_libraries(kNgine PRIVATE AudioFile)
 
 # make_directory(fonts_data)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/ressources/ DESTINATION ${CMAKE_BINARY_DIR}/ressources/)

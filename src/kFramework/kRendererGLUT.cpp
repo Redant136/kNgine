@@ -207,7 +207,7 @@ static const char *vertexShaderSource =
     "  isTex = aIsTex;\n"
     "  colorTexCoord = aColorTexCoord;\n"
     "}\0";
-static const char *fragmentShaderSource =
+static const char *defaultFragmentShaderSource =
     "#version 330 core\n"
     "in vec4 colorTexCoord;\n"
     "in float isTex;\n"
@@ -367,7 +367,7 @@ static void compileShaders()
       assert(0 && "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n");
     }
     i32 fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glShaderSource(fragmentShader, 1, &defaultFragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
     // error checks
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);

@@ -8,11 +8,11 @@
 #ifndef __APPLE__
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <wave/file.h>
+#include "AudioFile.h"
 #else //just for debug purpose, should never be loaded
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
-#include <wave/file.h>
+#include <AudioFile.h>
 #endif
 
 #include <iostream>
@@ -65,34 +65,36 @@ namespace kNgine
       if(type==audiofiletype::wav){
         // buffer = alutCreateBufferFromFile(fileName);
         alGenBuffers(1,&buffer);
-        wave::File file;
-        wave::Error err = file.Open(fileName, wave::kIn);
-        if (err)
-        {
-          std::cout << "Something went wrong in in open" << std::endl;
-        }
-        std::vector<float> content;
-        err = file.Read(&content);
-        if (err)
-        {
-          std::cout << "Something went wrong in read" << std::endl;
-        }
-        i32 chan=file.channel_number();
-        i32 samplerate=file.sample_rate();
-        i32 samples=content.size();
+        // wave::File file;
+        // wave::Error err = file.Open(fileName, wave::kIn);
+        // if (err)
+        // {
+        //   std::cout << "Something went wrong in in open" << std::endl;
+        // }
+        // std::vector<float> content;
+        // err = file.Read(&content);
+        // if (err)
+        // {
+        //   std::cout << "Something went wrong in read" << std::endl;
+        // }
+        AudioFile<f32> file;
+        file.load(fileName);
+        i32 chan=file.getNumChannels();
+        i32 samplerate=file.getSampleRate();
+        i32 samples = file.getNumSamplesPerChannel();
         // AudioFile<double> audioFile;
         // audioFile.load(fileName);
         // i32 samplerate = audioFile.getSampleRate();
         // i32 samples = audioFile.getNumSamplesPerChannel();
         // i32 chan = audioFile.getNumChannels();
         ALenum format;
-        if (chan == 1 && samplerate == 44100)
+        if (file.isMono() && samplerate == 44100)
           format = AL_FORMAT_MONO8;
-        else if (chan == 1 && samplerate == 48000)
+        else if (file.isMono() && samplerate == 48000)
           format = AL_FORMAT_MONO16;
-        else if (chan == 2 && samplerate == 44100)
+        else if (file.isStereo() && samplerate == 44100)
           format = AL_FORMAT_STEREO8;
-        else if (chan == 2 && samplerate == 48000)
+        else if (file.isStereo() && samplerate == 48000)
           format = AL_FORMAT_STEREO16;
         else
         {
@@ -102,7 +104,12 @@ namespace kNgine
               << samplerate << " bps" << std::endl;
           std::cout<<samples<<std::endl;
         }
-        alBufferData(buffer, format, content.data(), samples * sizeof(float), samplerate);
+        f32**content=new f32*[chan];
+        for(u32 i=0;i<chan;i++){
+          content[i]=file.samples[i].data();
+        }
+        alBufferData(buffer, format, content, samples * sizeof(float), samplerate);
+        delete[]content;
         if (!check_alc_errors(__FILE__, __LINE__, openALDevice) || buffer == AL_NONE)
         {
           std::cerr << "ERROR: Could not load file" << std::endl;

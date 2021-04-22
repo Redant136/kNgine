@@ -3,20 +3,22 @@
 # main branch
 
 ## currently working on
+- [ ] fix openal
+- [x] use audiofile lib (https://github.com/adamstark/AudioFile.git)
+- [ ] stored objects in kRenderer
 ## testing
+- [ ] audiofile lib
 - [ ] test custom shader in renderer
 ## next step
-- [ ] fix openal
-- [ ] use audiofile lib (https://github.com/adamstark/AudioFile.git)
 - [ ] object info tool
 - [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf, glfw opengl ES)
+- [ ] https://github.com/Dawoodoz/DFPSR
 ## research
 - [ ] https://thebookofshaders.com/
 - [ ] metal
 - [ ] glfw opengl ES
 ## procrastinating
 - [ ] map editor tool
-- [ ] stored objects in kRenderer
 - [ ] OpenGL glut 2.0
 - [ ] tileset auto mapping
 - [ ] tileset prejoin sprites (implement + test)

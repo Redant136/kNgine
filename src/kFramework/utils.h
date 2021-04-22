@@ -1,5 +1,7 @@
 #pragma once
 
+// general utils functions, can work with both c and c++
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -848,63 +850,63 @@ inline kv4::kv4(const kiv4 &base)
 #define toIV3(v) iv3((v).x, (v).y, (v).z)
 #define toIV4(v) iv3((v).x, (v).y, (v).z, (v).w)
 
-static float V2Dot(v2 a, v2 b)
+static inline float V2Dot(v2 a, v2 b)
 {
   return a.x * b.x + a.y * b.y;
 }
-static float V2LengthSquared(v2 v)
+static inline float V2LengthSquared(v2 v)
 {
   return v.x * v.x + v.y * v.y;
 }
-static v2 V2Normalize(v2 v)
+static inline v2 V2Normalize(v2 v)
 {
   float length = sqrtf(V2LengthSquared(v));
   v.x /= length;
   v.y /= length;
   return v;
 }
-static v2 V2AddV2(v2 a, v2 b)
+static inline v2 V2AddV2(v2 a, v2 b)
 {
   v2 v = v2(a.x + b.x, a.y + b.y);
   return v;
 }
-static v2 V2MinusV2(v2 a, v2 b)
+static inline v2 V2MinusV2(v2 a, v2 b)
 {
   v2 v = v2(a.x - b.x, a.y - b.y);
   return v;
 }
-static v2 V2MultiplyF32(v2 v, float f)
+static inline v2 V2MultiplyF32(v2 v, float f)
 {
   v.x *= f;
   v.y *= f;
   return v;
 }
-static v3 V3AddV3(v3 a, v3 b)
+static inline v3 V3AddV3(v3 a, v3 b)
 {
   v3 c = v3(a.x + b.x, a.y + b.y, a.z + b.z);
   return c;
 }
-static v3 V3MinusV3(v3 a, v3 b)
+static inline v3 V3MinusV3(v3 a, v3 b)
 {
   v3 c = v3(a.x - b.x, a.y - b.y, a.z - b.z);
   return c;
 }
-static v3 V3MultiplyF32(v3 v, float f)
+static inline v3 V3MultiplyF32(v3 v, float f)
 {
   v.x *= f;
   v.y *= f;
   v.z *= f;
   return v;
 }
-static float V3LengthSquared(v3 a)
+static inline float V3LengthSquared(v3 a)
 {
   return a.x * a.x + a.y * a.y + a.z * a.z;
 }
-static float V3Length(v3 a)
+static inline float V3Length(v3 a)
 {
   return sqrtf(V3LengthSquared(a));
 }
-static v3 V3Normalize(v3 v)
+static inline v3 V3Normalize(v3 v)
 {
   float length = V3Length(v);
   v3 result = v3(
@@ -913,7 +915,7 @@ static v3 V3Normalize(v3 v)
       v.z / length);
   return result;
 }
-static float V3Dot(v3 a, v3 b)
+static inline float V3Dot(v3 a, v3 b)
 {
   float dot =
       a.x * b.x +
@@ -921,7 +923,7 @@ static float V3Dot(v3 a, v3 b)
       a.z * b.z;
   return dot;
 }
-static v3 V3Cross(v3 a, v3 b)
+static inline v3 V3Cross(v3 a, v3 b)
 {
   v3 result = v3(
       a.y * b.z - a.z * b.y,
@@ -929,7 +931,7 @@ static v3 V3Cross(v3 a, v3 b)
       a.x * b.y - a.y * b.x);
   return result;
 }
-static float minInV3(v3 v)
+static inline float minInV3(v3 v)
 {
   float minimum = v.x;
   if (v.y < minimum)
@@ -942,7 +944,7 @@ static float minInV3(v3 v)
   }
   return minimum;
 }
-static float maxInV3(v3 v)
+static inline float maxInV3(v3 v)
 {
   float maximum = v.x;
   if (v.y > maximum)
@@ -955,7 +957,7 @@ static float maxInV3(v3 v)
   }
   return maximum;
 }
-static bool V4RectHasPoint(v4 v, v2 p)
+static inline bool V4RectHasPoint(v4 v, v2 p)
 {
   return (p.x >= v.x && p.x <= v.x + v.width &&
           p.y >= v.y && p.y <= v.y + v.height);
@@ -987,7 +989,7 @@ static m4 M4InitDiagonal(float diagonal)
       }};
   return m;
 }
-static m4 M4MultiplyM4(m4 a, m4 b)
+static inline m4 M4MultiplyM4(m4 a, m4 b)
 {
   m4 c = {0};
 
@@ -1004,7 +1006,7 @@ static m4 M4MultiplyM4(m4 a, m4 b)
 
   return c;
 }
-static m4 M4MultiplyF32(m4 a, float b)
+static inline m4 M4MultiplyF32(m4 a, float b)
 {
   for (int32_t j = 0; j < 4; ++j)
   {
@@ -1016,31 +1018,31 @@ static m4 M4MultiplyF32(m4 a, float b)
 
   return a;
 }
-static float V4Dot(v4 a, v4 b)
+static inline float V4Dot(v4 a, v4 b)
 {
   return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
-static v4 V4AddV4(v4 a, v4 b)
+static inline v4 V4AddV4(v4 a, v4 b)
 {
   v4 c = v4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
   return c;
 }
-static v4 V4MinusV4(v4 a, v4 b)
+static inline v4 V4MinusV4(v4 a, v4 b)
 {
   v4 c = v4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
   return c;
 }
-static v4 V4MultiplyF32(v4 a, float f)
+static inline v4 V4MultiplyF32(v4 a, float f)
 {
   v4 c = v4(a.x * f, a.y * f, a.z * f, a.w * f);
   return c;
 }
-static v4 V4MultiplyV4(v4 a, v4 b)
+static inline v4 V4MultiplyV4(v4 a, v4 b)
 {
   v4 c = v4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
   return c;
 }
-static v4 V4MultiplyM4(v4 v, m4 m)
+static inline v4 V4MultiplyM4(v4 v, m4 m)
 {
   v4 result = v4(0, 0, 0, 0);
   for (int32_t i = 0; i < 4; ++i)
@@ -1052,7 +1054,7 @@ static v4 V4MultiplyM4(v4 v, m4 m)
   }
   return result;
 }
-static m4 M4TranslateV3(v3 translation)
+static inline m4 M4TranslateV3(v3 translation)
 {
   m4 result = M4InitDiagonal(1.f);
   result.elements[3][0] = translation.x;
@@ -1060,7 +1062,7 @@ static m4 M4TranslateV3(v3 translation)
   result.elements[3][2] = translation.z;
   return result;
 }
-static m4 M4ScaleV3(v3 scale)
+static inline m4 M4ScaleV3(v3 scale)
 {
   m4 result = M4InitDiagonal(1.f);
   result.elements[0][0] = scale.x;
@@ -1068,7 +1070,7 @@ static m4 M4ScaleV3(v3 scale)
   result.elements[2][2] = scale.z;
   return result;
 }
-static m4 M4Perspective(float fov, float aspect_ratio, float near_z, float far_z)
+static inline m4 M4Perspective(float fov, float aspect_ratio, float near_z, float far_z)
 {
   m4 result = {0};
   float tan_theta_over_2 = tanf(fov * (PIf / 360.f));
@@ -1080,7 +1082,7 @@ static m4 M4Perspective(float fov, float aspect_ratio, float near_z, float far_z
   result.elements[3][3] = 0.f;
   return result;
 }
-static m4 M4Orthographic(float left, float right, float bottom, float top, float near_depth, float far_depth)
+static inline m4 M4Orthographic(float left, float right, float bottom, float top, float near_depth, float far_depth)
 {
   m4 result = {0};
 
@@ -1094,7 +1096,7 @@ static m4 M4Orthographic(float left, float right, float bottom, float top, float
 
   return result;
 }
-static m4 M4LookAt(v3 eye, v3 center, v3 up)
+static inline m4 M4LookAt(v3 eye, v3 center, v3 up)
 {
   m4 result;
 
@@ -1124,7 +1126,7 @@ static m4 M4LookAt(v3 eye, v3 center, v3 up)
 
   return result;
 }
-static m4 M4Inverse(m4 m)
+static inline m4 M4Inverse(m4 m)
 {
   float coef00 = m.elements[2][2] * m.elements[3][3] - m.elements[3][2] * m.elements[2][3];
   float coef02 = m.elements[1][2] * m.elements[3][3] - m.elements[3][2] * m.elements[1][3];
@@ -1183,7 +1185,7 @@ static m4 M4Inverse(m4 m)
 
   return M4MultiplyF32(inverse, one_over_det);
 }
-static m4 M4RemoveRotation(m4 mat)
+static inline m4 M4RemoveRotation(m4 mat)
 {
   v3 scale = v3(
       V3Length(v3(mat.elements[0][0], mat.elements[0][1], mat.elements[0][2])),
@@ -1204,7 +1206,7 @@ static m4 M4RemoveRotation(m4 mat)
 
   return mat;
 }
-static m4 M4Rotate(float angle, v3 axis)
+static inline m4 M4Rotate(float angle, v3 axis)
 {
   m4 result = M4InitDiagonal(1.f);
 
@@ -1228,7 +1230,7 @@ static m4 M4Rotate(float angle, v3 axis)
 
   return result;
 }
-static v3 calculateTriangleNormal(v3 p1, v3 p2, v3 p3)
+static inline v3 calculateTriangleNormal(v3 p1, v3 p2, v3 p3)
 {
   v3 p1_to_p2 = v3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
   v3 p1_to_p3 = v3(p3.x - p1.x, p3.y - p1.y, p3.z - p1.z);
@@ -1236,13 +1238,13 @@ static v3 calculateTriangleNormal(v3 p1, v3 p2, v3 p3)
   normal.y *= -1;
   return normal;
 }
-static v3 calculateTriangleNormalNormalized(v3 p1, v3 p2, v3 p3)
+static inline v3 calculateTriangleNormalNormalized(v3 p1, v3 p2, v3 p3)
 {
   v3 normal = calculateTriangleNormal(p1, p2, p3);
   normal = V3Normalize(normal);
   return normal;
 }
-static m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
+static inline m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
 {
   // float scale = (n - min.x) / (max.x - min.x) * (targetMax.x - targetMin.x) + targetMin.x;
 
@@ -1259,20 +1261,20 @@ static m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
 #define fCompare(a,b) (fabsf(a - b) < 0.0001)
 #define fCompareN(a,b,n) (fabsf(a - b) < n)
 
-static bool CharIsSpace(char c)
+static inline bool CharIsSpace(char c)
 {
   return c <= 32;
 }
-static bool CharIsAlpha(char c)
+static inline bool CharIsAlpha(char c)
 {
   return ((c >= 'a' && c <= 'z') ||
           (c >= 'A' && c <= 'Z'));
 }
-static bool CharIsDigit(char c)
+static inline bool CharIsDigit(char c)
 {
   return (c >= '0' && c <= '9');
 }
-static int32_t CharToLower(int32_t c)
+static inline int32_t CharToLower(int32_t c)
 {
   if (c >= 'A' && c <= 'Z')
   {
@@ -1280,7 +1282,7 @@ static int32_t CharToLower(int32_t c)
   }
   return c;
 }
-static int32_t CharToUpper(int32_t c)
+static inline int32_t CharToUpper(int32_t c)
 {
   if (c >= 'a' && c <= 'z')
   {
@@ -1288,7 +1290,7 @@ static int32_t CharToUpper(int32_t c)
   }
   return c;
 }
-static bool CStringMatchCaseInsensitive(const char *str1, const char *str2)
+static inline bool CStringMatchCaseInsensitive(const char *str1, const char *str2)
 {
   bool result = 1;
 
@@ -1314,7 +1316,7 @@ static bool CStringMatchCaseInsensitive(const char *str1, const char *str2)
 
   return result;
 }
-static bool CStringMatchCaseSensitive(const char *str1, const char *str2)
+static inline bool CStringMatchCaseSensitive(const char *str1, const char *str2)
 {
   bool result = 1;
 
@@ -1347,7 +1349,7 @@ static bool CStringMatchCaseSensitive(const char *str1, const char *str2)
 #define CStringToint32_t(s) ((int32_t)atoi(s))
 #define CStringToI16(s) ((int16_t)atoi(s))
 #define CStringToF32(s) ((float)atof(s))
-static uint32_t HashCString(char *string)
+static inline uint32_t HashCString(char *string)
 {
   uint32_t hash = 5381;
   int32_t c;
@@ -1357,7 +1359,7 @@ static uint32_t HashCString(char *string)
   }
   return hash;
 }
-static bool CStringMatchCaseInsensitiveN(const char *str1, const char *str2, uint32_t n)
+static inline bool CStringMatchCaseInsensitiveN(const char *str1, const char *str2, uint32_t n)
 {
   bool result = 1;
 
@@ -1383,7 +1385,7 @@ static bool CStringMatchCaseInsensitiveN(const char *str1, const char *str2, uin
 
   return result;
 }
-static bool CStringMatchCaseSensitiveN(const char *str1, const char *str2, uint32_t n)
+static inline bool CStringMatchCaseSensitiveN(const char *str1, const char *str2, uint32_t n)
 {
   bool result = 1;
 
@@ -1409,7 +1411,7 @@ static bool CStringMatchCaseSensitiveN(const char *str1, const char *str2, uint3
 
   return result;
 }
-static bool CStringContains(const char *str, const char *substr)
+static inline bool CStringContains(const char *str, const char *substr)
 {
   bool result = 0;
 
@@ -1439,7 +1441,7 @@ static bool CStringContains(const char *str, const char *substr)
 
   return result;
 }
-static char *CStringPointerAfterSubstring(char *str, char *substr)
+static inline char *CStringPointerAfterSubstring(char *str, char *substr)
 {
   char *result = 0;
 
@@ -1486,7 +1488,7 @@ static char *CStringPointerAfterSubstring(char *str, char *substr)
 
   return result;
 }
-static uint32_t CStringIndexAfterSubstring(char *str, char *substr)
+static inline uint32_t CStringIndexAfterSubstring(char *str, char *substr)
 {
   uint32_t result = 0;
   for (uint32_t i = 0; str[i]; ++i)
@@ -1501,7 +1503,7 @@ static uint32_t CStringIndexAfterSubstring(char *str, char *substr)
   }
   return result;
 }
-static uint32_t CStringFirstIndexAfterSubstring(char *str, char *substr)
+static inline uint32_t CStringFirstIndexAfterSubstring(char *str, char *substr)
 {
   uint32_t result = 0;
   for (uint32_t i = 0; str[i]; ++i)
@@ -1517,7 +1519,7 @@ static uint32_t CStringFirstIndexAfterSubstring(char *str, char *substr)
   }
   return result;
 }
-static char *CStringFindSubstring(char *str, char *substr)
+static inline char *CStringFindSubstring(char *str, char *substr)
 {
   char *result = 0;
 
@@ -1549,7 +1551,7 @@ static char *CStringFindSubstring(char *str, char *substr)
 
   return result;
 }
-static void CopyCStringToFixedSizeBuffer(char *destination, uint32_t destination_max, char *source)
+static inline void CopyCStringToFixedSizeBuffer(char *destination, uint32_t destination_max, char *source)
 {
   for (uint32_t i = 0; i < destination_max; ++i)
   {
@@ -1561,7 +1563,7 @@ static void CopyCStringToFixedSizeBuffer(char *destination, uint32_t destination
   }
   destination[destination_max - 1] = 0;
 }
-static void CopySubstringToStringUntilCharN(char *str1, uint32_t str1_max, char *str2, char str2_term)
+static inline void CopySubstringToStringUntilCharN(char *str1, uint32_t str1_max, char *str2, char str2_term)
 {
   uint32_t write_pos = 0;
   while (1)
@@ -1578,7 +1580,7 @@ static void CopySubstringToStringUntilCharN(char *str1, uint32_t str1_max, char 
     }
   }
 }
-static int32_t GetFirstint32_tFromCString(char *str)
+static inline int32_t GetFirstint32_tFromCString(char *str)
 {
   int32_t result = 0;
 
@@ -1621,7 +1623,7 @@ static int32_t GetFirstint32_tFromCString(char *str)
 
   return result;
 }
-static float GetFirstF32FromCString(char *str)
+static inline float GetFirstF32FromCString(char *str)
 {
   float result = 0;
   bool found_first_digit = 0;
@@ -1678,7 +1680,7 @@ static rgbcolor RGBColorInit(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
   return c;
 }
 #define rgbcolor(r, g, b, a) RGBColorInit(r, g, b, a)
-static v3 RGBToHSV(v3 rgb)
+static inline v3 RGBToHSV(v3 rgb)
 {
   float c_max = maxInV3(rgb);
   float c_min = minInV3(rgb);
@@ -1694,12 +1696,12 @@ static v3 RGBToHSV(v3 rgb)
   v3 hsv = v3(h / 6.f, s, v);
   return hsv;
 }
-static v3 RGBColorToHSV(rgbcolor rgba)
+static inline v3 RGBColorToHSV(rgbcolor rgba)
 {
   v3 newColor = v3(rgba.r / 255.f, rgba.g / 255.f, rgba.b / 255.f);
   return RGBToHSV(newColor);
 }
-static v3 HSVToRGB(v3 hsv)
+static inline v3 HSVToRGB(v3 hsv)
 {
   float h = fmodf(hsv.x * 360.f, 360.f);
   float s = hsv.y;
@@ -1754,7 +1756,7 @@ static v3 HSVToRGB(v3 hsv)
   v3 rgb = v3(r + m, g + m, b + m);
   return rgb;
 }
-static rgbcolor HSVToRGBColor(v3 hsv)
+static inline rgbcolor HSVToRGBColor(v3 hsv)
 {
   v3 newColor = HSVToRGB(hsv);
   return rgbcolor((int32_t)floorf(newColor.r * 255) % 255, (int32_t)floorf(newColor.g * 255) % 255, (int32_t)floorf(newColor.b * 255) % 255, 1);
@@ -1870,7 +1872,7 @@ typedef enum Key
   MOUSE_BUTTON8,
   MOUSE_LAST
 } Key;
-static char KeyToChar(Key k){
+static inline char KeyToChar(Key k){
   switch (k)
   {
   case KEY_SPACE:
@@ -1983,7 +1985,7 @@ static char KeyToChar(Key k){
     return 0;
   }
 }
-static Key CharToKey(char c){
+static inline Key CharToKey(char c){
   switch (c)
   {
     case ' ':
@@ -2096,7 +2098,7 @@ static Key CharToKey(char c){
       return UNREGISTERED_KEY;
   }
 }
-static u64 KeyBitmap(Key k){
+static inline u64 KeyBitmap(Key k){
   if(k<ASCII_KEY_LAST){
     return 1ULL<<k;
   }else{
@@ -2118,11 +2120,11 @@ typedef enum cardinal8dir
 } cardinal8dir;
 
 #ifndef utils_NoRand
-static void seedRandomNumberGenerator(void)
+static inline void seedRandomNumberGenerator(void)
 {
   srand((uint32_t)time(0));
 }
-static float randf()
+static inline float randf()
 {
   return ((float)rand() / (RAND_MAX));
 }
@@ -2144,20 +2146,20 @@ static int32_t global_perlin_noise_hash[] = {
     135, 176, 183, 191, 253, 115, 184, 21, 233, 58, 129, 233, 142, 39, 128, 211, 118, 137, 139, 255,
     114, 20, 218, 113, 154, 27, 127, 246, 250, 1, 8, 198, 250, 209, 92, 222, 173, 21, 88, 102, 219};
 
-static int32_t PerlinNoise2(int32_t x, int32_t y)
+static inline int32_t PerlinNoise2(int32_t x, int32_t y)
 {
   int32_t tmp = global_perlin_noise_hash[(y + global_perlin_noise_seed) % 256];
   return global_perlin_noise_hash[(tmp + x) % 256];
 }
-static float PerlinLinearlyInterpolate(float x, float y, float s)
+static inline float PerlinLinearlyInterpolate(float x, float y, float s)
 {
   return x + s * (y - x);
 }
-static float PerlinSmoothlyInterpolate(float x, float y, float s)
+static inline float PerlinSmoothlyInterpolate(float x, float y, float s)
 {
   return PerlinLinearlyInterpolate(x, y, s * s * (3 - 2 * s));
 }
-static float PerlinNoise2D(float x, float y)
+static inline float PerlinNoise2D(float x, float y)
 {
   int32_t x_int = (int32_t)x;
   int32_t y_int = (int32_t)y;
@@ -2171,7 +2173,7 @@ static float PerlinNoise2D(float x, float y)
   float high = PerlinSmoothlyInterpolate((float)u, (float)v, x_frac);
   return PerlinSmoothlyInterpolate(low, high, y_frac);
 }
-static float Perlin2D(float x, float y, float freq, int32_t depth)
+static inline float Perlin2D(float x, float y, float freq, int32_t depth)
 {
   float xa = x * freq;
   float ya = y * freq;
@@ -2192,7 +2194,7 @@ static float Perlin2D(float x, float y, float freq, int32_t depth)
 }
 #endif
 
-static float interpolateLinear(float t)
+static inline float interpolateLinear(float t)
 {
   float result = 0;
   if (t < 0)
@@ -2209,7 +2211,7 @@ static float interpolateLinear(float t)
   }
   return result;
 }
-static float interpolateSmooth(float t)
+static inline float interpolateSmooth(float t)
 {
   float result = 0;
   if (t < 0)
@@ -2229,23 +2231,23 @@ static float interpolateSmooth(float t)
   }
   return result;
 }
-static float regularizeDegree(float angle)
+static inline float regularizeDegree(float angle)
 {
   float degree = fmodf(angle, 360);
   if (degree < 0)
     degree += 360;
   return degree;
 }
-static float regularizeRad(float angle)
+static inline float regularizeRad(float angle)
 {
   float rad = fmodf(angle, 2 * PIf);
   if (rad < 0)
     rad += 2 * PIf;
   return rad;
 }
-static float degreeToRad(float degree) { return degree / 180.f * PIf; }
-static float radToDegree(float rad) { return rad / PIf * 180; }
-static float fast_cos(float angle)
+static inline float degreeToRad(float degree) { return degree / 180.f * PIf; }
+static inline float radToDegree(float rad) { return rad / PIf * 180; }
+static inline float fast_cos(float angle)
 {
   float t_angle = regularizeRad(angle) - PIf;
   float res = 0;
@@ -2281,7 +2283,7 @@ static float fast_cos(float angle)
   }
   return -res;
 }
-static float fast_sin(float angle)
+static inline float fast_sin(float angle)
 {
   float t_angle = regularizeRad(angle) - PIf;
   float res = 0;
@@ -2318,7 +2320,7 @@ static float fast_sin(float angle)
   }
   return -res;
 }
-static float fast_atan(float a)
+static inline float fast_atan(float a)
 {
   if ((a > -1.5 && a < -0.7) || (a < 1.4 && a >= 0.6))
   {
@@ -2362,7 +2364,7 @@ static float fast_atan(float a)
   }
 }
 
-static void sleepMillis(uint32_t millis)
+static inline void sleepMillis(uint32_t millis)
 {
 #ifdef _WIN32
   Sleep(millis);

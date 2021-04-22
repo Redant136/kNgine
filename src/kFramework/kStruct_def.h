@@ -1,9 +1,10 @@
 #pragma once
 
 #include "utils.h"
+#include <stdio.h>
 
 #ifndef kStruct_arg_def_max_length
-#define kStruct_arg_def_max_length 4
+#define kStruct_arg_def_max_length 16
 #endif
 
 #if _WIN32 || _WIN64
@@ -31,9 +32,11 @@ typedef enum kTypes
   kTYPE_i32,
   kTYPE_u32,
   kTYPE_f32,
+  kType_float = kTYPE_f32,
   kTYPE_i64,
   kTYPE_u64,
   kTYPE_f64,
+  kType_double= kTYPE_f64,
   kTYPE_PTR,
   kTYPE_v2,
   kTYPE_v3,
@@ -43,13 +46,13 @@ typedef enum kTypes
   kTYPE_iv4
 } kTypes;
 
-static u8 kTypeSizeByte(kTypes t)
+// return the size of the type in terms of how many u8 it takes up
+static inline u8 kType_sizeOf(kTypes t)
 {
-#ifndef kType_lookupTable
   switch (t)
   {
   case kTYPE_bool:
-    return 1 << 0;
+    return 1 << 2;
   case kTYPE_char:
     return 1 << 0;
   case kTYPE_i8:
@@ -89,48 +92,210 @@ static u8 kTypeSizeByte(kTypes t)
   default:
     return 0;
   }
-#else
-  if (t >= 18)
-  {
-    return 0;
-  }
-  static const u8 table[18] = {
-      1 << 0,
-      1 << 0,
-      1 << 0,
-      1 << 0,
-      1 << 1,
-      1 << 1,
-      1 << 2,
-      1 << 2,
-      1 << 2,
-      1 << 3,
-      1 << 3,
-      1 << 3,
-      kTypePointerSize,
-      (1 << 2) * 2,
-      (1 << 2) * 3,
-      (1 << 2) * 4,
-      (1 << 2) * 2,
-      (1 << 2) * 3,
-      (1 << 2) * 4};
-  return table[t];
-#endif
 }
 typedef struct kStruct_StructDef
 {
   size_t length;
   kTypes args[kStruct_arg_def_max_length];
 } kStruct_StructDef;
-static void *getElementOfObjectAtIndex(u32 index, kStruct_StructDef def, void *obj)
+static inline void *kStruct_getElementOfObjectAtIndex(u32 index, kStruct_StructDef def, void *obj)
 {
   u8 *ptr = (u8 *)obj;
-  u32 distance;
+  u32 distance=0;
   for (u32 i = 0; i < index; i++)
   {
-    distance += kTypeSizeByte(def.args[i]);
+    distance += kType_sizeOf(def.args[i]);
   }
   return ptr + distance;
+}
+static inline size_t kStruct_sizeOf(kStruct_StructDef def){
+  size_t size=0;
+  for(u32 i=0;i<def.length;i++){
+    size+=kType_sizeOf(def.args[i]);
+  }
+  return size;
+}
+static inline size_t kStruct_unpackVectorsLength(kStruct_StructDef def){
+  size_t size = 0;
+  for (u32 i = 0; i < def.length; i++)
+  {
+    if (def.args[i] >= kTYPE_v2)
+    {
+      size += kType_sizeOf(def.args[i]) / 4;
+    }
+    else
+    {
+      size++;
+    }
+  }
+  return size;
+}
+static inline kStruct_StructDef kStruct_unpackVectors(kStruct_StructDef def){
+  size_t size = kStruct_unpackVectorsLength(def);
+  kStruct_StructDef res;
+  res.length=size;
+  kTypes*array=res.args;
+  for(u32 i=0,offset=0;i<def.length;i++){
+    if(def.args[i]>=kTYPE_v2){
+      u32 vecSize = kType_sizeOf(def.args[i]) / 4;
+      for(u32 j=0;j<vecSize;j++){
+        if(def.args[i]>=kTYPE_iv2){
+          array[i + offset + j] = kTYPE_i32;
+        }else{
+          array[i + offset + j] = kTYPE_f32;
+        }
+      }
+      offset+=vecSize-1;
+    }else{
+      array[i+offset]=def.args[i];
+    }
+  }
+  return res;
+}
+
+static void kStruct_printDef(kStruct_StructDef def){
+  printf("{");
+  for (u32 i = 0; i < def.length; i++)
+  {
+    switch (def.args[i])
+    {
+    case kTYPE_bool:
+      printf("bool");
+      break;
+    case kTYPE_char:
+      printf("char");
+      break;
+    case kTYPE_i8:
+      printf("i8");
+      break;
+    case kTYPE_u8:
+      printf("u8");
+      break;
+    case kTYPE_i16:
+      printf("i16");
+      break;
+    case kTYPE_u16:
+      printf("u16");
+      break;
+    case kTYPE_i32:
+      printf("i32");
+      break;
+    case kTYPE_u32:
+      printf("u32");
+      break;
+    case kTYPE_f32:
+      printf("f32");
+      break;
+    case kTYPE_i64:
+      printf("i64");
+      break;
+    case kTYPE_u64:
+      printf("u64");
+      break;
+    case kTYPE_f64:
+      printf("f64");
+      break;
+    case kTYPE_PTR:
+      printf("void*");
+      break;
+    case kTYPE_v2:
+      printf("v2");
+      break;
+    case kTYPE_v3:
+      printf("v3");
+      break;
+    case kTYPE_v4:
+      printf("v4");
+      break;
+    case kTYPE_iv2:
+      printf("iv2");
+      break;
+    case kTYPE_iv3:
+      printf("iv3");
+      break;
+    case kTYPE_iv4:
+      printf("iv4");
+      break;
+    default:
+      return ;
+    }
+    if(i<def.length-1){
+      printf(",");
+    }
+  }
+  printf("}\n");
+}
+static void kStruct_printObject(kStruct_StructDef def,void*obj){
+  printf("{");
+  for(u32 i=0;i<def.length;i++){
+    switch (def.args[i])
+    {
+    case kTYPE_bool:
+      printf("%i",*(bool*)kStruct_getElementOfObjectAtIndex(i,def,obj));
+      break;
+    case kTYPE_char:
+      printf("%c", *(char *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_i8:
+      printf("%i", *(i8 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_u8:
+      printf("%u", *(u8 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_i16:
+      printf("%i", *(i16 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_u16:
+      printf("%u", *(u16 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_i32:
+      printf("%i", *(i32 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_u32:
+      printf("%u", *(u32 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_f32:
+      printf("%f", *(f32 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_i64:
+      printf("%lli", *(i64 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_u64:
+      printf("%llu", *(u64 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_f64:
+      printf("%f", *(f64 *)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_PTR:
+      printf("%p", *(void **)kStruct_getElementOfObjectAtIndex(i, def, obj));
+      break;
+    case kTYPE_v2:
+      printf("{%f,%f}", (*(v2 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).x, (*(v2 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).y);
+      break;
+    case kTYPE_v3:
+      printf("{%f,%f,%f}", (*(v3 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).x, (*(v3 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).y, (*(v3 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).z);
+      break;
+    case kTYPE_v4:
+      printf("{%f,%f,%f,%f}", (*(v4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).x, (*(v4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).y, (*(v4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).z, (*(v4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).w);
+      break;
+    case kTYPE_iv2:
+      printf("{%i,%i}", (*(iv2 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).x, (*(iv2 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).y);
+      break;
+    case kTYPE_iv3:
+      printf("{%i,%i,%i}", (*(iv3 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).x, (*(iv3 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).y, (*(iv3 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).z);
+      break;
+    case kTYPE_iv4:
+      printf("{%i,%i,%i,%i}", (*(iv4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).x, (*(iv4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).y, (*(iv4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).z, (*(iv4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).w);
+      break;
+    default:
+      return ;
+    }
+    if (i < def.length - 1)
+    {
+      printf(", ");
+    }
+  }
+  printf("}\n");
 }
 
 #undef kTypePointerSize
@@ -208,9 +373,11 @@ static void *getElementOfObjectAtIndex(u32 index, kStruct_StructDef def, void *o
 #define kCastType_i32(var, data, type) castableKTypePointerCasting(i32, var, data, type);
 #define kCastType_u32(var, data, type) castableKTypePointerCasting(u32, var, data, type);
 #define kCastType_f32(var, data, type) castableKTypePointerCasting(f32, var, data, type);
+#define kCastType_float(var, data, type) castableKTypePointerCasting(float, var, data, type);
 #define kCastType_i64(var, data, type) castableKTypePointerCasting(i64, var, data, type);
 #define kCastType_u64(var, data, type) castableKTypePointerCasting(u64, var, data, type);
 #define kCastType_f64(var, data, type) castableKTypePointerCasting(f64, var, data, type);
+#define kCastType_double(var, data, type) castableKTypePointerCasting(double, var, data, type);
 #define kCastType_v2(var, data, type)                                         \
   {                                                                           \
     if (type == kTYPE_bool)                                       \

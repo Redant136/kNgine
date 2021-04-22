@@ -7,17 +7,47 @@
 #define kRenderer_maxWindows 8
 #define kRenderer_maxFonts 32
 #define kRenderer_maxShaderPrograms 16
-#define kRenderer_maxShadersPerProgram 16
+#define kRenderer_maxShadersPerProgram 8
+
+#define kRenderer_maxObjectTriangles 128
+#define kRenderer_maxBoundObjects 64
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+  enum kRenderer_shaderTypes
+  {
+    kRenderer_SHADER_Vertex,
+    kRenderer_SHADER_Fragment,
+    kRenderer_SHADER_Geometry
+  };
+
   typedef struct kRenderer_WindowContext
   {
+    // cannot be changed after window creation
+    // ----------------------------------------------------------
+    // cannot be changed after launch
+    struct
+    {
+      // the number of shader programs
+      size_t length;
+      struct
+      {
+        kStruct_StructDef argsDef;
+        size_t length;
+        struct
+        {
+          enum kRenderer_shaderTypes shaderType;
+          const char *shader;
+        } shaders[kRenderer_maxShadersPerProgram];
+      } programs[kRenderer_maxShaderPrograms];
+    } windowShaders;
+    // ----------------------------------------------------------
+    // should be changed through kRenderer after window creation
+    
     const char *name;
-    v4 currentColor;
     union
     {
       iv2 windowSize;
@@ -27,31 +57,32 @@ extern "C"
         u32 height;
       };
     };
-    bool vSync;
-    enum shaderTypes
-    {
-      kRenderer_SHADER_Vertex,
-      kRenderer_SHADER_Fragment,
-      kRenderer_SHADER_Geometry
-    };
-    // the first argument of the shader must be v3 position
-    struct
-    {
-      size_t length;
-      struct
-      {
-        kStruct_StructDef argsDef;
-        size_t length;
-        struct
-        {
-          enum shaderTypes shaderType;
-          const char *shader;
-        } shaders[kRenderer_maxShadersPerProgram];
-      } programs[kRenderer_maxShaderPrograms];
-    } windowShaders;
+    // ----------------------------------------------------------
+    // can be changed through context
+    v4 currentColor;
+    u8 vSync;
     void (*init)();
     void (*draw)();
   } kRenderer_WindowContext;
+
+  typedef struct kRenderer_RendererObject
+  {
+    // the number of shader programs it uses
+    size_t length;
+    struct
+    {
+      u32 shadersIndex;
+      // the number of triangles
+      size_t length;
+      struct
+      {
+        // the data of each triangle point
+        void *arg[3];
+        // if the values at that index were updated
+        bool valueUpdated[kStruct_arg_def_max_length];
+      } triangles[kRenderer_maxObjectTriangles];
+    } shaderElements[kRenderer_maxShaderPrograms];
+  } kRenderer_RendererObject;
 
   // page creation methods
   // call in order init>createContext>size|name>createwindow>draw>launch
@@ -62,6 +93,7 @@ extern "C"
 
   void kRenderer_setWindowSize(i32 width, i32 height);
   void kRenderer_setWindowName(const char *windowName);
+  void kRenderer_setWindowVSync(u8 vSync);
   void kRenderer_setStartFunction(void (*startDisplayFunc)());
   void kRenderer_setDrawFunction(void (*refreshFunction)());
   void kRenderer_setWindowBoundsScale(v3 mins, v3 maxs); // sets the scale on which the elements are draw
@@ -71,7 +103,7 @@ extern "C"
   // runtime methods
   void kRenderer_rotateViewport(v3 angle);
 
-  void kRenderer_loadFont(const char*fontPath,const char*fontName);
+  void kRenderer_loadFont(const char *fontPath, const char *fontName);
 
   void kRenderer_setDrawColor(v4 color);
   void kRenderer_clear(v4 color);
@@ -87,15 +119,24 @@ extern "C"
 
   void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
                                           v3 position, i32 width, i32 height, v3 rotation);
-  void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-                            void *args[kRenderer_maxShaderPrograms][4]);
+  // void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
+  //                           void *args[kRenderer_maxShaderPrograms][4]);
   void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer, i32 bufferWidth, i32 bufferHeight, i32 numChannels);
   void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation);
-  void kRenderer_drawStoredTexture(u32 textureIndex, void *args[kRenderer_maxShaderPrograms][4]);
+  void kRenderer_drawStoredTexture(u32 textureIndex, size_t numShaders, u32 *shaders, void **args[4]);
   void kRenderer_unbindTexture(u32 textureIndex);
 
-  void kRenderer_setFont(const char*fontName);
-  void kRenderer_displayText(v3 position,v3 rotation, const char *text,f32 scale);
+  u32 kRenderer_bindObject(u32*index,kRenderer_RendererObject obj);
+  kRenderer_RendererObject *kRenderer_getBoundObject(u32 index);
+  // updates the values of all objects
+  void kRenderer_updateObjects();
+  // updates the values of a single object
+  void kRenderer_updateObject(u32 index);
+  void kRenderer_drawObject(u32 index);
+  void kRenderer_unbindObject(u32 index);
+
+  void kRenderer_setFont(const char *fontName);
+  void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale);
 
   //key events methods
   bool kRenderer_keyStatusPressed(Key e);

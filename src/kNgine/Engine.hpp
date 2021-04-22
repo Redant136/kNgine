@@ -22,10 +22,12 @@ namespace kNgine
   extern v2 window_size;
   extern LayerOrder renderingLayerOrder; // layer order must have a DEFAULT_LAYER layer at index 0
 
+  extern kRenderer_WindowContext context;
+
   extern bool DEBUG;
 
 
-  namespace{
+  namespace {
     static void includeChildren()
     {
       bool addedParent = false;
@@ -190,9 +192,8 @@ namespace kNgine
     seedRandomNumberGenerator();
     includeChildren();
     kRenderer_init(0, NULL);
-    kRenderer_WindowContext context;
     kRenderer_createContext(&context);
-    context.vSync=false;
+    context.vSync = 1;
     kRenderer_setWindowName(window_name.c_str());
     kRenderer_setWindowSize(window_size.x, window_size.y);
     kRenderer_createWindow(&context);

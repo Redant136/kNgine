@@ -7,9 +7,6 @@
 [submodule "extern/glfw"]
 	path = extern/glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "extern/wave"]
-	path = extern/wave
-	url = https://github.com/audionamix/wave.git
 [submodule "extern/openal-soft"]
 	path = extern/openal-soft
 	url = https://github.com/kcat/openal-soft.git
@@ -19,3 +16,6 @@
 [submodule "extern/FreeGLUT"]
 	path = extern/FreeGLUT
 	url = https://github.com/dcnieho/FreeGLUT.git
+[submodule "extern/AudioFile"]
+	path = extern/AudioFile
+	url = https://github.com/adamstark/AudioFile.git

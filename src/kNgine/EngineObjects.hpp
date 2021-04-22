@@ -37,7 +37,7 @@ namespace kNgine
     AUDIO           = 1 << 7
   };
 
-  #define kNgine_maxLayerOrder 64
+#define kNgine_maxLayerOrder 64
   struct LayerOrder{
      size_t length;
      struct {u32 layerId;const char*name;} ids[kNgine_maxLayerOrder];
@@ -45,7 +45,7 @@ namespace kNgine
   };
   static LayerOrder layerOrderInit()// have to allocate array
   {
-    LayerOrder lo = {0, NULL, NULL};
+    LayerOrder lo = {0};
     return lo;
   }
   static void addLayerOrderDef(LayerOrder*order, const char *layer)
@@ -64,7 +64,7 @@ namespace kNgine
   {
     for (u32 i = 0; i < order.length; i++)
     {
-      if(order.ids[i].name==name){
+      if(std::string(order.ids[i].name)==name){
         return order.ids[i].layerId;
       }
     }
