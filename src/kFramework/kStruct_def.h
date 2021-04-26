@@ -36,7 +36,7 @@ typedef enum kTypes
   kTYPE_i64,
   kTYPE_u64,
   kTYPE_f64,
-  kType_double= kTYPE_f64,
+  kType_double = kTYPE_f64,
   kTYPE_PTR,
   kTYPE_v2,
   kTYPE_v3,
@@ -49,13 +49,14 @@ typedef enum kTypes
 // return the size of the type in terms of how many u8 it takes up
 static inline u8 kType_sizeOf(kTypes t)
 {
-  if(sizeof(bool)!=4){
-    assert(0&&"size of bool not ok");
+  if (sizeof(bool) != 4)
+  {
+    assert(0 && "size of bool not ok");
   }
   switch (t)
   {
   case kTYPE_bool:
-    return 1 << 2;// this can change depending on implementation
+    return 1 << 2; // this can change depending on implementation
   case kTYPE_char:
     return 1 << 0;
   case kTYPE_i8:
@@ -104,21 +105,24 @@ typedef struct kStruct_StructDef
 static inline void *kStruct_getElementOfObjectAtIndex(u32 index, kStruct_StructDef def, void *obj)
 {
   u8 *ptr = (u8 *)obj;
-  u32 distance=0;
+  u32 distance = 0;
   for (u32 i = 0; i < index; i++)
   {
     distance += kType_sizeOf(def.args[i]);
   }
   return ptr + distance;
 }
-static inline size_t kStruct_sizeOf(kStruct_StructDef def){
-  size_t size=0;
-  for(u32 i=0;i<def.length;i++){
-    size+=kType_sizeOf(def.args[i]);
+static inline size_t kStruct_sizeOf(kStruct_StructDef def)
+{
+  size_t size = 0;
+  for (u32 i = 0; i < def.length; i++)
+  {
+    size += kType_sizeOf(def.args[i]);
   }
   return size;
 }
-static inline size_t kStruct_unpackVectorsLength(kStruct_StructDef def){
+static inline size_t kStruct_unpackVectorsLength(kStruct_StructDef def)
+{
   size_t size = 0;
   for (u32 i = 0; i < def.length; i++)
   {
@@ -133,30 +137,40 @@ static inline size_t kStruct_unpackVectorsLength(kStruct_StructDef def){
   }
   return size;
 }
-static inline kStruct_StructDef kStruct_unpackVectors(kStruct_StructDef def){
+static inline kStruct_StructDef kStruct_unpackVectors(kStruct_StructDef def)
+{
   size_t size = kStruct_unpackVectorsLength(def);
   kStruct_StructDef res;
-  res.length=size;
-  kTypes*array=res.args;
-  for(u32 i=0,offset=0;i<def.length;i++){
-    if(def.args[i]>=kTYPE_v2){
+  res.length = size;
+  kTypes *array = res.args;
+  for (u32 i = 0, offset = 0; i < def.length; i++)
+  {
+    if (def.args[i] >= kTYPE_v2)
+    {
       u32 vecSize = kType_sizeOf(def.args[i]) / 4;
-      for(u32 j=0;j<vecSize;j++){
-        if(def.args[i]>=kTYPE_iv2){
+      for (u32 j = 0; j < vecSize; j++)
+      {
+        if (def.args[i] >= kTYPE_iv2)
+        {
           array[i + offset + j] = kTYPE_i32;
-        }else{
+        }
+        else
+        {
           array[i + offset + j] = kTYPE_f32;
         }
       }
-      offset+=vecSize-1;
-    }else{
-      array[i+offset]=def.args[i];
+      offset += vecSize - 1;
+    }
+    else
+    {
+      array[i + offset] = def.args[i];
     }
   }
   return res;
 }
 
-static void kStruct_printDef(kStruct_StructDef def){
+static void kStruct_printDef(kStruct_StructDef def)
+{
   printf("{");
   for (u32 i = 0; i < def.length; i++)
   {
@@ -220,21 +234,24 @@ static void kStruct_printDef(kStruct_StructDef def){
       printf("iv4");
       break;
     default:
-      return ;
+      return;
     }
-    if(i<def.length-1){
+    if (i < def.length - 1)
+    {
       printf(",");
     }
   }
   printf("}\n");
 }
-static void kStruct_printObject(kStruct_StructDef def,void*obj){
+static void kStruct_printObject(kStruct_StructDef def, void *obj)
+{
   printf("{");
-  for(u32 i=0;i<def.length;i++){
+  for (u32 i = 0; i < def.length; i++)
+  {
     switch (def.args[i])
     {
     case kTYPE_bool:
-      printf("%i",*(bool*)kStruct_getElementOfObjectAtIndex(i,def,obj));
+      printf("%i", *(bool *)kStruct_getElementOfObjectAtIndex(i, def, obj));
       break;
     case kTYPE_char:
       printf("%c", *(char *)kStruct_getElementOfObjectAtIndex(i, def, obj));
@@ -291,7 +308,7 @@ static void kStruct_printObject(kStruct_StructDef def,void*obj){
       printf("{%i,%i,%i,%i}", (*(iv4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).x, (*(iv4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).y, (*(iv4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).z, (*(iv4 *)kStruct_getElementOfObjectAtIndex(i, def, obj)).w);
       break;
     default:
-      return ;
+      return;
     }
     if (i < def.length - 1)
     {
@@ -302,7 +319,6 @@ static void kStruct_printObject(kStruct_StructDef def,void*obj){
 }
 
 #undef kTypePointerSize
-
 
 // for casting from void with kType to var
 #define KType(t) kTYPE_##t
@@ -315,58 +331,59 @@ static void kStruct_printObject(kStruct_StructDef def,void*obj){
   } // yes there will be semicolons extra, but this is to make sure user doesn't forget
 
 // wont work for pointer
-#define kCastingCondition(var, t, data, type) kCastingConditionExpression(var, t, data, type, {var = *(type *)data;})
+#define kCastingCondition(var, t, data, type) kCastingConditionExpression(var, t, data, type, { var = *(type *)data; })
 
 // if var is castable ie basic type, cast it. macro to save code typing
-#define castableKTypePointerCasting(varType, var, data, ktype)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             \
-  {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
-    if (ktype == kTYPE_bool)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    \
-    {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      \
-      var = (*(bool *)data) ? 1 : 0;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
-    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      \
-    else kCastingCondition(var, ktype, data, char) else kCastingCondition(var, ktype, data, i8) else kCastingCondition(var, ktype, data, u8) else kCastingCondition(var, ktype, data, i16) else kCastingCondition(var, ktype, data, u16) else kCastingCondition(var, ktype, data, i32) else kCastingCondition(var, ktype, data, u32) else kCastingCondition(var, ktype, data, f32) else kCastingCondition(var, ktype, data, i64) else kCastingCondition(var, ktype, data, u64) else kCastingCondition(var, ktype, data, f64) else if (ktype == kTYPE_PTR) \
-      {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    \
-        var = **(varType **)data;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
-      }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    \
-    else kCastingConditionExpression(var, ktype, data, v2, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    \
-      var = (*(v2 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
-    }) else kCastingConditionExpression(var, ktype, data, v3, {\
-      var = (*(v3*)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    \
-    }) else kCastingConditionExpression(var, ktype, data, v4, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 \
-      var = (*(v4 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
-    }) else kCastingConditionExpression(var, ktype, data, iv2, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
-      var = (*(iv2 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
-    }) else kCastingConditionExpression(var, ktype, data, iv3, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
-      var = (*(iv3 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
-    }) else kCastingConditionExpression(var, ktype, data, iv4, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
-      var = (*(iv4 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
-    })                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
+#define castableKTypePointerCasting(varType, var, data, ktype)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         \
+  {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    \
+    if (ktype == kTYPE_bool)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+    {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
+      var = (*(bool *)data) ? 1 : 0;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   \
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
+    else                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+      kCastingCondition(var, ktype, data, char) else kCastingCondition(var, ktype, data, i8) else kCastingCondition(var, ktype, data, u8) else kCastingCondition(var, ktype, data, i16) else kCastingCondition(var, ktype, data, u16) else kCastingCondition(var, ktype, data, i32) else kCastingCondition(var, ktype, data, u32) else kCastingCondition(var, ktype, data, f32) else kCastingCondition(var, ktype, data, i64) else kCastingCondition(var, ktype, data, u64) else kCastingCondition(var, ktype, data, f64) else if (ktype == kTYPE_PTR) \
+      {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
+        var = **(varType **)data;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      \
+      }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
+    else kCastingConditionExpression(var, ktype, data, v2, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+      var = (*(v2 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+    }) else kCastingConditionExpression(var, ktype, data, v3, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+      var = (*(v3 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+    }) else kCastingConditionExpression(var, ktype, data, v4, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+      var = (*(v4 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+    }) else kCastingConditionExpression(var, ktype, data, iv2, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+      var = (*(iv2 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+    }) else kCastingConditionExpression(var, ktype, data, iv3, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+      var = (*(iv3 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+    }) else kCastingConditionExpression(var, ktype, data, iv4, {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+      var = (*(iv4 *)data).x;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+    })                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 \
   }
 
-#define kCastType_bool(var, data, type)                                                                       \
-  {                                                                                                           \
-    if (type == kTYPE_bool)                                                                       \
-    {                                                                                                         \
-      var = *(bool *)data;                                                                                    \
-    }                                                                                                         \
-    else if (type == kTYPE_char || type == kTYPE_i8 ||                                \
-             type == kTYPE_u8 || type == kTYPE_i16 ||                                 \
-             type == kTYPE_u16 || type == kTYPE_i32 ||                                \
-             type == kTYPE_u32 || type == kTYPE_f32 ||                                \
-             type == kTYPE_i64 || type == kTYPE_u64 ||                                \
-             type == kTYPE_f64)                                                                   \
-    {                                                                                                         \
-      var = *(u64 *)data;                                                                                     \
-    }                                                                                                         \
-    else if (type == kTYPE_PTR)                                                                   \
-    {                                                                                                         \
-      var = data != NULL;                                                                                     \
-    }                                                                                                         \
+#define kCastType_bool(var, data, type)                                   \
+  {                                                                       \
+    if (type == kTYPE_bool)                                               \
+    {                                                                     \
+      var = *(bool *)data;                                                \
+    }                                                                     \
+    else if (type == kTYPE_char || type == kTYPE_i8 ||                    \
+             type == kTYPE_u8 || type == kTYPE_i16 ||                     \
+             type == kTYPE_u16 || type == kTYPE_i32 ||                    \
+             type == kTYPE_u32 || type == kTYPE_f32 ||                    \
+             type == kTYPE_i64 || type == kTYPE_u64 ||                    \
+             type == kTYPE_f64)                                           \
+    {                                                                     \
+      var = *(u64 *)data;                                                 \
+    }                                                                     \
+    else if (type == kTYPE_PTR)                                           \
+    {                                                                     \
+      var = data != NULL;                                                 \
+    }                                                                     \
     else if (type == kTYPE_v2 || type == kTYPE_v3 || type == kTYPE_v4 ||  \
              type == kTYPE_iv2 || type == kTYPE_iv3 || type == kTYPE_iv4) \
-    {                                                                                                         \
-      assert(0 && "cannot cast type");                                                                        \
-    }                                                                                                         \
+    {                                                                     \
+      assert(0 && "cannot cast type");                                    \
+    }                                                                     \
   }
 #define kCastType_char(var, data, type) castableKTypePointerCasting(char, var, data, type);
 #define kCastType_i8(var, data, type) castableKTypePointerCasting(i8, var, data, type);
@@ -381,290 +398,290 @@ static void kStruct_printObject(kStruct_StructDef def,void*obj){
 #define kCastType_u64(var, data, type) castableKTypePointerCasting(u64, var, data, type);
 #define kCastType_f64(var, data, type) castableKTypePointerCasting(f64, var, data, type);
 #define kCastType_double(var, data, type) castableKTypePointerCasting(double, var, data, type);
-#define kCastType_v2(var, data, type)                                         \
-  {                                                                           \
+#define kCastType_v2(var, data, type)                             \
+  {                                                               \
     if (type == kTYPE_bool)                                       \
-    {                                                                         \
-      var = v2((*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0);             \
-    }                                                                         \
-    else                                                                      \
+    {                                                             \
+      var = v2((*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0); \
+    }                                                             \
+    else                                                          \
       kCastingConditionExpression(var, type, data, char, {        \
-        var = v2(*(u8 *)data, 0);                                             \
+        var = v2(*(u8 *)data, 0);                                 \
       }) else kCastingConditionExpression(var, type, data, i8, {  \
-        var = v2(*(i8 *)data, 0);                                             \
+        var = v2(*(i8 *)data, 0);                                 \
       }) else kCastingConditionExpression(var, type, data, u8, {  \
-        var = v2(*(u8 *)data, 0);                                             \
+        var = v2(*(u8 *)data, 0);                                 \
       }) else kCastingConditionExpression(var, type, data, i16, { \
-        var = v2(*(i16 *)data, 0);                                            \
+        var = v2(*(i16 *)data, 0);                                \
       }) else kCastingConditionExpression(var, type, data, u16, { \
-        var = v2(*(u16 *)data, 0);                                            \
+        var = v2(*(u16 *)data, 0);                                \
       }) else kCastingConditionExpression(var, type, data, i32, { \
-        var = v2(*(i32 *)data, 0);                                            \
+        var = v2(*(i32 *)data, 0);                                \
       }) else kCastingConditionExpression(var, type, data, u32, { \
-        var = v2(*(u32 *)data, 0);                                            \
+        var = v2(*(u32 *)data, 0);                                \
       }) else kCastingConditionExpression(var, type, data, f32, { \
-        var = v2(*(f32 *)data, 0);                                            \
+        var = v2(*(f32 *)data, 0);                                \
       }) else kCastingConditionExpression(var, type, data, i64, { \
-        var = v2(*(i64 *)data, 0);                                            \
+        var = v2(*(i64 *)data, 0);                                \
       }) else kCastingConditionExpression(var, type, data, u64, { \
-        var = v2(*(u64 *)data, 0);                                            \
+        var = v2(*(u64 *)data, 0);                                \
       }) else kCastingConditionExpression(var, type, data, f64, { \
-        var = v2(*(f64 *)data, 0);                                            \
+        var = v2(*(f64 *)data, 0);                                \
       }) else if (type == kTYPE_PTR)                              \
-      {                                                                       \
-        var = **(v2 **)data;                                                  \
-      }                                                                       \
+      {                                                           \
+        var = **(v2 **)data;                                      \
+      }                                                           \
     else kCastingConditionExpression(var, type, data, v2, {       \
-      var = *(v2 *)data;                                                      \
+      var = *(v2 *)data;                                          \
     }) else kCastingConditionExpression(var, type, data, v3, {    \
-      var = toV2(*(v3 *)data);                                                \
+      var = toV2(*(v3 *)data);                                    \
     }) else kCastingConditionExpression(var, type, data, v4, {    \
-      var = toV2(*(v4 *)data);                                                \
+      var = toV2(*(v4 *)data);                                    \
     }) else kCastingConditionExpression(var, type, data, iv2, {   \
-      var = toV2(*(iv2 *)data);                                               \
+      var = toV2(*(iv2 *)data);                                   \
     }) else kCastingConditionExpression(var, type, data, iv3, {   \
-      var = toV2(*(iv3 *)data);                                               \
+      var = toV2(*(iv3 *)data);                                   \
     }) else kCastingConditionExpression(var, type, data, iv4, {   \
-      var = toV2(*(iv4 *)data);                                               \
-    })                                                                        \
+      var = toV2(*(iv4 *)data);                                   \
+    })                                                            \
   }
 #define kCastType_v3(var, data, type)                                                      \
   {                                                                                        \
-    if (type == kTYPE_bool)                                                    \
+    if (type == kTYPE_bool)                                                                \
     {                                                                                      \
       var = v3((*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0); \
     }                                                                                      \
     else                                                                                   \
-      kCastingConditionExpression(var, type, data, char, {                     \
+      kCastingConditionExpression(var, type, data, char, {                                 \
         var = v3(*(u8 *)data, 0, 0);                                                       \
-      }) else kCastingConditionExpression(var, type, data, i8, {               \
+      }) else kCastingConditionExpression(var, type, data, i8, {                           \
         var = v3(*(i8 *)data, 0, 0);                                                       \
-      }) else kCastingConditionExpression(var, type, data, u8, {               \
+      }) else kCastingConditionExpression(var, type, data, u8, {                           \
         var = v3(*(u8 *)data, 0, 0);                                                       \
-      }) else kCastingConditionExpression(var, type, data, i16, {              \
+      }) else kCastingConditionExpression(var, type, data, i16, {                          \
         var = v3(*(i16 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, u16, {              \
+      }) else kCastingConditionExpression(var, type, data, u16, {                          \
         var = v3(*(u16 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, i32, {              \
+      }) else kCastingConditionExpression(var, type, data, i32, {                          \
         var = v3(*(i32 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, u32, {              \
+      }) else kCastingConditionExpression(var, type, data, u32, {                          \
         var = v3(*(u32 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, f32, {              \
+      }) else kCastingConditionExpression(var, type, data, f32, {                          \
         var = v3(*(f32 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, i64, {              \
+      }) else kCastingConditionExpression(var, type, data, i64, {                          \
         var = v3(*(i64 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, u64, {              \
+      }) else kCastingConditionExpression(var, type, data, u64, {                          \
         var = v3(*(u64 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, f64, {              \
+      }) else kCastingConditionExpression(var, type, data, f64, {                          \
         var = v3(*(f64 *)data, 0, 0);                                                      \
-      }) else if (type == kTYPE_PTR)                                           \
+      }) else if (type == kTYPE_PTR)                                                       \
       {                                                                                    \
         var = **(v3 **)data;                                                               \
       }                                                                                    \
-    else kCastingConditionExpression(var, type, data, v2, {                    \
+    else kCastingConditionExpression(var, type, data, v2, {                                \
       var = v3((*(v2 *)data).x, (*(v2 *)data).y, 0);                                       \
-    }) else kCastingConditionExpression(var, type, data, v3, {                 \
+    }) else kCastingConditionExpression(var, type, data, v3, {                             \
       var = *(v3 *)data;                                                                   \
-    }) else kCastingConditionExpression(var, type, data, v4, {                 \
+    }) else kCastingConditionExpression(var, type, data, v4, {                             \
       var = toV3(*(v4 *)data);                                                             \
-    }) else kCastingConditionExpression(var, type, data, iv2, {                \
+    }) else kCastingConditionExpression(var, type, data, iv2, {                            \
       var = v3((*(iv2 *)data).x, (*(iv2 *)data).y, 0);                                     \
-    }) else kCastingConditionExpression(var, type, data, iv3, {                \
+    }) else kCastingConditionExpression(var, type, data, iv3, {                            \
       var = toV3(*(iv3 *)data);                                                            \
-    }) else kCastingConditionExpression(var, type, data, iv4, {                \
+    }) else kCastingConditionExpression(var, type, data, iv4, {                            \
       var = toV3(*(iv4 *)data);                                                            \
     })                                                                                     \
   }
 #define kCastType_v4(var, data, type)                                                                               \
   {                                                                                                                 \
-    if (type == kTYPE_bool)                                                                             \
+    if (type == kTYPE_bool)                                                                                         \
     {                                                                                                               \
       var = v4((*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0); \
     }                                                                                                               \
     else                                                                                                            \
-      kCastingConditionExpression(var, type, data, char, {                                              \
+      kCastingConditionExpression(var, type, data, char, {                                                          \
         var = v4(*(u8 *)data, 0, 0, 0);                                                                             \
-      }) else kCastingConditionExpression(var, type, data, i8, {                                        \
+      }) else kCastingConditionExpression(var, type, data, i8, {                                                    \
         var = v4(*(i8 *)data, 0, 0, 0);                                                                             \
-      }) else kCastingConditionExpression(var, type, data, u8, {                                        \
+      }) else kCastingConditionExpression(var, type, data, u8, {                                                    \
         var = v4(*(u8 *)data, 0, 0, 0);                                                                             \
-      }) else kCastingConditionExpression(var, type, data, i16, {                                       \
+      }) else kCastingConditionExpression(var, type, data, i16, {                                                   \
         var = v4(*(i16 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, u16, {                                       \
+      }) else kCastingConditionExpression(var, type, data, u16, {                                                   \
         var = v4(*(u16 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, i32, {                                       \
+      }) else kCastingConditionExpression(var, type, data, i32, {                                                   \
         var = v4(*(i32 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, u32, {                                       \
+      }) else kCastingConditionExpression(var, type, data, u32, {                                                   \
         var = v4(*(u32 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, f32, {                                       \
+      }) else kCastingConditionExpression(var, type, data, f32, {                                                   \
         var = v4(*(f32 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, i64, {                                       \
+      }) else kCastingConditionExpression(var, type, data, i64, {                                                   \
         var = v4(*(i64 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, u64, {                                       \
+      }) else kCastingConditionExpression(var, type, data, u64, {                                                   \
         var = v4(*(u64 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, f64, {                                       \
+      }) else kCastingConditionExpression(var, type, data, f64, {                                                   \
         var = v4(*(f64 *)data, 0, 0, 0);                                                                            \
-      }) else if (type == kTYPE_PTR)                                                                    \
+      }) else if (type == kTYPE_PTR)                                                                                \
       {                                                                                                             \
         var = **(v4 **)data;                                                                                        \
       }                                                                                                             \
-    else kCastingConditionExpression(var, type, data, v2, {                                             \
+    else kCastingConditionExpression(var, type, data, v2, {                                                         \
       var = v4((*(v2 *)data).x, (*(v2 *)data).y, 0, 0);                                                             \
-    }) else kCastingConditionExpression(var, type, data, v3, {                                          \
+    }) else kCastingConditionExpression(var, type, data, v3, {                                                      \
       var = v4((*(v3 *)data).x, (*(v3 *)data).y, (*(v3 *)data).z, 0);                                               \
-    }) else kCastingConditionExpression(var, type, data, v4, {                                          \
+    }) else kCastingConditionExpression(var, type, data, v4, {                                                      \
       var = *(v4 *)data;                                                                                            \
-    }) else kCastingConditionExpression(var, type, data, iv2, {                                         \
+    }) else kCastingConditionExpression(var, type, data, iv2, {                                                     \
       var = v4((*(iv2 *)data).x, (*(iv2 *)data).y, 0, 0);                                                           \
-    }) else kCastingConditionExpression(var, type, data, iv3, {                                         \
+    }) else kCastingConditionExpression(var, type, data, iv3, {                                                     \
       var = v4((*(iv3 *)data).x, (*(iv3 *)data).y, (*(iv3 *)data).z, 0);                                            \
-    }) else kCastingConditionExpression(var, type, data, iv4, {                                         \
+    }) else kCastingConditionExpression(var, type, data, iv4, {                                                     \
       var = toV4(*(iv4 *)data);                                                                                     \
     })                                                                                                              \
   }
-#define kCastType_iv2(var, data, type)                                        \
-  {                                                                           \
-    if (type == kTYPE_bool)                                       \
-    {                                                                         \
-      var = iv2((*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0);            \
-    }                                                                         \
-    else                                                                      \
-      kCastingConditionExpression(var, type, data, char, {        \
-        var = iv2(*(u8 *)data, 0);                                            \
-      }) else kCastingConditionExpression(var, type, data, i8, {  \
-        var = iv2(*(i8 *)data, 0);                                            \
-      }) else kCastingConditionExpression(var, type, data, u8, {  \
-        var = iv2(*(u8 *)data, 0);                                            \
-      }) else kCastingConditionExpression(var, type, data, i16, { \
-        var = iv2(*(i16 *)data, 0);                                           \
-      }) else kCastingConditionExpression(var, type, data, u16, { \
-        var = iv2(*(u16 *)data, 0);                                           \
-      }) else kCastingConditionExpression(var, type, data, i32, { \
-        var = iv2(*(i32 *)data, 0);                                           \
-      }) else kCastingConditionExpression(var, type, data, u32, { \
-        var = iv2(*(u32 *)data, 0);                                           \
-      }) else kCastingConditionExpression(var, type, data, f32, { \
-        var = iv2(*(f32 *)data, 0);                                           \
-      }) else kCastingConditionExpression(var, type, data, i64, { \
-        var = iv2(*(i64 *)data, 0);                                           \
-      }) else kCastingConditionExpression(var, type, data, u64, { \
-        var = iv2(*(u64 *)data, 0);                                           \
-      }) else kCastingConditionExpression(var, type, data, f64, { \
-        var = iv2(*(f64 *)data, 0);                                           \
-      }) else if (type == kTYPE_PTR)                              \
-      {                                                                       \
-        var = **(iv2 **)data;                                                 \
-      }                                                                       \
-    else kCastingConditionExpression(var, type, data, v2, {       \
-      var = toIV2(*(v2 *)data);                                               \
-    }) else kCastingConditionExpression(var, type, data, v3, {    \
-      var = toIV2(*(v3 *)data);                                               \
-    }) else kCastingConditionExpression(var, type, data, v4, {    \
-      var = toIV2(*(v4 *)data);                                               \
-    }) else kCastingConditionExpression(var, type, data, iv2, {   \
-      var = *(iv2 *)data;                                                     \
-    }) else kCastingConditionExpression(var, type, data, iv3, {   \
-      var = toIV2(*(iv3 *)data);                                              \
-    }) else kCastingConditionExpression(var, type, data, iv4, {   \
-      var = toIV2(*(iv4 *)data);                                              \
-    })                                                                        \
+#define kCastType_iv2(var, data, type)                             \
+  {                                                                \
+    if (type == kTYPE_bool)                                        \
+    {                                                              \
+      var = iv2((*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0); \
+    }                                                              \
+    else                                                           \
+      kCastingConditionExpression(var, type, data, char, {         \
+        var = iv2(*(u8 *)data, 0);                                 \
+      }) else kCastingConditionExpression(var, type, data, i8, {   \
+        var = iv2(*(i8 *)data, 0);                                 \
+      }) else kCastingConditionExpression(var, type, data, u8, {   \
+        var = iv2(*(u8 *)data, 0);                                 \
+      }) else kCastingConditionExpression(var, type, data, i16, {  \
+        var = iv2(*(i16 *)data, 0);                                \
+      }) else kCastingConditionExpression(var, type, data, u16, {  \
+        var = iv2(*(u16 *)data, 0);                                \
+      }) else kCastingConditionExpression(var, type, data, i32, {  \
+        var = iv2(*(i32 *)data, 0);                                \
+      }) else kCastingConditionExpression(var, type, data, u32, {  \
+        var = iv2(*(u32 *)data, 0);                                \
+      }) else kCastingConditionExpression(var, type, data, f32, {  \
+        var = iv2(*(f32 *)data, 0);                                \
+      }) else kCastingConditionExpression(var, type, data, i64, {  \
+        var = iv2(*(i64 *)data, 0);                                \
+      }) else kCastingConditionExpression(var, type, data, u64, {  \
+        var = iv2(*(u64 *)data, 0);                                \
+      }) else kCastingConditionExpression(var, type, data, f64, {  \
+        var = iv2(*(f64 *)data, 0);                                \
+      }) else if (type == kTYPE_PTR)                               \
+      {                                                            \
+        var = **(iv2 **)data;                                      \
+      }                                                            \
+    else kCastingConditionExpression(var, type, data, v2, {        \
+      var = toIV2(*(v2 *)data);                                    \
+    }) else kCastingConditionExpression(var, type, data, v3, {     \
+      var = toIV2(*(v3 *)data);                                    \
+    }) else kCastingConditionExpression(var, type, data, v4, {     \
+      var = toIV2(*(v4 *)data);                                    \
+    }) else kCastingConditionExpression(var, type, data, iv2, {    \
+      var = *(iv2 *)data;                                          \
+    }) else kCastingConditionExpression(var, type, data, iv3, {    \
+      var = toIV2(*(iv3 *)data);                                   \
+    }) else kCastingConditionExpression(var, type, data, iv4, {    \
+      var = toIV2(*(iv4 *)data);                                   \
+    })                                                             \
   }
 #define kCastType_iv3(var, data, type)                                                      \
   {                                                                                         \
-    if (type == kTYPE_bool)                                                     \
+    if (type == kTYPE_bool)                                                                 \
     {                                                                                       \
       var = iv3((*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0); \
     }                                                                                       \
     else                                                                                    \
-      kCastingConditionExpression(var, type, data, char, {                      \
+      kCastingConditionExpression(var, type, data, char, {                                  \
         var = iv3(*(u8 *)data, 0, 0);                                                       \
-      }) else kCastingConditionExpression(var, type, data, i8, {                \
+      }) else kCastingConditionExpression(var, type, data, i8, {                            \
         var = iv3(*(i8 *)data, 0, 0);                                                       \
-      }) else kCastingConditionExpression(var, type, data, u8, {                \
+      }) else kCastingConditionExpression(var, type, data, u8, {                            \
         var = iv3(*(u8 *)data, 0, 0);                                                       \
-      }) else kCastingConditionExpression(var, type, data, i16, {               \
+      }) else kCastingConditionExpression(var, type, data, i16, {                           \
         var = iv3(*(i16 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, u16, {               \
+      }) else kCastingConditionExpression(var, type, data, u16, {                           \
         var = iv3(*(u16 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, i32, {               \
+      }) else kCastingConditionExpression(var, type, data, i32, {                           \
         var = iv3(*(i32 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, u32, {               \
+      }) else kCastingConditionExpression(var, type, data, u32, {                           \
         var = iv3(*(u32 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, f32, {               \
+      }) else kCastingConditionExpression(var, type, data, f32, {                           \
         var = iv3(*(f32 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, i64, {               \
+      }) else kCastingConditionExpression(var, type, data, i64, {                           \
         var = iv3(*(i64 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, u64, {               \
+      }) else kCastingConditionExpression(var, type, data, u64, {                           \
         var = iv3(*(u64 *)data, 0, 0);                                                      \
-      }) else kCastingConditionExpression(var, type, data, f64, {               \
+      }) else kCastingConditionExpression(var, type, data, f64, {                           \
         var = iv3(*(f64 *)data, 0, 0);                                                      \
-      }) else if (type == kTYPE_PTR)                                            \
+      }) else if (type == kTYPE_PTR)                                                        \
       {                                                                                     \
         var = **(iv3 **)data;                                                               \
       }                                                                                     \
-    else kCastingConditionExpression(var, type, data, v2, {                     \
+    else kCastingConditionExpression(var, type, data, v2, {                                 \
       var = iv3((*(v2 *)data).x, (*(v2 *)data).y, 0);                                       \
-    }) else kCastingConditionExpression(var, type, data, v3, {                  \
+    }) else kCastingConditionExpression(var, type, data, v3, {                              \
       var = toIV3(*(v3 *)data);                                                             \
-    }) else kCastingConditionExpression(var, type, data, v4, {                  \
+    }) else kCastingConditionExpression(var, type, data, v4, {                              \
       var = toIV3(*(v4 *)data);                                                             \
-    }) else kCastingConditionExpression(var, type, data, iv2, {                 \
+    }) else kCastingConditionExpression(var, type, data, iv2, {                             \
       var = iv3((*(iv2 *)data).x, (*(iv2 *)data).y, 0);                                     \
-    }) else kCastingConditionExpression(var, type, data, iv3, {                 \
+    }) else kCastingConditionExpression(var, type, data, iv3, {                             \
       var = *(iv3 *)data;                                                                   \
-    }) else kCastingConditionExpression(var, type, data, iv4, {                 \
+    }) else kCastingConditionExpression(var, type, data, iv4, {                             \
       var = toIV3(*(iv4 *)data);                                                            \
     })                                                                                      \
   }
 #define kCastType_iv4(var, data, type)                                                                               \
   {                                                                                                                  \
-    if (type == kTYPE_bool)                                                                              \
+    if (type == kTYPE_bool)                                                                                          \
     {                                                                                                                \
       var = iv4((*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0, (*(bool *)data) ? 1 : 0); \
     }                                                                                                                \
     else                                                                                                             \
-      kCastingConditionExpression(var, type, data, char, {                                               \
+      kCastingConditionExpression(var, type, data, char, {                                                           \
         var = iv4(*(u8 *)data, 0, 0, 0);                                                                             \
-      }) else kCastingConditionExpression(var, type, data, i8, {                                         \
+      }) else kCastingConditionExpression(var, type, data, i8, {                                                     \
         var = iv4(*(i8 *)data, 0, 0, 0);                                                                             \
-      }) else kCastingConditionExpression(var, type, data, u8, {                                         \
+      }) else kCastingConditionExpression(var, type, data, u8, {                                                     \
         var = iv4(*(u8 *)data, 0, 0, 0);                                                                             \
-      }) else kCastingConditionExpression(var, type, data, i16, {                                        \
+      }) else kCastingConditionExpression(var, type, data, i16, {                                                    \
         var = iv4(*(i16 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, u16, {                                        \
+      }) else kCastingConditionExpression(var, type, data, u16, {                                                    \
         var = iv4(*(u16 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, i32, {                                        \
+      }) else kCastingConditionExpression(var, type, data, i32, {                                                    \
         var = iv4(*(i32 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, u32, {                                        \
+      }) else kCastingConditionExpression(var, type, data, u32, {                                                    \
         var = iv4(*(u32 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, f32, {                                        \
+      }) else kCastingConditionExpression(var, type, data, f32, {                                                    \
         var = iv4(*(f32 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, i64, {                                        \
+      }) else kCastingConditionExpression(var, type, data, i64, {                                                    \
         var = iv4(*(i64 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, u64, {                                        \
+      }) else kCastingConditionExpression(var, type, data, u64, {                                                    \
         var = iv4(*(u64 *)data, 0, 0, 0);                                                                            \
-      }) else kCastingConditionExpression(var, type, data, f64, {                                        \
+      }) else kCastingConditionExpression(var, type, data, f64, {                                                    \
         var = iv4(*(f64 *)data, 0, 0, 0);                                                                            \
-      }) else if (type == kTYPE_PTR)                                                                     \
+      }) else if (type == kTYPE_PTR)                                                                                 \
       {                                                                                                              \
         var = **(iv4 **)data;                                                                                        \
       }                                                                                                              \
-    else kCastingConditionExpression(var, type, data, v2, {                                              \
+    else kCastingConditionExpression(var, type, data, v2, {                                                          \
       var = iv4((*(v2 *)data).x, (*(v2 *)data).y, 0, 0);                                                             \
-    }) else kCastingConditionExpression(var, type, data, v3, {                                           \
+    }) else kCastingConditionExpression(var, type, data, v3, {                                                       \
       var = iv4((*(v3 *)data).x, (*(v3 *)data).y, (*(v3 *)data).z, 0);                                               \
-    }) else kCastingConditionExpression(var, type, data, v4, {                                           \
+    }) else kCastingConditionExpression(var, type, data, v4, {                                                       \
       var = toIV4(*(v4 *)data);                                                                                      \
-    }) else kCastingConditionExpression(var, type, data, iv2, {                                          \
+    }) else kCastingConditionExpression(var, type, data, iv2, {                                                      \
       var = iv4((*(iv2 *)data).x, (*(iv2 *)data).y, 0, 0);                                                           \
-    }) else kCastingConditionExpression(var, type, data, iv3, {                                          \
+    }) else kCastingConditionExpression(var, type, data, iv3, {                                                      \
       var = iv4((*(iv3 *)data).x, (*(iv3 *)data).y, (*(iv3 *)data).z, 0);                                            \
-    }) else kCastingConditionExpression(var, type, data, iv4, {                                          \
+    }) else kCastingConditionExpression(var, type, data, iv4, {                                                      \
       var = *(iv4 *)data;                                                                                            \
     })                                                                                                               \
   }
 
 #define kCastType(varType, var, data, type) kCastType_##varType(var, data, type);
 #define kCastTypeCreate(varType, var, data, type) \
-  varType var;\
-  kCastType(varType,var,data,type);\
+  varType var;                                    \
+  kCastType(varType, var, data, type);

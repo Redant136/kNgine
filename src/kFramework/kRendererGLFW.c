@@ -446,7 +446,7 @@ static void compileShaders()
     }
   }
 }
-static void emptyFunction(){}
+static void emptyFunction() {}
 
 i32 kRenderer_init(i32 argc, const char **argv)
 {
@@ -568,8 +568,9 @@ void kRenderer_setWindowName(const char *windowName)
     glfwSetWindowTitle(kRenderer_WindowsContexts.windows[currentContext].window, windowName);
   }
 }
-void kRenderer_setWindowVSync(u8 vSync){
-  kRenderer_WindowsContexts.windows[currentContext].context->vSync=vSync;
+void kRenderer_setWindowVSync(u8 vSync)
+{
+  kRenderer_WindowsContexts.windows[currentContext].context->vSync = vSync;
 }
 void kRenderer_setStartFunction(void (*startDisplayFunc)())
 {
@@ -1226,19 +1227,22 @@ u32 kRenderer_bindObject(u32 *indexIn, kRenderer_RendererObject obj)
       }
     }
 
-    if(1){
+    if (1)
+    {
       size_t sizeOfArg = 0;
       f32 data[3 * kRenderer_maxObjectTriangles * (kStruct_arg_def_max_length * 4)];
-      for(u32 i=0;i<3*obj.shaderElements[s].length;i++){
-        for(u32 j=0;j<formatedArgs[i].numElements;j++){
-          data[sizeOfArg+j] = formatedArgs[i].elements[j];
+      for (u32 i = 0; i < 3 * obj.shaderElements[s].length; i++)
+      {
+        for (u32 j = 0; j < formatedArgs[i].numElements; j++)
+        {
+          data[sizeOfArg + j] = formatedArgs[i].elements[j];
         }
         sizeOfArg += formatedArgs[i].numElements;
       }
       glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * sizeOfArg * 3, data, GL_DYNAMIC_DRAW);
     }
 
-    u32 currentElementsIndex;
+    u32 currentElementsIndex = 0;
     // number of triangles
     for (u32 e = 0; e < obj.shaderElements[s].length; e++)
     {
@@ -1275,12 +1279,12 @@ void kRenderer_updateObjects()
 }
 void kRenderer_updateObject(u32 index)
 {
-  const kRenderer_WindowContext*current = kRenderer_WindowsContexts.windows[currentContext].context;
+  const kRenderer_WindowContext *current = kRenderer_WindowsContexts.windows[currentContext].context;
   const kRenderer_RendererObject *obj = &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects;
   for (u32 s = 0; s < obj->length; s++)
   {
     const kStruct_StructDef def = kRenderer_WindowsContexts.windows[currentContext].context->windowShaders.programs[obj->shaderElements[s].shadersIndex].argsDef;
-    u32 offset=0;
+    u32 offset = 0;
     for (u32 t = 0; t < obj->shaderElements[s].length; t++)
     {
       glBindBuffer(GL_ARRAY_BUFFER, kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].shaderData[s].VBO);
@@ -1340,10 +1344,11 @@ void kRenderer_drawObjectWithTexture(u32 objectIndex, u32 **textureIndex)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindVertexArray(kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].shaderData[i].VAO);
-    for (u32 t = 0; t < kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].boundObjects.shaderElements[i].length;t++){
+    for (u32 t = 0; t < kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].boundObjects.shaderElements[i].length; t++)
+    {
       glBindTexture(GL_TEXTURE_2D, textureIndex[i][t]);
       glUseProgram(kRenderer_WindowsContexts.windows[currentContext].shaderPrograms[kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].boundObjects.shaderElements[i].shadersIndex]);
-      glDrawArrays(GL_TRIANGLES, 3*t, 3 * (t+1));
+      glDrawArrays(GL_TRIANGLES, 3 * t, 3 * (t + 1));
     }
   }
   glBindVertexArray(0);
