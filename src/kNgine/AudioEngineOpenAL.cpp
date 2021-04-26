@@ -95,14 +95,21 @@ namespace kNgine
           assert(0);
         }
 
-        u8 *content = new u8[file.samples.size() * file.samples[0].size()];
-        for(u32 i=0;i<file.getNumSamplesPerChannel();i++){
-          for(u32 j=0;j<file.getNumChannels();j++){
-            content[j+i*file.getNumChannels()]=file.samples[j][i];
+        i16 *content = new i16[file.samples.size() * file.samples[0].size()];
+        // for(u32 i=0;i<file.getNumSamplesPerChannel();i++){
+        //   for(u32 j=0;j<file.getNumChannels();j++){
+        //     content[j+i*file.getNumChannels()]=file.samples[j][i];
+        //   }
+        // }
+        for (u32 i = 0; i < file.samples.size(); i++)
+        {
+          for (u32 j = 0; j < file.samples[i].size(); j++)
+          {
+            content[j + i * file.samples[i].size()] = file.samples[i][j]*32767;
           }
         }
         alGenBuffers(1, &buffer);
-        alBufferData(buffer, format, content, file.getNumSamplesPerChannel() * file.getNumChannels() * sizeof(u8), file.getSampleRate());
+        alBufferData(buffer, format, content, file.getNumSamplesPerChannel() * file.getNumChannels() * sizeof(i16), file.getSampleRate());
         delete[] content;
         if (!check_alc_errors(__FILE__, __LINE__, openALDevice) || buffer == AL_NONE)
         {

@@ -3,12 +3,9 @@
 # main branch
 
 ## currently working on
-- [x] windows testing, making sure everything works
-- [x] fixed rotation stuff that stretched textures
 - [x] fix openal
 ## testing
 - [ ] stored renderer objects in kNgine
-- [x] audiofile lib
 - [ ] test custom shader in renderer
 ## next step
 - [ ] object info tool
