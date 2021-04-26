@@ -55,66 +55,62 @@ namespace kNgine
   ALCcontext *openALContext;
   ALCdevice *openALDevice;
 
-  class OpenALBuffer:public BaseAudioBuffer
+  class OpenALBuffer : public BaseAudioBuffer
   {
   public:
     ALuint buffer;
-    ALuint source=0;
-    OpenALBuffer(const char* fileName,audiofiletype type)
+    ALuint source = 0;
+    OpenALBuffer(const char *fileName, audiofiletype type)
     {
-      if(type==audiofiletype::wav){
+      if (type == audiofiletype::wav || type == audiofiletype::aiff)
+      {
         // buffer = alutCreateBufferFromFile(fileName);
-        alGenBuffers(1,&buffer);
-        // wave::File file;
-        // wave::Error err = file.Open(fileName, wave::kIn);
-        // if (err)
-        // {
-        //   std::cout << "Something went wrong in in open" << std::endl;
-        // }
-        // std::vector<float> content;
-        // err = file.Read(&content);
-        // if (err)
-        // {
-        //   std::cout << "Something went wrong in read" << std::endl;
-        // }
         AudioFile<f32> file;
         file.load(fileName);
-        i32 chan=file.getNumChannels();
-        i32 samplerate=file.getSampleRate();
-        i32 samples = file.getNumSamplesPerChannel();
-        // AudioFile<double> audioFile;
-        // audioFile.load(fileName);
-        // i32 samplerate = audioFile.getSampleRate();
-        // i32 samples = audioFile.getNumSamplesPerChannel();
-        // i32 chan = audioFile.getNumChannels();
+        i32 bitdepth = file.getBitDepth();
         ALenum format;
-        if (file.isMono() && samplerate == 44100)
+        if (file.isMono() && bitdepth == 8)
+        {
           format = AL_FORMAT_MONO8;
-        else if (file.isMono() && samplerate == 48000)
+        }
+        else if (file.isMono() && bitdepth == 16)
+        {
           format = AL_FORMAT_MONO16;
-        else if (file.isStereo() && samplerate == 44100)
+        }
+        else if (file.isStereo() && bitdepth == 8)
+        {
           format = AL_FORMAT_STEREO8;
-        else if (file.isStereo() && samplerate == 48000)
+        }
+        else if (file.isStereo() && bitdepth == 16)
+        {
           format = AL_FORMAT_STEREO16;
+        }
         else
         {
+          format = AL_FORMAT_MONO8;
           std::cerr
               << "ERROR: unrecognised wave format: "
-              << chan << " channels, "
-              << samplerate << " bps" << std::endl;
-          std::cout<<samples<<std::endl;
+              << file.getNumChannels() << " channels, "
+              << file.getSampleRate() << " bps" << bitdepth << "bitdepth" << std::endl;
+          assert(0);
         }
-        f32**content=new f32*[chan];
-        for(u32 i=0;i<chan;i++){
-          content[i]=file.samples[i].data();
+
+        u8 *content = new u8[file.samples.size() * file.samples[0].size()];
+        for(u32 i=0;i<file.getNumSamplesPerChannel();i++){
+          for(u32 j=0;j<file.getNumChannels();j++){
+            content[j+i*file.getNumChannels()]=file.samples[j][i];
+          }
         }
-        alBufferData(buffer, format, content, samples * sizeof(float), samplerate);
-        delete[]content;
+        alGenBuffers(1, &buffer);
+        alBufferData(buffer, format, content, file.getNumSamplesPerChannel() * file.getNumChannels() * sizeof(u8), file.getSampleRate());
+        delete[] content;
         if (!check_alc_errors(__FILE__, __LINE__, openALDevice) || buffer == AL_NONE)
         {
           std::cerr << "ERROR: Could not load file" << std::endl;
         }
-      }else if(type=audiofiletype::ogg){
+      }
+      else if (type == audiofiletype::ogg)
+      {
         i32 chan, samplerate;
         short *output;
         i32 samples = stb_vorbis_decode_filename(fileName, &chan, &samplerate, &output);
@@ -126,7 +122,8 @@ namespace kNgine
         }
       }
     }
-    ~OpenALBuffer(){
+    ~OpenALBuffer()
+    {
       alDeleteBuffers(1, &buffer);
     }
   };
@@ -134,8 +131,9 @@ namespace kNgine
   SoundListenerComponent::SoundListenerComponent(ComponentGameObject *object) : ObjectComponent(object)
   {
     this->label = "[AudioPlayer]";
-    this->flags|=ObjectFlags::AUDIO;
-    if(!openALDevice){
+    this->flags |= ObjectFlags::AUDIO;
+    if (!openALDevice)
+    {
       openALDevice = alcOpenDevice(nullptr);
       if (!openALDevice)
       {
@@ -153,8 +151,10 @@ namespace kNgine
       }
     }
   }
-  SoundListenerComponent::~SoundListenerComponent(){
-    if(openALDevice){
+  SoundListenerComponent::~SoundListenerComponent()
+  {
+    if (openALDevice)
+    {
       alcMakeContextCurrent(nullptr);
       if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
       {
@@ -176,7 +176,7 @@ namespace kNgine
   SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player) : ObjectComponent(object)
   {
     this->label = "[AudioEmiter]";
-    this->flags|=ObjectFlags::AUDIO;
+    this->flags |= ObjectFlags::AUDIO;
     this->buffer = buffer;
     this->player = player;
     // job.stop();
@@ -212,9 +212,10 @@ namespace kNgine
 
   AudioEngine::AudioEngine()
   {
-    this->flags|=ObjectFlags::AUDIO;
+    this->flags |= ObjectFlags::AUDIO;
     this->labels.push_back("AudioEngine");
-    if(!openALDevice){
+    if (!openALDevice)
+    {
       openALDevice = alcOpenDevice(nullptr);
       if (!openALDevice)
       {
@@ -235,7 +236,8 @@ namespace kNgine
       }
     }
   }
-  AudioEngine::~AudioEngine(){
+  AudioEngine::~AudioEngine()
+  {
     for (u32 i = 0; i < queue.size(); i++)
     {
       delete queue[i].buffer;
@@ -256,23 +258,26 @@ namespace kNgine
       }
     }
   }
-  
+
   void AudioEngine::play(const char *fileName, audiofiletype type)
   {
-    BaseAudioBuffer *buffer = createBuffer(fileName,type);
+    BaseAudioBuffer *buffer = createBuffer(fileName, type);
     play(buffer);
   }
-  void AudioEngine::play(BaseAudioBuffer* buffer){
-    queueBuffer("",buffer,false);
+  void AudioEngine::play(BaseAudioBuffer *buffer)
+  {
+    queueBuffer("", buffer, false);
     queue[queue.size() - 1].discard = true;
-    play(queue.size()-1);
+    play(queue.size() - 1);
   }
-  void AudioEngine::queueBuffer(const char* name,BaseAudioBuffer *buffer, bool loop){
-    this->queue.push_back(AudioQueue(name,buffer));
+  void AudioEngine::queueBuffer(const char *name, BaseAudioBuffer *buffer, bool loop)
+  {
+    this->queue.push_back(AudioQueue(name, buffer));
   }
   void AudioEngine::load(std::vector<EngineObject *> objects)
   {
-    for(AudioQueue q:queue){
+    for (AudioQueue q : queue)
+    {
       ALuint albuffer = ((OpenALBuffer *)q.buffer)->buffer;
       ALuint source;
       alGenSources(1, &source);
@@ -284,14 +289,15 @@ namespace kNgine
       {
         std::cerr << "gen source" << std::endl;
       }
-      ((OpenALBuffer *)q.buffer)->source=source;
+      ((OpenALBuffer *)q.buffer)->source = source;
     }
   }
   void AudioEngine::update(std::vector<msg> msgs)
   {
-    for(u32 i=0;i<queue.size();i++){
-      AudioQueue*q=&queue[i];
-      OpenALBuffer*buffer=(OpenALBuffer*)q->buffer;
+    for (u32 i = 0; i < queue.size(); i++)
+    {
+      AudioQueue *q = &queue[i];
+      OpenALBuffer *buffer = (OpenALBuffer *)q->buffer;
       alSourcef(buffer->source, AL_GAIN, q->volume);
       if (q->loop)
       {
@@ -305,48 +311,51 @@ namespace kNgine
       {
         std::cerr << "gen source" << std::endl;
       }
-      if(q->start){
+      if (q->start)
+      {
         alSourcePlay(buffer->source);
-        q->start=false;
+        q->start = false;
+        q->isPlaying = true;
       }
-      if(q->stop){
+      if (q->stop)
+      {
         alSourceStop(buffer->source);
         alSourceRewind(buffer->source);
-        q->isPlaying=false;
-      }else{
-        std::cout << "a" << std::endl;
+        q->stop = false;
+        q->isPlaying = false;
+      }
+      else
+      {
         ALint state = AL_PLAYING;
-        q->isPlaying = true;
-        while (q->isPlaying) {
-            std::cout << "a" << std::endl;
-
+        if (q->isPlaying)
+        {
           alGetSourcei(buffer->source, AL_SOURCE_STATE, &state);
-          q->isPlaying=state==AL_PLAYING;
+          q->isPlaying = state == AL_PLAYING;
         }
       }
-      //std::cout << q->isPlaying << std::endl;
-      //std::cout << queue.size() << std::endl;
 
-      if (q->discard&&!q->isPlaying)
+      if (q->discard && !q->isPlaying)
       {
+        std::cout << "delete" << std::endl;
         alDeleteSources(1, &buffer->source);
         buffer->source = 0;
         delete buffer;
-        queue.erase(queue.begin()+i);
+        queue.erase(queue.begin() + i);
       }
     }
   }
   void AudioEngine::unload(std::vector<EngineObject *> objects)
   {
-    for(AudioQueue q:queue){
+    for (AudioQueue q : queue)
+    {
       OpenALBuffer *buffer = (OpenALBuffer *)q.buffer;
       alDeleteSources(1, &buffer->source);
-      buffer->source=0;
+      buffer->source = 0;
     }
   }
 
   BaseAudioBuffer *createBuffer(const char *fileName, audiofiletype type)
   {
-    return new OpenALBuffer(fileName,type);
+    return new OpenALBuffer(fileName, type);
   }
 }

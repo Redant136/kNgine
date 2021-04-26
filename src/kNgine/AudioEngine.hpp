@@ -10,6 +10,7 @@ namespace kNgine
   enum audiofiletype
   {
     wav,
+    aiff,
     ogg
   };
 

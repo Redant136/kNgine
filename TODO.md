@@ -3,18 +3,16 @@
 # main branch
 
 ## currently working on
-- [x] stored objects in kRenderer
-- [x] stored renderer objects in kNgine
-- [x] make camera use unit cube instead of screen size
+- [x] windows testing, making sure everything works
+- [x] fixed rotation stuff that stretched textures
+- [x] fix openal
 ## testing
 - [ ] stored renderer objects in kNgine
-- [ ] audiofile lib
+- [x] audiofile lib
 - [ ] test custom shader in renderer
 ## next step
-- [ ] fix openal
 - [ ] object info tool
-- [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf, glfw opengl ES)
-- [ ] https://github.com/Dawoodoz/DFPSR
+- [ ] c thread (unix + windows) is broken
 ## research
 - [ ] https://thebookofshaders.com/
 - [ ] https://github.com/Dawoodoz/DFPSR
@@ -22,6 +20,7 @@
 - [ ] https://handmade.network/library/resource/9
 - [ ] metal
 - [ ] glfw opengl ES
+- [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf, glfw opengl ES)
 ## procrastinating
 - [ ] map editor tool
 - [ ] OpenGL glut 2.0

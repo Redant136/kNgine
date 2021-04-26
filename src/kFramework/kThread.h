@@ -93,7 +93,7 @@ public:
 // windows.h already included
 typedef struct kThread
 {
-  Handle threadHandle;
+  HANDLE threadHandle;
 } kThread;
 static void kjoin(kThread thread)
 {
@@ -103,16 +103,16 @@ static void kjoin(kThread thread)
     CloseHandle(thread.threadHandle);
   }
 }
-static void kThreadDetach(void *(*function)(void *))
+static void kThreadDetach(void *(*function)(void *),void*arg)
 {
   DWORD ThreadId;
-  HANDLE ThreadHandle = CreateThread(NULL, 0, kThreadLaunchFunction, function, 0, &ThreadId);
+  HANDLE ThreadHandle = CreateThread(NULL, 0, function, arg, 0, &ThreadId);
   // TODO : detach thread
 }
-static kThread kThreadLaunch(void *(*function)(void *))
+static kThread kThreadLaunch(void *(*function)(void *),void*arg)
 {
   DWORD ThreadId;
-  HANDLE ThreadHandle = CreateThread(NULL, 0, kThreadLaunchFunction, function, 0, &ThreadId);
+  HANDLE ThreadHandle = CreateThread(NULL, 0, function, arg, 0, &ThreadId);
   kThread t = {ThreadHandle};
 }
 static DWORD WINAPI threaded_jobFunc(void *pJob)
@@ -131,13 +131,25 @@ static DWORD WINAPI threaded_jobFunc(void *pJob)
   // }
   return 0;
 }
+
+typedef struct threaded_job
+{
+    bool jobStart;
+    bool jobEnded;
+    bool alive;
+    kThread thread;
+    void* (*job)(void*);
+    void* arg;
+} threaded_job;
+
 threaded_job threaded_jobInit(void (*function)())
 {
   DWORD ThreadId;
-  threaded_job job;
-  HANDLE ThreadHandle = CreateThread(NULL, 0, threaded_jobFunc, &job, 0, &ThreadId);
+  HANDLE ThreadHandle = CreateThread(NULL, 0, threaded_jobFunc, NULL, 0, &ThreadId);
   kThread thread = {ThreadHandle};
-  job = jobInit(thread, function);
+  //job = jobInit(thread, function);
+  threaded_job job={ false, true, true,thread,function,NULL };
+
   return job;
 }
 #elif defined(__unix__) || defined(__APPLE__)

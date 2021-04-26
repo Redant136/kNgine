@@ -273,10 +273,10 @@ namespace kNgine
     default_points[2].isTex = 1;
     default_points[3].isTex = 1;
 
-    default_points[0].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
-    default_points[1].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);
-    default_points[2].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);
-    default_points[3].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
+    default_points[0].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);;
+    default_points[1].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);;
+    default_points[2].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);;
+    default_points[3].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);;
 
     kRenderer_bindObject(&rendererObjectIndex,object);
   }
@@ -314,10 +314,10 @@ namespace kNgine
     default_points[2].isTex = 1;
     default_points[3].isTex = 1;
 
-    default_points[0].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
-    default_points[1].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);
-    default_points[2].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);
-    default_points[3].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
+    default_points[0].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);;
+    default_points[1].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);;
+    default_points[2].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);;
+    default_points[3].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);;
 
     kRenderer_bindObject(&rendererObjectIndex, object);
   }

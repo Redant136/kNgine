@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.2)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 99)
@@ -96,7 +97,6 @@ target_link_libraries(kNgine PRIVATE "-framework OpenGL -framework GLUT")
 else()
 
 add_subdirectory(extern/FreeGlut/freeglut/freeglut)
-
 target_include_directories(kNgineFramework PRIVATE extern/FreeGlut/freeglut/freeglut/include)
 target_include_directories(kNgine PRIVATE extern/FreeGlut/freeglut/freeglut/include)
 
@@ -111,7 +111,7 @@ endif()
 add_subdirectory(extern/freetype/)
 target_link_libraries(kNgineFramework PRIVATE freetype)
 target_link_libraries(kNgine PRIVATE freetype)
-
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/ressources/ DESTINATION ${CMAKE_BINARY_DIR}/ressources/)
 
 set(BOX2D_BUILD_UNIT_TESTS OFF)
 set(BOX2D_BUILD_TESTBED OFF)
@@ -121,16 +121,18 @@ target_link_libraries(kNgine PRIVATE box2d)
 add_subdirectory(extern/AudioFile)
 target_link_libraries(kNgine PRIVATE AudioFile)
 
-# make_directory(fonts_data)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/ressources/ DESTINATION ${CMAKE_BINARY_DIR}/ressources/)
-
-
 if(APPLE)
   target_link_directories(kNgine PUBLIC "/usr/local/lib")
   target_link_libraries(kNgine PRIVATE "-framework Foundation -framework AppKit -framework CoreAudio -pthread")
 elseif(WIN32)
   add_subdirectory(extern/openal-soft)
+  # find_library(kNgineOpenAL NAMES OpenAL OpenAL32 PATHS ${CMAKE_BINARY_DIR}/kNgine/extern/openal-soft)
   target_link_libraries(kNgine PRIVATE OpenAL)
+
+  find_file(OpenALDLL NAMES "OpenAL32.dll" PATHS ${CMAKE_BINARY_DIR}/kNgine/extern/openal-soft)
+  message(STATUS "openal32.dll path = ${OpenALDLL}")
+  file(COPY ${OpenALDLL}/../OpenAL32.dll DESTINATION ${CMAKE_BINARY_DIR}/Debug)
+  file(COPY ${OpenALDLL}/../OpenAL32.dll DESTINATION ${CMAKE_BINARY_DIR}/Release)
 elseif(UNIX)
   add_subdirectory(extern/openal-soft)
   target_link_libraries(kNgine PRIVATE OpenAL)

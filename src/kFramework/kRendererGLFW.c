@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 
-static v3 rotation = {0, 0, 0};
+static v3 kRenderer_rotation = {0, 0, 0};
 
 // fonts
 static FT_Library ft;
@@ -631,7 +631,7 @@ void kRenderer_launch()
 
 void kRenderer_rotateViewport(v3 angle)
 {
-  rotation = angle;
+  kRenderer_rotation = angle;
 }
 
 void kRenderer_loadFont(const char *fontPath, const char *fontName)
@@ -867,20 +867,28 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f3
     f32 b;
     v4 texCoord;
   };
-  v3 points[4] = {v3(-width / 2.0f, -height / 2.0f, 0), v3(width / 2.0f, -height / 2.0f, 0), v3(-width / 2.0f, height / 2.0f, 0), v3(width / 2.0f, height / 2.0f, 0)};
+  v3 points[4]={position,v3(position.x+width,position.y,position.z),v3(position.x,position.y+height,position.z),v3(position.x+width,position.y+height,position.z)};
   struct corner corners[4];
+
+  v2 windowSize=V2MultiplyF32(toV2(kRenderer_getWindowSize()),0.5);
 
   m4 mat = M4InitDiagonal(1.0f);
   mat = M4MultiplyM4(mat, kRenderer_getMapper());
-
-  mat = M4MultiplyM4(mat, M4TranslateV3(position));
-  mat = M4MultiplyM4(mat, M4TranslateV3(v3(width / 2.f, height / 2.f, 0.f)));
-
-  mat = M4MultiplyM4(mat, M4Rotate(-rotation.x, v3(1.0f, 0.0f, 0.0f)));
-  mat = M4MultiplyM4(mat, M4Rotate(-rotation.y, v3(0.0f, 1.0f, 0.0f)));
-  mat = M4MultiplyM4(mat, M4Rotate(-rotation.z, v3(0.0f, 0.0f, 1.0f)));
-
-  mat = M4MultiplyM4(mat, M4ScaleV3(v3(1.0f, -1.0f, 1.0f)));
+  mat = M4MultiplyM4(mat,M4TranslateV3(v3(width/2.f,height/2,0)));
+  mat = M4MultiplyM4(mat,M4TranslateV3(position));
+  mat = M4MultiplyM4(mat, M4Mapper(v3(-windowSize.x, -windowSize.y, 0),
+                                   v3(windowSize.x, windowSize.y, 1),
+                                   kRenderer_WindowsContexts.windows[currentContext].min,
+                                   kRenderer_WindowsContexts.windows[currentContext].max));
+  mat = M4MultiplyM4(mat, M4Rotate(rotation.x, v3(1.0f, 0.0f, 0.0f)));
+  mat = M4MultiplyM4(mat, M4Rotate(rotation.y, v3(0.0f, 1.0f, 0.0f)));
+  mat = M4MultiplyM4(mat, M4Rotate(rotation.z, v3(0.0f, 0.0f, 1.0f)));
+  mat = M4MultiplyM4(mat, M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min,
+                                   kRenderer_WindowsContexts.windows[currentContext].max,
+                                   v3(-windowSize.x, -windowSize.y, 0),
+                                   v3(windowSize.x, windowSize.y, 1)));
+  mat = M4MultiplyM4(mat,M4TranslateV3(V3MultiplyF32(position,-1)));
+  mat = M4MultiplyM4(mat,M4TranslateV3(v3(-width/2.f,-height/2,0)));
 
   for (u32 i = 0; i < 4; i++)
   {
@@ -892,10 +900,10 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f3
     corners[i] = a;
   }
 
-  corners[0].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
-  corners[1].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);
-  corners[2].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);
-  corners[3].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
+  corners[0].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);
+  corners[1].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
+  corners[2].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
+  corners[3].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);
 
   u32 VBO;
   struct corner corners1[6] = {corners[0], corners[1], corners[3], corners[0], corners[2], corners[3]};
@@ -1531,9 +1539,9 @@ f64 kRenderer_getTimeSinceLastFrame()
 m4 kRenderer_getMapper()
 {
   m4 mapper = M4InitDiagonal(1);
-  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.x, v3(1, 0, 0)));
-  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.y, v3(0, 1, 0)));
-  mapper = M4MultiplyM4(mapper, M4Rotate(rotation.z, v3(0, 0, 1)));
+  mapper = M4MultiplyM4(mapper, M4Rotate(kRenderer_rotation.x, v3(1, 0, 0)));
+  mapper = M4MultiplyM4(mapper, M4Rotate(kRenderer_rotation.y, v3(0, 1, 0)));
+  mapper = M4MultiplyM4(mapper, M4Rotate(kRenderer_rotation.z, v3(0, 0, 1)));
   mapper = M4MultiplyM4(mapper, M4Mapper(kRenderer_WindowsContexts.windows[currentContext].min, kRenderer_WindowsContexts.windows[currentContext].max, v3(-1, -1, -1), v3(1, 1, 1)));
   return mapper;
 }
