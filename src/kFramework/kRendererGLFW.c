@@ -817,7 +817,7 @@ void kRenderer_drawCircle(v2 startPoint, f32 radius)
 }
 
 void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-                                        v3 position, i32 width, i32 height, v3 rotation)
+                                        v3 position, f32 width, f32 height, v3 rotation)
 {
   u32 texture;
   kRenderer_bindTexture(&texture, buffer, bufferWidth, bufferHeight, numChannels);
@@ -858,7 +858,7 @@ void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer, i32 realWidth, i32 rea
   }
   glGenerateMipmap(GL_TEXTURE_2D);
 }
-void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, i32 width, i32 height, v3 rotation)
+void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f32 width, f32 height, v3 rotation)
 {
   struct corner
   {
@@ -1330,6 +1330,21 @@ void kRenderer_drawObject(u32 index)
     glBindVertexArray(kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].shaderData[i].VAO);
     glUseProgram(kRenderer_WindowsContexts.windows[currentContext].shaderPrograms[kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[i].shadersIndex]);
     glDrawArrays(GL_TRIANGLES, 0, 3 * kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[i].length);
+  }
+  glBindVertexArray(0);
+}
+void kRenderer_drawObjectWithTexture(u32 objectIndex, u32 **textureIndex)
+{
+  for (u32 i = 0; i < kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].boundObjects.length; i++)
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindVertexArray(kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].shaderData[i].VAO);
+    for (u32 t = 0; t < kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].boundObjects.shaderElements[i].length;t++){
+      glBindTexture(GL_TEXTURE_2D, textureIndex[i][t]);
+      glUseProgram(kRenderer_WindowsContexts.windows[currentContext].shaderPrograms[kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].boundObjects.shaderElements[i].shadersIndex]);
+      glDrawArrays(GL_TRIANGLES, 3*t, 3 * (t+1));
+    }
   }
   glBindVertexArray(0);
 }

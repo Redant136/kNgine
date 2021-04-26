@@ -39,7 +39,6 @@ https://github.com/Redant136/kNgine.git
 - b2PhysicsBodyComponent: when adding a physics body something to an object
 - b2PhysicsEngine: has to be included to use physics, handles all physics setup
 - b2Rect: rectangular body
-### Custom phys engine is deprecated but should still work
 ## Tilesets
 - Tileset: object to hold a tileset/tilemap
 - Tileset::TileDef : a definition of a tile. add a tile using the position in the array of it's definition

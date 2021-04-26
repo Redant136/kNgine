@@ -21,16 +21,17 @@ namespace kNgine
       MIN_WH,
       WIDTH,
       HEIGHT,
-      DIAGONAL
+      DIAGONAL//idk what I will use this for
     } fovType = MAX_WH;
     bool showDebugHitBox = false;
     struct{u64*engineObjectLength;EngineObject**engineObjects;}engineInfo;
     Camera();
-    Camera(f32 fov, i32 windowWidth, i32 windowHeight);
+    Camera(f32 fov, u32 windowWidth, u32 windowHeight);
     ~Camera();
 
     void init(std::vector<EngineObject *> objects);
-    void updateWindowSize(i32 windowWidth, i32 windowHeight);
+    void updateWindowSize(u32 windowWidth, u32 windowHeight);
+    void update(std::vector<msg>msgs);
 
     void render();
   };

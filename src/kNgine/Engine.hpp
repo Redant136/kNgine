@@ -127,6 +127,13 @@ namespace kNgine
       m.cursorPos = rendPos;
       msgs.push_back(m);
     }
+    { //window size
+      iv2 windowSize=kRenderer_getWindowSize();
+      msg m=msg();
+      m.msgType=msg::WINDOW_SIZE;
+      m.window_size=windowSize;
+      msgs.push_back(m);
+    }
     { // key msgs
       u64 ascii_key=0;
       u64 nonAscii_key=0;
@@ -173,22 +180,27 @@ namespace kNgine
         for (LayerRenderer *r : layer)
         {
           kRenderer_setDrawColor(v4(1, 1, 1, 1));
-          r->updateWindowSize(windowSize.x, windowSize.y);
+          // r->updateWindowSize(windowSize.x, windowSize.y);
           r->render();
         }
       }
     }
+    
     if(DEBUG){
       std::string fps = std::to_string(1.0/time);
-      kRenderer_displayText(v3(0,0,0),v3(0,0,0),fps.c_str(),0.5);
+      kRenderer_displayText(v3(-1,1,1),v3(0,0,0),fps.c_str(),0.5);
     }
   }
-  static void frameStart(){
+  static void frameStart()
+  {
     reloadObjects();
     frameUpdate();
   }
   static void start()
   {
+#ifdef kNgine_DEBUG
+    DEBUG=true;
+#endif
     seedRandomNumberGenerator();
     includeChildren();
     kRenderer_init(0, NULL);
@@ -196,6 +208,8 @@ namespace kNgine
     context.vSync = 1;
     kRenderer_setWindowName(window_name.c_str());
     kRenderer_setWindowSize(window_size.x, window_size.y);
+    kRenderer_setWindowBoundsScale(v3(-1,-1,-1),v3(1,1,1));
+    
     kRenderer_createWindow(&context);
     kRenderer_setStartFunction(frameStart);
     kRenderer_setDrawFunction(frameUpdate);

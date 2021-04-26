@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 #include "../kFramework/utils.h"
+#include <iostream>
 
 namespace kNgine
 {
@@ -15,56 +16,64 @@ namespace kNgine
       TIME_ELAPSED,
       ASCII_KEY,
       NONASCII_KEY,
-      CURSOR
+      CURSOR,
+      WINDOW_SIZE
     } msgType;
     union
     {
       f32 time;
       u64 key;
       v2 cursorPos;
+      iv2 window_size;
     };
   };
   enum ObjectFlags
   {
-    NONE            = 0 << 0,
-    GAME_OBJECT     = 1 << 0,
-    COMPONENT       = 1 << 1,
-    PARENT          = 1 << 2,
-    SPRITE          = 1 << 3,
-    Sprite_List     = 1 << 4,
-    RENDERER_LAYER  = 1 << 5,
-    Physics         = 1 << 6,
-    AUDIO           = 1 << 7
+    NONE = 0 << 0,
+    GAME_OBJECT = 1 << 0,    // object with position
+    COMPONENT = 1 << 1,      // contains components
+    PARENT = 1 << 2,         // contains child game object components
+    RENDERER_LAYER = 1 << 3, // renderer
+    RENDERABLE = 1 << 4,     // contains renderable component
+    Physics = 1 << 5,        // contains physics component
+    AUDIO = 1 << 6           // contains audio component
   };
 
 #define kNgine_maxLayerOrder 64
-  struct LayerOrder{
-     size_t length;
-     struct {u32 layerId;const char*name;} ids[kNgine_maxLayerOrder];
-     u32 order[kNgine_maxLayerOrder];
+  struct LayerOrder
+  {
+    size_t length;
+    struct
+    {
+      u32 layerId;
+      const char *name;
+    } ids[kNgine_maxLayerOrder];
+    u32 order[kNgine_maxLayerOrder];
   };
-  static LayerOrder layerOrderInit()// have to allocate array
+  static LayerOrder layerOrderInit() // have to allocate array
   {
     LayerOrder lo = {0};
     return lo;
   }
-  static void addLayerOrderDef(LayerOrder*order, const char *layer)
+  static void addLayerOrderDef(LayerOrder *order, const char *layer)
   {
     assert(order->length < kNgine_maxLayerOrder);
     order->ids[order->length] = {(u32)order->length, layer};
     order->length++;
   }
-  static void setLayerOrder(LayerOrder*order,u32*o){
+  static void setLayerOrder(LayerOrder *order, u32 *o)
+  {
     for (u32 i = 0; i < order->length; i++)
     {
-      order->order[i]=o[i];
+      order->order[i] = o[i];
     }
   }
-  static u32 layerO(LayerOrder order,const char*name)
+  static u32 layerO(LayerOrder order, const char *name)
   {
     for (u32 i = 0; i < order.length; i++)
     {
-      if(std::string(order.ids[i].name)==name){
+      if (std::string(order.ids[i].name) == name)
+      {
         return order.ids[i].layerId;
       }
     }
@@ -76,17 +85,17 @@ namespace kNgine
 #define layerO(order, layer) layerO(order, #layer)
 
   typedef struct
- {
-   u32 width, height, numChannels;
-   u8 *buffer;
- } Sprite;
- inline Sprite SpriteInit(u32 width, u32 height, u32 numChannels, u8 *buffer)
- {
-   Sprite spr = {width, height, numChannels, buffer};
-   return spr;
- }
+  {
+    u32 width, height, numChannels;
+    u8 *buffer;
+  } Sprite;
+  static Sprite SpriteInit(u32 width, u32 height, u32 numChannels, u8 *buffer)
+  {
+    Sprite spr = {width, height, numChannels, buffer};
+    return spr;
+  }
 #define Sprite(width, height, channels, buffer) SpriteInit(width, height, channels, buffer)
-  inline Sprite fillSprite(u32 width, u32 height, rgbcolor fill)
+  static inline Sprite fillSprite(u32 width, u32 height, rgbcolor fill)
   {
     u8 *colorMap = new u8[width * height * 4];
     for (int i = 0; i < width * height * 4; i += 4)
@@ -98,11 +107,11 @@ namespace kNgine
     }
     return Sprite(width, height, 4, colorMap);
   }
-  inline void freeSprite(Sprite sprite)
+  static inline void freeSprite(Sprite sprite)
   {
     delete[] sprite.buffer;
   }
-  inline void offsetPixelsInSprite(Sprite *sprite, cardinal8dir dir, u32 offset)
+  static inline void offsetPixelsInSprite(Sprite *sprite, cardinal8dir dir, u32 offset)
   {
     if (dir == CENTER)
     {
@@ -183,6 +192,7 @@ namespace kNgine
   {
   protected:
     bool enabled = true;
+
   public:
     std::vector<std::string> labels = std::vector<std::string>();
     u64 flags = 0;
@@ -227,6 +237,8 @@ namespace kNgine
     virtual ~ComponentGameObject();
     void update(std::vector<msg> msgs);
     void addComponent(ObjectComponent *component);
+    template <typename T>
+    T *findComponent(u64 flags);
     template <typename T = ObjectComponent>
     T *findComponent(std::string flag);
     void removeComponent(ObjectComponent *component);
@@ -238,12 +250,24 @@ namespace kNgine
   public:
     ComponentGameObject *object;
     std::string label;
-    u64 flags=0;
+    u64 flags = 0;
     ObjectComponent(ComponentGameObject *base);
     ObjectComponent(const ObjectComponent &base);
     virtual ~ObjectComponent();
     virtual void update(std::vector<msg> msgs);
   };
+  template <typename T>
+  T *ComponentGameObject::findComponent(u64 flags)
+  {
+    for (ObjectComponent *mod : components)
+    {
+      if (mod->flags & flags)
+      {
+        return (T *)mod;
+      }
+    }
+    return NULL;
+  }
   template <typename T>
   T *ComponentGameObject::findComponent(std::string flag)
   {
@@ -261,6 +285,7 @@ namespace kNgine
   class SpriteAccessor : public ObjectComponent
   {
   public:
+    bool specialAccessor = false; // if the accessor requires something different before rendering
     cardinal8dir spriteLocation;
     v2 offset = {0.0f, 0.0f}; // offset in game units
     SpriteAccessor(ComponentGameObject *base);
@@ -306,28 +331,31 @@ namespace kNgine
   class LayerRenderer : public GameObject
   {
   public:
-    u32 layer=0;// to be used in conjunction with LayerOrder
+    u32 layer = 0; // to be used in conjunction with LayerOrder
     LayerRenderer() { this->flags |= ObjectFlags::RENDERER_LAYER; }
     LayerRenderer(const LayerRenderer &base) : GameObject(base) {}
-    virtual void updateWindowSize(i32 windowWidth, i32 windowHeight){}
-    virtual void render(){}
+    virtual void render() {}
   };
-  static std::vector<LayerRenderer*>getRenderersAtLayer(std::vector<LayerRenderer*>renderers,u32 layer){
-    std::vector<LayerRenderer*>res;
-    for(u32 i=0;i<renderers.size();i++){
-      if(renderers[i]->layer==layer){
+  static std::vector<LayerRenderer *> getRenderersAtLayer(std::vector<LayerRenderer *> renderers, u32 layer)
+  {
+    std::vector<LayerRenderer *> res;
+    for (u32 i = 0; i < renderers.size(); i++)
+    {
+      if (renderers[i]->layer == layer)
+      {
         res.push_back(renderers[i]);
       }
     }
     return res;
   }
 
-  class NodeObjectComponent final: public ObjectComponent
+  class NodeObjectComponent final : public ObjectComponent
   {
   private:
     v3 previousParentPos;
+
   public:
-    GameObject* child;
+    GameObject *child;
     NodeObjectComponent(ComponentGameObject *parent, GameObject *child);
     void update(std::vector<msg> msgs);
   };
@@ -340,7 +368,7 @@ namespace kNgine
   void addEvent(EngineEvent event);
   void *callEvent(std::string name, void *arg = NULL);
 
-  template <class T = EngineObject,class I = EngineObject>
+  template <class T = EngineObject, class I = EngineObject>
   std::vector<T *> findObject(std::vector<I *> objects,
                               std::string label)
   {

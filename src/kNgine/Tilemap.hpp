@@ -14,7 +14,8 @@ namespace kNgine{
       u32 index;
     };
   public:
-    // bool preJoinSprites=false;// instead of rendering multiple sprites, should joins tiles into one sprite and should (to test) improves performance at the cost of ram.
+    // bool preJoinSprites=false;
+    // instead of rendering multiple sprites, should joins tiles into one sprite and should (to test) improves performance at the cost of ram.
     class TileDef{
     public:
       u32 spriteMapIndex;

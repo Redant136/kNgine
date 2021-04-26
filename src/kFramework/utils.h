@@ -10,6 +10,23 @@
 #include <math.h>
 #include <time.h>
 
+#ifdef utils_print
+#ifndef __cplusplus
+#include <stdio.h>
+#define println(x) printf("%s\n",x);
+#define printv2(v) printf("{%f,%f}",v.x,v.y);
+#define printv3(v) printf("{%f,%f,%f}", v.x, v.y,v.z);
+#define printv4(v) printf("{%f,%f,%f,%f}", v.x, v.y,v.z,v.w);
+#else
+#include <iostream>
+#define print(x) std::cout<<x;
+#define println(x) std::cout << x << std::endl;
+#define printv2(v) std::cout << "{" << v.x << "," << v.y << "}" << std::endl;
+#define printv3(v) std::cout << "{" << v.x << "," << v.y << "," << v.z << "}" << std::endl;
+#define printv4(v) std::cout << "{" << v.x << "," << v.y << "," << v.z << "," << v.w << "}" << std::endl;
+#endif
+#endif
+
 #ifdef _WIN32
 #define NOMINMAX
 #include <Windows.h>
@@ -2444,6 +2461,10 @@ public:
               yScale * V4MinusV4(targetMax, targetMin).y + targetMin.y,
               zScale * V4MinusV4(targetMax, targetMin).z + targetMin.z,
               wScale * V4MinusV4(targetMax, targetMin).w + targetMin.w);
+  }
+  m4 toM4(){
+    m4 mat=M4Mapper(toV3(min),toV3(max),toV3(targetMin),toV3(targetMax));
+    return mat;
   }
 };
 #endif

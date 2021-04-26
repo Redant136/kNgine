@@ -10,7 +10,7 @@ namespace kNgine
   {
   public:
     std::vector<Sprite> list = std::vector<Sprite>();
-    std::vector<u32 > texIndex = std::vector<u32 >();
+    std::vector<u32> texIndex = std::vector<u32>();
     SpriteMap();
     virtual ~SpriteMap();
     void init(std::vector<EngineObject *> objects);
@@ -19,12 +19,13 @@ namespace kNgine
     void unload(std::vector<EngineObject *> objects);
     void offsetPixelsInSprites(cardinal8dir dir, u32 offset);
   };
-  class SpriteMapAccessor:public SpriteAccessor{
+  class SpriteMapAccessor : public SpriteAccessor
+  {
   public:
-    SpriteMap* spriteList;
+    SpriteMap *spriteList;
     SpriteMapAccessor(ComponentGameObject *base);
     bool hasToSave() { return false; }
-    virtual u32 getMapIndex()=0;
+    virtual u32 getMapIndex(){return 0;};
   };
   class SpriteReferenceComponent : public SpriteMapAccessor
   {
@@ -36,7 +37,7 @@ namespace kNgine
     SpriteReferenceComponent(const SpriteComponent &base, SpriteMap *spriteList);
     SpriteReferenceComponent(const SpriteReferenceComponent &base);
     virtual ~SpriteReferenceComponent();
-    virtual void update(std::vector<msg>msgs);
+    virtual void update(std::vector<msg> msgs);
     u32 getMapIndex();
     Sprite *getSprite();
     v2 getSpriteDimensions();
@@ -44,70 +45,122 @@ namespace kNgine
   class SpriteAnimation : public SpriteMapAccessor
   {
   private:
-    std::vector<u32 >spritesIndexes;
+    std::vector<u32> spritesIndexes;
     u32 frame;
-    f32 timeUntilNextFrame=0;
+    f32 timeUntilNextFrame = 0;
+
   public:
-    std::vector<v2>spriteDimensions;
+    std::vector<v2> spriteDimensions;
     f32 frameLength;
-    SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<u32 > indexes,
+    SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<u32> indexes,
                     f32 frameLength, v2 spriteDimension = v2(1.0f, 1.0f));
     SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<Sprite> sprites,
                     f32 frameLength, v2 spriteDimension = v2(1.0f, 1.0f));
 
-    SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<u32 > indexes,
+    SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<u32> indexes,
                     f32 frameLength, std::vector<v2> spriteDimensions);
     SpriteAnimation(ComponentGameObject *base, SpriteMap *spriteList, std::vector<Sprite> sprites,
                     f32 frameLength, std::vector<v2> spriteDimensions);
     SpriteAnimation(const SpriteAnimation &base);
     virtual ~SpriteAnimation();
-    virtual void update(std::vector<msg>msgs);
+    virtual void update(std::vector<msg> msgs);
     u32 getMapIndex();
     Sprite *getSprite();
     v2 getSpriteDimensions();
   };
+
+  // [RendererObject]
+  // should really be extended, but not necessary
+  // WILL FUCK UP IF MORE THAN ONE CAMERA EACH FRAME
+  class SpriteRendererObject_base : public SpriteMapAccessor
+  {
+  public:
+    u32 rendererObjectIndex;
+    std::vector<std::vector<u32>>spriteIndexes;
+
+    SpriteRendererObject_base(ComponentGameObject *base, SpriteMap *spriteList);
+    SpriteRendererObject_base(ComponentGameObject *base, SpriteMap *spriteList, size_t numShaders,
+      u32 *shaderIndex, size_t *numTriangles, void ***points[3]);
+    SpriteRendererObject_base(ComponentGameObject *base, SpriteMap *spriteList, size_t numShaders,
+      u32 *shaderIndex, size_t *numTriangles, void ***points[3], std::vector<std::vector<u32>> spriteIndexes);
+    SpriteRendererObject_base(ComponentGameObject *base, SpriteMap *spriteList, size_t numShaders,
+      u32 *shaderIndex, size_t *numTriangles, void ***points[3], std::vector<std::vector<Sprite>> sprite);
+
+    virtual void updatePoints(m4 matrix){}
+  };
+
+  // WILL FUCK UP IF MORE THAN ONE CAMERA EACH FRAME
+  class SpriteRendererObject : public SpriteRendererObject_base
+  {
+  private:
+    struct
+    {
+      v3 pos;
+      bool isTex;
+      v4 texCoord;
+    } default_points[4];
+
+  public:
+    v2 spriteDimensions;
+
+    SpriteRendererObject(ComponentGameObject *base, SpriteMap *spriteList, u32 spriteIndex);
+    SpriteRendererObject(ComponentGameObject *base, SpriteMap *spriteList, Sprite sprite);
+    v2 getSpriteDimensions(){return spriteDimensions;}
+    virtual void updatePoints(m4 matrix);
+  };
+
   //[animation_system]
-  class SpriteAnimationSystem:public SpriteMapAccessor{//make sure that spriteanimation uses the same map
+  class SpriteAnimationSystem : public SpriteMapAccessor
+  { //make sure that spriteanimation uses the same map
   protected:
-    struct accessor_pair{
+    struct accessor_pair
+    {
       std::string name;
-      SpriteMapAccessor*accessor;
+      SpriteMapAccessor *accessor;
     };
-    std::vector<accessor_pair>accessors;
+    std::vector<accessor_pair> accessors;
     SpriteMapAccessor *active;
+
   public:
     v2 spriteDimension;
     SpriteAnimationSystem(ComponentGameObject *base, SpriteMap *spriteList) : SpriteMapAccessor(base)
     {
-      this->spriteList=spriteList;
-      active=NULL;
-      spriteDimension=v2(1,1);
+      this->spriteList = spriteList;
+      active = NULL;
+      spriteDimension = v2(1, 1);
     }
-    void addSprite(SpriteMapAccessor *accessor,std::string name){
-      struct accessor_pair a = { name,accessor };
+    void addSprite(SpriteMapAccessor *accessor, std::string name)
+    {
+      struct accessor_pair a = {name, accessor};
       accessors.push_back(a);
-      accessor->object=this->object;
-      if(active==NULL)active=accessor;
+      accessor->object = this->object;
+      if (active == NULL)
+        active = accessor;
     }
-    void setActive(std::string name) {
-      for(i32 i=0;i<accessors.size();i++){
-        if(accessors[i].name==name){
-          this->active=accessors[i].accessor;
+    void setActive(std::string name)
+    {
+      for (i32 i = 0; i < accessors.size(); i++)
+      {
+        if (accessors[i].name == name)
+        {
+          this->active = accessors[i].accessor;
         }
       }
     }
-    void setActive(u32 index){
-      this->active=accessors[index].accessor;
+    void setActive(u32 index)
+    {
+      this->active = accessors[index].accessor;
     }
-    virtual void update(std::vector<msg> msgs){active->update(msgs);}
-    u32 getMapIndex(){return active->getMapIndex();}
-    Sprite *getSprite(){return active->getSprite();}
-    v2 getSpriteDimensions(){return v2(active->getSpriteDimensions().x*spriteDimension.x,active->getSpriteDimensions().y*spriteDimension.y);}
-    v2 getSpriteLocation(){return active->getSpriteLocation();}
+    virtual void update(std::vector<msg> msgs) { active->update(msgs); }
+    u32 getMapIndex() { return active->getMapIndex(); }
+    Sprite *getSprite() { return active->getSprite(); }
+    v2 getSpriteDimensions() { return v2(active->getSpriteDimensions().x * spriteDimension.x, active->getSpriteDimensions().y * spriteDimension.y); }
+    v2 getSpriteLocation() { return active->getSpriteLocation(); }
   };
 
   //[sprite_list]
-  class SpriteList : public SpriteAccessor{
+  class SpriteList : public SpriteAccessor
+  {
   protected:
     std::vector<SpriteAccessor *> accessors;
   public:
@@ -117,8 +170,9 @@ namespace kNgine
     }
     SpriteList(ComponentGameObject *base, std::vector<SpriteAccessor *> accessors, SpriteMap *spriteList) : SpriteAccessor(base)
     {
-      this->label="[sprite_list]";
-      this->accessors=accessors;
+      this->label = "[sprite_list]";
+      this->specialAccessor = true;
+      this->accessors = accessors;
       spriteDimension = v2(1, 1);
     }
     virtual ~SpriteList()
@@ -128,18 +182,20 @@ namespace kNgine
         delete spr;
       }
     }
-    void addAccessor(SpriteAccessor* accessor){accessors.push_back(accessor);}
-    virtual void update(std::vector<msg> msgs) {
-      for(SpriteAccessor*spr:accessors){
+    void addAccessor(SpriteAccessor *accessor) { accessors.push_back(accessor); }
+    virtual void update(std::vector<msg> msgs)
+    {
+      for (SpriteAccessor *spr : accessors)
+      {
         spr->update(msgs);
       }
     }
-    SpriteAccessor**getSpriteList(){return accessors.data();}
-    i32 getSpriteListLength(){return accessors.size();}
-    bool hasToSave(){return false;}
-    Sprite *getSprite(){return accessors[0]->getSprite();}
-    v2 getSpriteDimensions() { return accessors[0]->getSpriteLocation();}
-    v2 getSpriteLocation(){return accessors[0]->getSpriteLocation();}
+    SpriteAccessor **getSpriteList() { return accessors.data(); }
+    i32 getSpriteListLength() { return accessors.size(); }
+    bool hasToSave() { return false; }
+    Sprite *getSprite() { return accessors[0]->getSprite(); }
+    v2 getSpriteDimensions() { return accessors[0]->getSpriteLocation(); }
+    v2 getSpriteLocation() { return accessors[0]->getSpriteLocation(); }
   };
 
   std::vector<Sprite> importSpriteSheet(const char *filename, i32 spriteWidth, i32 spriteHeight);

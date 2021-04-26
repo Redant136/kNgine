@@ -71,7 +71,7 @@ namespace kNgine{
   SpriteAccessor::SpriteAccessor(ComponentGameObject *base) : ObjectComponent(base)
   {
     this->label = "[sprite]";
-    this->flags|=ObjectFlags::SPRITE;
+    this->flags|=ObjectFlags::RENDERABLE;
   }
 
   SpriteComponent::SpriteComponent(ComponentGameObject *base)

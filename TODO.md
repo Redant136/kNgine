@@ -3,18 +3,23 @@
 # main branch
 
 ## currently working on
-- [ ] fix openal
-- [x] use audiofile lib (https://github.com/adamstark/AudioFile.git)
-- [ ] stored objects in kRenderer
+- [x] stored objects in kRenderer
+- [x] stored renderer objects in kNgine
+- [x] make camera use unit cube instead of screen size
 ## testing
+- [ ] stored renderer objects in kNgine
 - [ ] audiofile lib
 - [ ] test custom shader in renderer
 ## next step
+- [ ] fix openal
 - [ ] object info tool
 - [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf, glfw opengl ES)
 - [ ] https://github.com/Dawoodoz/DFPSR
 ## research
 - [ ] https://thebookofshaders.com/
+- [ ] https://github.com/Dawoodoz/DFPSR
+- [ ] quaternions
+- [ ] https://handmade.network/library/resource/9
 - [ ] metal
 - [ ] glfw opengl ES
 ## procrastinating
@@ -33,6 +38,7 @@
 - [ ] direct x
 - [ ] vulkan
 - [ ] 3d engine (https://www.youtube.com/watch?v=whyJzrVEgVc)
+
 ---
 
 # Mac Engine Branch
@@ -43,6 +49,7 @@
 ## procrastinating
 ## someday... maybe
 - [ ] coreaudio
+
 ---
 
 # Windows Engine Branch
