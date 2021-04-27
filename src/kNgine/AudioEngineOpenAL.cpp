@@ -6,7 +6,6 @@
 #include "../../extern/stb/stb_vorbis.c"
 
 #ifndef __APPLE__
-#define AL_LIBTYPE_STATIC
 #include <AL/al.h>
 #include <AL/alc.h>
 #include "AudioFile.h"
@@ -281,6 +280,13 @@ namespace kNgine
   void AudioEngine::queueBuffer(const char *name, BaseAudioBuffer *buffer, bool loop)
   {
     this->queue.push_back(AudioQueue(name, buffer));
+    ALuint source;
+    alGenSources(1, &source);
+    alSourcef(source, AL_PITCH, 1);
+    alSource3f(source, AL_POSITION, 0, 0, 0);
+    alSource3f(source, AL_VELOCITY, 0, 0, 0);
+    alSourcei(source, AL_BUFFER, ((OpenALBuffer*)buffer)->buffer);
+    ((OpenALBuffer*)buffer)->source=source;
   }
   void AudioEngine::load(std::vector<EngineObject *> objects)
   {
@@ -344,7 +350,6 @@ namespace kNgine
 
       if (q->discard && !q->isPlaying)
       {
-        std::cout << "delete" << std::endl;
         alDeleteSources(1, &buffer->source);
         buffer->source = 0;
         delete buffer;

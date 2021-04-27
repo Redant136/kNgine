@@ -52,7 +52,7 @@ namespace kNgine{
     virtual ~Tilemap();
     void addTileDef(TileDef tileDef){tileDefs.push_back(tileDef);}
     void addTileDef(Sprite spr);
-    void addTileDef(std::vector<Sprite>sprites){for(i32 i=0;i<sprites.size();i++){addTileDef(sprites[i]);}}
+    void addTileDef(std::vector<Sprite>sprites){for(u32 i=0;i<sprites.size();i++){addTileDef(sprites[i]);}}
     void addTile(v2 pos, TileDef tileDef);
     void addTile(v2 pos,u32 tileDefIndex);
     virtual void init(std::vector<EngineObject*>objects);

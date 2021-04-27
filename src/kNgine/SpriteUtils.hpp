@@ -139,7 +139,7 @@ namespace kNgine
     }
     void setActive(std::string name)
     {
-      for (i32 i = 0; i < accessors.size(); i++)
+      for (u32 i = 0; i < accessors.size(); i++)
       {
         if (accessors[i].name == name)
         {

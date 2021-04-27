@@ -468,9 +468,9 @@ namespace kNgine
     {
       return std::vector<T *>();
     }
-    for (i32 i = 0; i < objects.size() - 1; i++)
+    for (u32 i = 0; i < objects.size() - 1; i++)
     {
-      for (i32 j = 0; j < objects.size() - 1 - i; j++)
+      for (u32 j = 0; j < objects.size() - 1 - i; j++)
       {
         if (objects[j]->position.z > objects[j + 1]->position.z)
         {
@@ -481,7 +481,7 @@ namespace kNgine
       }
     }
     std::vector<T *> res = std::vector<T *>(objects.size());
-    for (i32 i = 0; i < objects.size(); i++)
+    for (u32 i = 0; i < objects.size(); i++)
     {
       res[i] = (T *)objects[i];
     }

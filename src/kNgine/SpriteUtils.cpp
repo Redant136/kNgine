@@ -10,7 +10,7 @@ namespace kNgine
   SpriteMap::SpriteMap() {}
   SpriteMap::~SpriteMap()
   {
-    for (i32 i = 0; i < list.size(); i++)
+    for (u32 i = 0; i < list.size(); i++)
     {
       freeSprite(list[i]);
     }
@@ -24,7 +24,7 @@ namespace kNgine
   void SpriteMap::load(std::vector<EngineObject *> objects)
   {
     texIndex = std::vector<u32>();
-    for (i32 i = 0; i < list.size(); i++)
+    for (u32 i = 0; i < list.size(); i++)
     {
       u32 texture, VBO;
       kRenderer_bindTexture(&texture, list[i].buffer, list[i].width, list[i].height, list[i].numChannels);
@@ -33,7 +33,7 @@ namespace kNgine
   }
   void SpriteMap::unload(std::vector<EngineObject *> objects)
   {
-    for (i32 i = 0; i < list.size(); i++)
+    for (u32 i = 0; i < list.size(); i++)
     {
       kRenderer_unbindTexture(texIndex[i]);
     }
@@ -103,7 +103,7 @@ namespace kNgine
     this->frameLength = frameLength;
     this->spritesIndexes = indexes;
     this->spriteDimensions = std::vector<v2>(indexes.size());
-    for (i32 i = 0; i < indexes.size(); i++)
+    for (u32 i = 0; i < indexes.size(); i++)
     {
       this->spriteDimensions[i] = spriteDimension;
     }
@@ -117,7 +117,7 @@ namespace kNgine
     this->frameLength = frameLength;
     this->spritesIndexes = std::vector<u32>(sprites.size());
     this->spriteDimensions = std::vector<v2>(sprites.size());
-    for (i32 i = 0; i < sprites.size(); i++)
+    for (u32 i = 0; i < sprites.size(); i++)
     {
       this->spritesIndexes[i] = spriteList->list.size();
       this->spriteDimensions[i] = spriteDimension;
@@ -142,7 +142,7 @@ namespace kNgine
     this->frame = 0;
     this->frameLength = frameLength;
     this->spriteDimensions = spriteDimensions;
-    for (i32 i = 0; i < sprites.size(); i++)
+    for (u32 i = 0; i < sprites.size(); i++)
     {
       this->spritesIndexes[i] = this->spriteList->list.size();
       this->spriteList->list.push_back(sprites[i]);
@@ -163,7 +163,7 @@ namespace kNgine
   void SpriteAnimation::update(std::vector<msg> msgs)
   {
     f32 timeElapsed = 0;
-    for (i32 i = 0; i < msgs.size(); i++)
+    for (u32 i = 0; i < msgs.size(); i++)
     {
       if (msgs[i].msgType == msg::TIME_ELAPSED)
       {
@@ -343,9 +343,9 @@ namespace kNgine
     i32 numSpritesHor = width / spriteWidth;
     i32 numSpritesVert = height / spriteHeight;
     std::vector<Sprite> sprites = std::vector<Sprite>();
-    for (i32 i = 0; i < numSpritesVert; i++)
+    for (u32 i = 0; i < numSpritesVert; i++)
     {
-      for (i32 j = 0; j < numSpritesHor; j++)
+      for (u32 j = 0; j < numSpritesHor; j++)
       {
         u8 *sprite = new u8[spriteWidth * spriteHeight * numChannels];
         for (i32 y = 0; y < spriteHeight; y++)

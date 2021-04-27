@@ -19,7 +19,7 @@ namespace kNgine
   {
     this->position = v3(0, 0, 1);
     this->posMapper = mapper(v2(0,0),v2(0,0),v2(-1,-1),v2(1,1));
-    if (windowWidth > windowHeight)
+    if (windowHeight < windowWidth)
     {
       posMapper.min.x = -fov / 2;
       posMapper.max.x = fov / 2;
@@ -30,13 +30,8 @@ namespace kNgine
     {
       posMapper.min.y = -fov / 2;
       posMapper.max.y = fov / 2;
-      posMapper.min.x = -((f32)windowHeight) / windowWidth * fov / 2;
-      posMapper.max.x = ((f32)windowHeight) / windowWidth * fov / 2;
-
-      // f32 heightFOV = ((float)windowHeight) / windowWidth * fov;
-      // this->posMapper =
-      //     mapper(v2(-fov / 2, -heightFOV / 2), v2(fov / 2, heightFOV / 2),
-      //            v2(0, windowHeight), v2(windowWidth, 0));
+      posMapper.min.x = -((f32)windowWidth) / windowHeight * fov / 2;
+      posMapper.max.x = ((f32)windowWidth) / windowHeight * fov / 2;
     }
     this->fov = fov;
     this->flags|=ObjectFlags::RENDERER_LAYER;

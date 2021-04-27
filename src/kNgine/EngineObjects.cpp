@@ -35,7 +35,7 @@ namespace kNgine{
   }
   ComponentGameObject::ComponentGameObject(const ComponentGameObject &base) :GameObject(base){
     this->components=std::vector<ObjectComponent*>();
-    for(i32 i=0;i<base.components.size();i++){
+    for(u32 i=0;i<base.components.size();i++){
       ObjectComponent*comp=new ObjectComponent(this);
       *comp=*base.components[i];
       this->components.push_back(comp);
@@ -43,7 +43,7 @@ namespace kNgine{
     }
   }
   ComponentGameObject::~ComponentGameObject() {
-    for (i32 i = 0; i < components.size(); i++) {
+    for (u32 i = 0; i < components.size(); i++) {
       delete components[i];
     }
   }
@@ -59,7 +59,7 @@ namespace kNgine{
     }
   }
   void ComponentGameObject::removeComponent(ObjectComponent*component){
-    for(i32 i=0;i<components.size();i++){
+    for(u32 i=0;i<components.size();i++){
       if(components[i]==component){
         delete components[i];
         components.erase(components.begin()+i);
@@ -118,7 +118,7 @@ namespace kNgine{
     Sprite res;
     if (numChannels == 3) {
       u8 *data2 = new u8[width * height * 4];
-      for (i32 i = 0; i < width * height; i++) {
+      for (u32 i = 0; i < width * height; i++) {
         data2[4 * i] = data[numChannels * i];
         data2[4 * i + 1] = data[numChannels * i + 1];
         data2[4 * i + 2] = data[numChannels * i + 2];
@@ -138,7 +138,7 @@ namespace kNgine{
     events.push_back(event);
   }
   void* callEvent(std::string name,void*arg){
-    for(i32 i=0;i<events.size();i++){
+    for(u32 i=0;i<events.size();i++){
       if(events[i].name==name){
         return events[i].event(arg);
       }

@@ -865,7 +865,7 @@ void kRenderer_rotateViewport(v3 angle)
 // }
 // void kRenderer_drawLineLoop(v2 *points, i32 numPoints)
 // {
-//   for (i32 i = 0; i < numPoints; i++)
+//   for (u32 i = 0; i < numPoints; i++)
 //   {
 //     v2 lines[2] = {points[i], points[(i + 1) % 4]};
 //     kRenderer_drawLine(lines);

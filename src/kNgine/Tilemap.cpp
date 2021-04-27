@@ -36,7 +36,7 @@ namespace kNgine
   void Tilemap::init(std::vector<EngineObject *> objects){
     std::vector<b2FixtureDef>fixtures;
     std::vector<SpriteAccessor *> spritesRefs;
-    for(i32 i=0;i<tiles.size();i++){
+    for(u32 i=0;i<tiles.size();i++){
       if(tileDefs[tiles[i].index].tileType==TileDef::rect){
         b2FixtureDef def;
         b2PolygonShape *shape = new b2PolygonShape();
@@ -63,7 +63,7 @@ namespace kNgine
     addComponent(new physics::b2PhysicsBodyComponent(this,fixtures));
   }
   void Tilemap::end(std::vector<EngineObject *> objects){
-    for(i32 i=0;i<shapesList.size();i++){
+    for(u32 i=0;i<shapesList.size();i++){
       delete shapesList[i];
     }
   }
