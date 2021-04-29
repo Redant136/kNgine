@@ -6,8 +6,6 @@
 #include "../kFramework/utils.h"
 #include "EngineObjects.hpp"
 #include "../kFramework/kRenderer.h"
-#include "Camera.hpp"
-#include "SpriteUtils.hpp"
 #include "Engine.hpp"
 
 namespace kNgine

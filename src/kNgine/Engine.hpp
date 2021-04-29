@@ -180,7 +180,6 @@ namespace kNgine
         for (LayerRenderer *r : layer)
         {
           kRenderer_setDrawColor(v4(1, 1, 1, 1));
-          // r->updateWindowSize(windowSize.x, windowSize.y);
           r->render();
         }
       }

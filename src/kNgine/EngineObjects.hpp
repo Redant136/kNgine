@@ -38,7 +38,7 @@ namespace kNgine
     AUDIO = 1 << 6           // contains audio component
   };
 
-#define kNgine_maxLayerOrder 64
+#define kNgine_maxLayerOrder 32
   struct LayerOrder
   {
     size_t length;
@@ -54,20 +54,20 @@ namespace kNgine
     LayerOrder lo = {0};
     return lo;
   }
-  static void addLayerOrderDef(LayerOrder *order, const char *layer)
+  static inline void addLayerOrderDef(LayerOrder *order, const char *layer)
   {
     assert(order->length < kNgine_maxLayerOrder);
     order->ids[order->length] = {(u32)order->length, layer};
     order->length++;
   }
-  static void setLayerOrder(LayerOrder *order, u32 *o)
+  static inline void setLayerOrder(LayerOrder *order, u32 *o)
   {
     for (u32 i = 0; i < order->length; i++)
     {
       order->order[i] = o[i];
     }
   }
-  static u32 layerO(LayerOrder order, const char *name)
+  static inline u32 layerO(LayerOrder order, const char *name)
   {
     for (u32 i = 0; i < order.length; i++)
     {
@@ -83,11 +83,11 @@ namespace kNgine
 #define setLayerOrder(order, o) setLayerOrder(&order, o)
 #define layerO(order, layer) layerO(order, #layer)
 
-  typedef struct
+  struct Sprite
   {
     u32 width, height, numChannels;
     u8 *buffer;
-  } Sprite;
+  };
   static Sprite SpriteInit(u32 width, u32 height, u32 numChannels, u8 *buffer)
   {
     Sprite spr = {width, height, numChannels, buffer};
@@ -455,7 +455,7 @@ namespace kNgine
   std::vector<T *> findObject(std::vector<I *> objects,
                               u64 flags)
   {
-    return findObject<T>(objects.data(), objects.size(), flags);
+    return findObject<T,I>(objects.data(), objects.size(), flags);
   };
 
   Sprite importSprite(const char *filename);
