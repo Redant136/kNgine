@@ -6,8 +6,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../../extern/stb/stb_image.h"
 
-#include <iostream>
-
 namespace kNgine{
   std::vector<EngineEvent> events;
 

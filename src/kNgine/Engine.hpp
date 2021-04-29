@@ -11,7 +11,6 @@
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
 
-#include <iostream>
 namespace kNgine
 {
   extern std::vector<EngineObject *> objects;

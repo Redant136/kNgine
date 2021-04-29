@@ -8,8 +8,6 @@
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
 
-#include <iostream>
-
 namespace kNgine
 {
   Camera::Camera() : Camera(1, 1920, 1080)
