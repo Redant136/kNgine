@@ -4,7 +4,6 @@
 #include <string>
 #include <functional>
 #include "../kFramework/utils.h"
-#include <iostream>
 
 namespace kNgine
 {

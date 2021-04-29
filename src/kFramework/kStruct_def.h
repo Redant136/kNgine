@@ -56,7 +56,7 @@ static inline u8 kType_sizeOf(kTypes t)
   switch (t)
   {
   case kTYPE_bool:
-    return 1 << 2; // this can change depending on implementation
+    return 1 << 0; // this can change depending on implementation
   case kTYPE_char:
     return 1 << 0;
   case kTYPE_i8:

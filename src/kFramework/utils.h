@@ -4,7 +4,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 #include <assert.h>
 #include <math.h>
@@ -57,6 +56,13 @@ typedef uint32_t u32;
 typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
+typedef u8 b8;
+#ifndef __cplusplus
+#define bool u8
+#define true 1
+#define false 0
+
+#endif
 #endif
 
 
