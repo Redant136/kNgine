@@ -12,13 +12,13 @@
 #ifdef utils_print
 #ifndef __cplusplus
 #include <stdio.h>
-#define println(x) printf("%s\n",x);
-#define printv2(v) printf("{%f,%f}",v.x,v.y);
-#define printv3(v) printf("{%f,%f,%f}", v.x, v.y,v.z);
-#define printv4(v) printf("{%f,%f,%f,%f}", v.x, v.y,v.z,v.w);
+#define println(x) printf("%s\n", x);
+#define printv2(v) printf("{%f,%f}", v.x, v.y);
+#define printv3(v) printf("{%f,%f,%f}", v.x, v.y, v.z);
+#define printv4(v) printf("{%f,%f,%f,%f}", v.x, v.y, v.z, v.w);
 #else
 #include <iostream>
-#define print(x) std::cout<<x;
+#define print(x) std::cout << x;
 #define println(x) std::cout << x << std::endl;
 #define printv2(v) std::cout << "{" << v.x << "," << v.y << "}" << std::endl;
 #define printv3(v) std::cout << "{" << v.x << "," << v.y << "," << v.z << "}" << std::endl;
@@ -65,7 +65,6 @@ typedef u8 b8;
 #endif
 #endif
 
-
 #ifdef __cplusplus
 union v2
 {
@@ -75,38 +74,38 @@ union v2
     float y;
   };
   float elements[2];
-  v2 operator+(const v2& a) { return {x + a.x, y + a.y}; }
-  v2 operator-(const v2& a) { return {x - a.x, y - a.y}; }
-  void operator+=(const v2& a)
+  v2 operator+(const v2 &a) { return {x + a.x, y + a.y}; }
+  v2 operator-(const v2 &a) { return {x - a.x, y - a.y}; }
+  void operator+=(const v2 &a)
   {
     x += a.x;
     y += a.y;
   }
-  void operator-=(const v2& a)
+  void operator-=(const v2 &a)
   {
     x -= a.x;
     y -= a.y;
   }
-  v2 operator+(const float& a) { return {x + a, y + a}; }
-  v2 operator-(const float& a) { return {x - a, y - a}; }
-  v2 operator*(const float& a) { return {x * a, y * a}; }
-  v2 operator/(const float& a) { return {x / a, y / a}; }
-  void operator+=(const float& a)
+  v2 operator+(const float &a) { return {x + a, y + a}; }
+  v2 operator-(const float &a) { return {x - a, y - a}; }
+  v2 operator*(const float &a) { return {x * a, y * a}; }
+  v2 operator/(const float &a) { return {x / a, y / a}; }
+  void operator+=(const float &a)
   {
     x += a;
     y += a;
   }
-  void operator-=(const float& a)
+  void operator-=(const float &a)
   {
     x -= a;
     y -= a;
   }
-  void operator*=(const float& a)
+  void operator*=(const float &a)
   {
     x *= a;
     y *= a;
   }
-  void operator/=(const float& a)
+  void operator/=(const float &a)
   {
     x /= a;
     y /= a;
@@ -127,43 +126,43 @@ union v3
     float b;
   };
   float elements[3];
-  v3 operator+(const v3& a) { return {x + a.x, y + a.y, z + a.z}; }
-  v3 operator-(const v3& a) { return {x - a.x, y - a.y, z - a.z}; }
-  void operator+=(const v3& a)
+  v3 operator+(const v3 &a) { return {x + a.x, y + a.y, z + a.z}; }
+  v3 operator-(const v3 &a) { return {x - a.x, y - a.y, z - a.z}; }
+  void operator+=(const v3 &a)
   {
     x += a.x;
     y += a.y;
     z += a.z;
   }
-  void operator-=(const v3& a)
+  void operator-=(const v3 &a)
   {
     x -= a.x;
     y -= a.y;
     z -= a.z;
   }
-  v3 operator+(const float& a) { return {x + a, y + a, z + a}; }
-  v3 operator-(const float& a) { return {x - a, y - a, z - a}; }
-  v3 operator*(const float& a) { return {x * a, y * a, z * a}; }
-  v3 operator/(const float& a) { return {x / a, y / a, z / a}; }
-  void operator+=(const float& a)
+  v3 operator+(const float &a) { return {x + a, y + a, z + a}; }
+  v3 operator-(const float &a) { return {x - a, y - a, z - a}; }
+  v3 operator*(const float &a) { return {x * a, y * a, z * a}; }
+  v3 operator/(const float &a) { return {x / a, y / a, z / a}; }
+  void operator+=(const float &a)
   {
     x += a;
     y += a;
     z += a;
   }
-  void operator-=(const float& a)
+  void operator-=(const float &a)
   {
     x -= a;
     y -= a;
     z -= a;
   }
-  void operator*=(const float& a)
+  void operator*=(const float &a)
   {
     x *= a;
     y *= a;
     z *= a;
   }
-  void operator/=(const float& a)
+  void operator/=(const float &a)
   {
     x /= a;
     y /= a;
@@ -208,48 +207,48 @@ union v4
     float a;
   };
   float elements[4];
-  v4 operator+(const v4& a) { return {x + a.x, y + a.y, z + a.z, w + a.w}; }
-  v4 operator-(const v4& a) { return {x - a.x, y - a.y, z - a.z, w - a.w}; }
-  void operator+=(const v4& a)
+  v4 operator+(const v4 &a) { return {x + a.x, y + a.y, z + a.z, w + a.w}; }
+  v4 operator-(const v4 &a) { return {x - a.x, y - a.y, z - a.z, w - a.w}; }
+  void operator+=(const v4 &a)
   {
     x += a.x;
     y += a.y;
     z += a.z;
     w += a.w;
   }
-  void operator-=(const v4& a)
+  void operator-=(const v4 &a)
   {
     x -= a.x;
     y -= a.y;
     z -= a.z;
     w -= a.w;
   }
-  v4 operator+(const float& a) { return {x + a, y + a, z + a, w + a}; }
-  v4 operator-(const float& a) { return {x - a, y - a, z - a, w - a}; }
-  v4 operator*(const float& a) { return {x * a, y * a, z * a, w * a}; }
-  v4 operator/(const float& a) { return {x / a, y / a, z / a, w / a}; }
-  void operator+=(const float& a)
+  v4 operator+(const float &a) { return {x + a, y + a, z + a, w + a}; }
+  v4 operator-(const float &a) { return {x - a, y - a, z - a, w - a}; }
+  v4 operator*(const float &a) { return {x * a, y * a, z * a, w * a}; }
+  v4 operator/(const float &a) { return {x / a, y / a, z / a, w / a}; }
+  void operator+=(const float &a)
   {
     x += a;
     y += a;
     z += a;
     z += a;
   }
-  void operator-=(const float& a)
+  void operator-=(const float &a)
   {
     x -= a;
     y -= a;
     z -= a;
     z -= a;
   }
-  void operator*=(const float& a)
+  void operator*=(const float &a)
   {
     x *= a;
     y *= a;
     z *= a;
     z *= a;
   }
-  void operator/=(const float& a)
+  void operator/=(const float &a)
   {
     x /= a;
     y /= a;
@@ -298,10 +297,10 @@ union iv2
     x -= a.x;
     y -= a.y;
   }
-  iv2 operator+(const int32_t& a) { return {x + a, y + a}; }
-  iv2 operator-(const int32_t& a) { return {x - a, y - a}; }
-  iv2 operator*(const int32_t& a) { return {x * a, y * a}; }
-  iv2 operator/(const int32_t& a) { return {x / a, y / a}; }
+  iv2 operator+(const int32_t &a) { return {x + a, y + a}; }
+  iv2 operator-(const int32_t &a) { return {x - a, y - a}; }
+  iv2 operator*(const int32_t &a) { return {x * a, y * a}; }
+  iv2 operator/(const int32_t &a) { return {x / a, y / a}; }
   void operator+=(const int32_t &a)
   {
     x += a;
@@ -322,8 +321,8 @@ union iv2
     x /= a;
     y /= a;
   }
-  bool operator==(const iv2& a){return x==a.x&&y==a.y;}
-  bool operator!=(const iv2& a){return !(x==a.x&&y==a.y);}
+  bool operator==(const iv2 &a) { return x == a.x && y == a.y; }
+  bool operator!=(const iv2 &a) { return !(x == a.x && y == a.y); }
 };
 union iv3
 {
@@ -382,8 +381,8 @@ union iv3
     y /= a;
     z /= a;
   }
-  bool operator==(const iv3 &a) { return x == a.x && y == a.y&&z==a.z; }
-  bool operator!=(const iv3 &a) { return !(x == a.x && y == a.y&&z==a.z); }
+  bool operator==(const iv3 &a) { return x == a.x && y == a.y && z == a.z; }
+  bool operator!=(const iv3 &a) { return !(x == a.x && y == a.y && z == a.z); }
 };
 union iv4
 {
@@ -450,8 +449,8 @@ union iv4
     z /= a;
     z /= a;
   }
-  bool operator==(const iv4 &a) { return x == a.x && y == a.y && z == a.z && w==a.w; }
-  bool operator!=(const iv4 &a) { return !(x == a.x && y == a.y && z == a.z && w==a.w); }
+  bool operator==(const iv4 &a) { return x == a.x && y == a.y && z == a.z && w == a.w; }
+  bool operator!=(const iv4 &a) { return !(x == a.x && y == a.y && z == a.z && w == a.w); }
 };
 static iv2 IV2Init(int32_t x, int32_t y)
 {
@@ -475,7 +474,8 @@ static iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
 #else
 typedef union v2
 {
-  struct{
+  struct
+  {
     float x;
     float y;
   };
@@ -564,7 +564,8 @@ static v4 V4Init(float x, float y, float z, float w)
 
 typedef union iv2
 {
-  struct{
+  struct
+  {
     int32_t x;
     int32_t y;
   };
@@ -629,6 +630,7 @@ static iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
 #endif
 
 #define utils_VectorObjects
+// #define __cplusplus
 #if defined(utils_VectorObjects) && defined(__cplusplus)
 struct kv2;
 struct kv3;
@@ -656,10 +658,10 @@ struct kv2
     this->y = 0;
   }
 
-  kv2(const v2&base)
+  kv2(const v2 &base)
   {
-    this->x=base.x;
-    this->y=base.y;
+    this->x = base.x;
+    this->y = base.y;
   }
   kv2(const v3 &base)
   {
@@ -775,51 +777,51 @@ struct kv3
   {
     this->x = base.x;
     this->y = base.y;
-    this->z=0;
+    this->z = 0;
   }
   kv3(const v3 &base)
   {
     this->x = base.x;
     this->y = base.y;
-    this->z=base.z;
+    this->z = base.z;
   }
   kv3(const v4 &base)
   {
     this->x = base.x;
     this->y = base.y;
-    this->z=base.z;
+    this->z = base.z;
   }
   kv3(const iv2 &base)
   {
     this->x = base.x;
     this->y = base.y;
-    this->z=0;
+    this->z = 0;
   }
   kv3(const iv3 &base)
   {
     this->x = base.x;
     this->y = base.y;
-    this->z=base.z;
+    this->z = base.z;
   }
   kv3(const iv4 &base)
   {
     this->x = base.x;
     this->y = base.y;
-    this->z=base.z;
+    this->z = base.z;
   }
 
   kv3(const kv2 &base)
   {
     this->x = base.x;
     this->y = base.y;
-    this->z=0;
+    this->z = 0;
   }
   kv3(const kiv2 &base);
   kv3(const kv3 &base)
   {
-    this->x=base.x;
-    this->y=base.y;
-    this->z=base.z;
+    this->x = base.x;
+    this->y = base.y;
+    this->z = base.z;
   }
   kv3(const kiv3 &base);
   kv3(const kv4 &base);
@@ -931,28 +933,28 @@ struct kv4
     this->x = base.x;
     this->y = base.y;
     this->z = 0;
-    this->w=0;
+    this->w = 0;
   }
   kv4(const v3 &base)
   {
     this->x = base.x;
     this->y = base.y;
     this->z = base.z;
-    this->w=0;
+    this->w = 0;
   }
   kv4(const v4 &base)
   {
     this->x = base.x;
     this->y = base.y;
     this->z = base.z;
-    this->w=base.w;
+    this->w = base.w;
   }
   kv4(const iv2 &base)
   {
     this->x = base.x;
     this->y = base.y;
     this->z = 0;
-    this->w=0;
+    this->w = 0;
   }
   kv4(const iv3 &base)
   {
@@ -1073,7 +1075,7 @@ struct kiv2
     this->x = d;
     this->y = 0;
   }
-  
+
   kiv2(const v2 &base)
   {
     this->x = base.x;
@@ -1110,18 +1112,21 @@ struct kiv2
     this->x = base.x;
     this->y = base.y;
   }
-  kiv2(const kiv2 &base){
-    this->x=base.x;
-    this->y=base.y;
+  kiv2(const kiv2 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
   }
-  kiv2(const kv3 &base){
-    this->x=base.x;
-    this->y=base.y;
+  kiv2(const kv3 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
   }
   kiv2(const kiv3 &base);
-  kiv2(const kv4 &base){
-    this->x=base.x;
-    this->y=base.y;
+  kiv2(const kv4 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
   }
   kiv2(const kiv4 &base);
   bool operator==(const kiv2 &a) { return x == a.x && y == a.y; }
@@ -1228,10 +1233,11 @@ struct kiv3
     this->y = base.y;
     this->z = 0;
   }
-  kiv3(const kiv2 &base){
-    this->x=base.x;
-    this->y=base.y;
-    this->z=0;
+  kiv3(const kiv2 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+    this->z = 0;
   }
   kiv3(const kv3 &base)
   {
@@ -1239,15 +1245,17 @@ struct kiv3
     this->y = base.y;
     this->z = base.z;
   }
-  kiv3(const kiv3 &base){
-    this->x=base.x;
-    this->y=base.y;
-    this->z=base.z;
+  kiv3(const kiv3 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+    this->z = base.z;
   }
-  kiv3(const kv4 &base){
-    this->x=base.x;
-    this->y=base.y;
-    this->z=base.z;
+  kiv3(const kv4 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+    this->z = base.z;
   }
   kiv3(const kiv4 &base);
   bool operator==(const kiv3 &a) { return x == a.x && y == a.y && z == a.z; }
@@ -1377,11 +1385,12 @@ struct kiv4
     this->z = 0;
     this->w = 0;
   }
-  kiv4(const kiv2 &base){
-    this->x=base.x;
-    this->y=base.y;
-    this->z=0;
-    this->w=0;
+  kiv4(const kiv2 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+    this->z = 0;
+    this->w = 0;
   }
   kiv4(const kv3 &base)
   {
@@ -1390,11 +1399,12 @@ struct kiv4
     this->z = base.z;
     this->w = 0;
   }
-  kiv4(const kiv3 &base){
-    this->x=base.x;
-    this->y=base.y;
-    this->z=base.z;
-    this->w=0;
+  kiv4(const kiv3 &base)
+  {
+    this->x = base.x;
+    this->y = base.y;
+    this->z = base.z;
+    this->w = 0;
   }
   kiv4(const kv4 &base)
   {
@@ -1403,7 +1413,7 @@ struct kiv4
     this->z = base.z;
     this->w = base.w;
   }
-  kiv4(const kv4 &base)
+  kiv4(const kiv4 &base)
   {
     this->x = (int32_t)floor(base.x);
     this->y = (int32_t)floor(base.y);
@@ -1483,88 +1493,95 @@ struct kiv4
   kiv3 toIV3() { return kiv3(x, y, z); }
 };
 
-inline kv2::kv2(const kiv2 &base){
-  this->x=base.x;
-  this->y=base.y;
+inline kv2::kv2(const kiv2 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
 }
-inline kv2::kv2(const kv3 &base){
-  this->x=base.x;
-  this->y=base.y;
+inline kv2::kv2(const kv3 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
 }
-inline kv2::kv2(const kiv3 &base){
-  this->x=base.x;
-  this->y=base.y;
-}
-inline kv2::kv2(const kv4 &base){
-  this->x=base.x;
-  this->y=base.y;
-}
-inline kv2::kv2(const kiv4 &base){
-  this->x=base.x;
-  this->y=base.y;
+inline kv2::kv2(const kiv3 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
 }
 inline kv2::kv2(const kv4 &base)
 {
   this->x = base.x;
   this->y = base.y;
 }
-
-inline kv3::kv3(const kiv2 &base){
-  this->x=base.x;
-  this->y=base.y;
-  this->z=0;
-}
-inline kv3::kv3(const kiv3 &base){
-  this->x=base.x;
-  this->y=base.y;
-  this->z=base.z;
-}
-inline kv3::kv3(const kv4 &base){
-  this->x=base.x;
-  this->y=base.y;
-  this->z=base.z;
-}
-inline kv3::kv3(const kiv4 &base){
-  this->x=base.x;
-  this->y=base.y;
-  this->z=base.z;
+inline kv2::kv2(const kiv4 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
 }
 
-inline kv4::kv4(const kiv2 &base){
-  this->x=base.x;
-  this->y=base.y;
-  this->z=0;
-  this->w=0;
-
+inline kv3::kv3(const kiv2 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+  this->z = 0;
 }
-inline kv4::kv4(const kiv3 &base){
-  this->x=base.x;
-  this->y=base.y;
-  this->z=base.y;
-  this->w=0;
-
+inline kv3::kv3(const kiv3 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+  this->z = base.z;
 }
-inline kv4::kv4(const kiv4 &base){
-  this->x=base.x;
-  this->y=base.y;
-  this->z=base.y;
-  this->w=base.w;
-
+inline kv3::kv3(const kv4 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+  this->z = base.z;
 }
-
-inline kiv2::kiv2(const kiv3 &base){
-  this->x=base.x;
-  this->y=base.y;
-}
-inline kiv2::kiv2(const kiv4 &base){
-  this->x=base.x;
-  this->y=base.y;
+inline kv3::kv3(const kiv4 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+  this->z = base.z;
 }
 
-inline kiv3::kiv3(const kiv4 &base){
-  this->x=base.x;
-  this->y=base.y;
-  this->z=base.z;
+inline kv4::kv4(const kiv2 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+  this->z = 0;
+  this->w = 0;
+}
+inline kv4::kv4(const kiv3 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+  this->z = base.y;
+  this->w = 0;
+}
+inline kv4::kv4(const kiv4 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+  this->z = base.y;
+  this->w = base.w;
+}
+
+inline kiv2::kiv2(const kiv3 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+}
+inline kiv2::kiv2(const kiv4 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+}
+
+inline kiv3::kiv3(const kiv4 &base)
+{
+  this->x = base.x;
+  this->y = base.y;
+  this->z = base.z;
 }
 
 #define V2ToArray(v) \
@@ -1584,7 +1601,7 @@ inline kiv3::kiv3(const kiv4 &base){
 
 #define toV2(v) v2((v).x, (v).y)
 #define toV3(v) v3((v).x, (v).y, (v).z)
-#define toV4(v) v4((v).x, (v).y, (v).z,(v).w)
+#define toV4(v) v4((v).x, (v).y, (v).z, (v).w)
 #define toIV2(v) iv2((v).x, (v).y)
 #define toIV3(v) iv3((v).x, (v).y, (v).z)
 #define toIV4(v) iv3((v).x, (v).y, (v).z, (v).w)
@@ -1996,9 +2013,8 @@ static inline m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
   return transform;
 }
 
-
-#define fCompare(a,b) (fabsf(a - b) < 0.0001)
-#define fCompareN(a,b,n) (fabsf(a - b) < n)
+#define fCompare(a, b) (fabsf(a - b) < 0.0001)
+#define fCompareN(a, b, n) (fabsf(a - b) < n)
 
 static inline bool CharIsSpace(char c)
 {
@@ -2428,8 +2444,8 @@ static inline v3 RGBToHSV(v3 rgb)
   bool c_max_is_g = rgb.g > rgb.r && rgb.g > rgb.b;
   bool c_max_is_b = rgb.b > rgb.r && rgb.b > rgb.g;
   float h = (c_max_is_r ? (rgb.g - rgb.b) / delta + 0 : c_max_is_g ? (rgb.b - rgb.r) / delta + 2
-                                                  : c_max_is_b   ? (rgb.r - rgb.g) / delta + 4
-                                                                 : 0);
+                                                    : c_max_is_b   ? (rgb.r - rgb.g) / delta + 4
+                                                                   : 0);
   float s = c_max == 0 ? 0 : (delta / c_max);
   float v = c_max;
   v3 hsv = v3(h / 6.f, s, v);
@@ -2557,8 +2573,8 @@ typedef enum Key
   KEY_ESCAPE,
   KEY_DELETE,
   ASCII_KEY_LAST,
-// end of ascii characters
-  KEY_INSERT=ASCII_KEY_LAST,
+  // end of ascii characters
+  KEY_INSERT = ASCII_KEY_LAST,
   KEY_RIGHT,
   KEY_LEFT,
   KEY_DOWN,
@@ -2598,7 +2614,7 @@ typedef enum Key
   UNREGISTERED_KEY,
   KEY_LAST,
   // mouse buttons
-  MOUSE_BUTTON1=KEY_LAST,
+  MOUSE_BUTTON1 = KEY_LAST,
   MOUSE_LEFT = MOUSE_BUTTON1,
   MOUSE_BUTTON2,
   MOUSE_RIGHT = MOUSE_BUTTON2,
@@ -2611,7 +2627,8 @@ typedef enum Key
   MOUSE_BUTTON8,
   MOUSE_LAST
 } Key;
-static inline char KeyToChar(Key k){
+static inline char KeyToChar(Key k)
+{
   switch (k)
   {
   case KEY_SPACE:
@@ -2724,124 +2741,129 @@ static inline char KeyToChar(Key k){
     return 0;
   }
 }
-static inline Key CharToKey(char c){
+static inline Key CharToKey(char c)
+{
   switch (c)
   {
-    case ' ':
-      return KEY_SPACE;
-    case '\'':
-      return KEY_APOSTROPHE /* ' */;
-    case ',':
-      return KEY_COMMA /* , */;
-    case '-':
-      return KEY_MINUS /* - */;
-    case '.':
-      return KEY_PERIOD /* . */;
-    case '/':
-      return KEY_SLASH /* / */;
-    case '0':
-      return KEY_0;
-    case '1':
-      return KEY_1;
-    case '2':
-      return KEY_2;
-    case '3':
-      return KEY_3;
-    case '4':
-      return KEY_4;
-    case '5':
-      return KEY_5;
-    case '6':
-      return KEY_6;
-    case '7':
-      return KEY_7;
-    case '8':
-      return KEY_8;
-    case '9':
-      return KEY_9;
-    case ';':
-      return KEY_SEMICOLON /* ; */;
-    case '=':
-      return KEY_EQUAL /* = */;
-    case 'a':
-      return KEY_A;
-    case 'b':
-      return KEY_B;
-    case 'c':
-      return KEY_C;
-    case 'd':
-      return KEY_D;
-    case 'e':
-      return KEY_E;
-    case 'f':
-      return KEY_F;
-    case 'g':
-      return KEY_G;
-    case 'h':
-      return KEY_H;
-    case 'i':
-      return KEY_I;
-    case 'J':
-      return KEY_J;
-    case 'k':
-      return KEY_K;
-    case 'l':
-      return KEY_L;
-    case 'm':
-      return KEY_M;
-    case 'n':
-      return KEY_N;
-    case 'o':
-      return KEY_O;
-    case 'p':
-      return KEY_P;
-    case 'q':
-      return KEY_Q;
-    case 'r':
-      return KEY_R;
-    case 's':
-      return KEY_S;
-    case 't':
-      return KEY_T;
-    case 'u':
-      return KEY_U;
-    case 'v':
-      return KEY_V;
-    case 'w':
-      return KEY_W;
-    case 'x':
-      return KEY_X;
-    case 'y':
-      return KEY_Y;
-    case 'z':
-      return KEY_Z;
-    case '[':
-      return KEY_LEFT_BRACKET /* [ */;
-    case '\\':
-      return KEY_BACKSLASH /* \ */;
-    case ']':
-      return KEY_RIGHT_BRACKET /* ] */;
-    case '`':
-      return KEY_GRAVE_ACCENT /* ` */;
-    case 27:
-      return KEY_ESCAPE;
-    case 8:
-      return KEY_BACKSPACE;
-    case 127:
-      return KEY_DELETE;
-    case '\t':
-      return KEY_TAB;
-    case '\n':
-      return KEY_ENTER;
-    default:
-      return UNREGISTERED_KEY;
+  case ' ':
+    return KEY_SPACE;
+  case '\'':
+    return KEY_APOSTROPHE /* ' */;
+  case ',':
+    return KEY_COMMA /* , */;
+  case '-':
+    return KEY_MINUS /* - */;
+  case '.':
+    return KEY_PERIOD /* . */;
+  case '/':
+    return KEY_SLASH /* / */;
+  case '0':
+    return KEY_0;
+  case '1':
+    return KEY_1;
+  case '2':
+    return KEY_2;
+  case '3':
+    return KEY_3;
+  case '4':
+    return KEY_4;
+  case '5':
+    return KEY_5;
+  case '6':
+    return KEY_6;
+  case '7':
+    return KEY_7;
+  case '8':
+    return KEY_8;
+  case '9':
+    return KEY_9;
+  case ';':
+    return KEY_SEMICOLON /* ; */;
+  case '=':
+    return KEY_EQUAL /* = */;
+  case 'a':
+    return KEY_A;
+  case 'b':
+    return KEY_B;
+  case 'c':
+    return KEY_C;
+  case 'd':
+    return KEY_D;
+  case 'e':
+    return KEY_E;
+  case 'f':
+    return KEY_F;
+  case 'g':
+    return KEY_G;
+  case 'h':
+    return KEY_H;
+  case 'i':
+    return KEY_I;
+  case 'J':
+    return KEY_J;
+  case 'k':
+    return KEY_K;
+  case 'l':
+    return KEY_L;
+  case 'm':
+    return KEY_M;
+  case 'n':
+    return KEY_N;
+  case 'o':
+    return KEY_O;
+  case 'p':
+    return KEY_P;
+  case 'q':
+    return KEY_Q;
+  case 'r':
+    return KEY_R;
+  case 's':
+    return KEY_S;
+  case 't':
+    return KEY_T;
+  case 'u':
+    return KEY_U;
+  case 'v':
+    return KEY_V;
+  case 'w':
+    return KEY_W;
+  case 'x':
+    return KEY_X;
+  case 'y':
+    return KEY_Y;
+  case 'z':
+    return KEY_Z;
+  case '[':
+    return KEY_LEFT_BRACKET /* [ */;
+  case '\\':
+    return KEY_BACKSLASH /* \ */;
+  case ']':
+    return KEY_RIGHT_BRACKET /* ] */;
+  case '`':
+    return KEY_GRAVE_ACCENT /* ` */;
+  case 27:
+    return KEY_ESCAPE;
+  case 8:
+    return KEY_BACKSPACE;
+  case 127:
+    return KEY_DELETE;
+  case '\t':
+    return KEY_TAB;
+  case '\n':
+    return KEY_ENTER;
+  default:
+    return UNREGISTERED_KEY;
   }
 }
-static inline u64 KeyBitmap(Key k){
-  if(k<ASCII_KEY_LAST){
-    return 1ULL<<k;
-  }else{
-    return 1ULL<<(k-ASCII_KEY_LAST);
+static inline u64 KeyBitmap(Key k)
+{
+  if (k < ASCII_KEY_LAST)
+  {
+    return 1ULL << k;
+  }
+  else
+  {
+    return 1ULL << (k - ASCII_KEY_LAST);
   }
 }
 
@@ -3184,10 +3206,10 @@ public:
               zScale * V4MinusV4(targetMax, targetMin).z + targetMin.z,
               wScale * V4MinusV4(targetMax, targetMin).w + targetMin.w);
   }
-  m4 toM4(){
-    m4 mat=M4Mapper(toV3(min),toV3(max),toV3(targetMin),toV3(targetMax));
+  m4 toM4()
+  {
+    m4 mat = M4Mapper(toV3(min), toV3(max), toV3(targetMin), toV3(targetMax));
     return mat;
   }
 };
 #endif
-
