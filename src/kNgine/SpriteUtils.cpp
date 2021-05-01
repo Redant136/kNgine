@@ -322,16 +322,16 @@ namespace kNgine
     kRenderer_bindObject(&rendererObjectIndex, object);
   }
   void SpriteRendererObject::updatePoints(m4 matrix){
-    v2 dimensions = V2MinusV2(toV2(V4MultiplyM4(V4AddV4(v4(object->position.x, object->position.y, object->position.z, 1), v4(getSpriteDimensions().x, getSpriteDimensions().y, 0, 1)), matrix)), toV2(V4MultiplyM4(v4(object->position.x, object->position.y, object->position.z, 1), matrix)));
+    v2 dimensions = toV2(V4MultiplyM4(v4(object->position.x, object->position.y, object->position.z, 1)+ v4(getSpriteDimensions().x, getSpriteDimensions().y, 0, 1), matrix))- toV2(V4MultiplyM4(v4(object->position.x, object->position.y, object->position.z, 1), matrix));
     v2 spriteOffset = v2(getSpriteLocation().x*dimensions.x,getSpriteLocation().y*dimensions.y);
     kRenderer_RendererObject*obj= kRenderer_getBoundObject(rendererObjectIndex);
     obj->shaderElements[0].triangles[0].valueUpdated[0] = true;
     obj->shaderElements[0].triangles[1].valueUpdated[0] = true;
 
-    default_points[0].pos = V3AddV3(object->position, v3(spriteOffset.x, spriteOffset.y, 0));
-    default_points[1].pos = V3AddV3(object->position, V3AddV3(v3(spriteOffset.x, spriteOffset.y, 0), v3(dimensions.x, 0, 0)));
-    default_points[2].pos = V3AddV3(object->position, V3AddV3(v3(spriteOffset.x, spriteOffset.y, 0), v3(0, dimensions.y, 0)));
-    default_points[3].pos = V3AddV3(object->position, V3AddV3(v3(spriteOffset.x, spriteOffset.y, 0), v3(dimensions.x, dimensions.y, 0)));
+    default_points[0].pos = object->position+ v3(spriteOffset.x, spriteOffset.y, 0);
+    default_points[1].pos = object->position+ v3(spriteOffset.x, spriteOffset.y, 0)+ v3(dimensions.x, 0, 0);
+    default_points[2].pos = object->position+ v3(spriteOffset.x, spriteOffset.y, 0)+ v3(0, dimensions.y, 0);
+    default_points[3].pos = object->position+ v3(spriteOffset.x, spriteOffset.y, 0)+ v3(dimensions.x, dimensions.y, 0);
     kRenderer_updateObject(rendererObjectIndex);
   }
   std::vector<Sprite> importSpriteSheet(const char *filename, i32 spriteWidth,

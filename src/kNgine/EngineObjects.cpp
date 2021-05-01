@@ -105,7 +105,7 @@ namespace kNgine{
   }
   void NodeObjectComponent::update(std::vector<msg> msgs)
   {
-    child->position = V3AddV3(V3MinusV3(this->object->position, previousParentPos), child->position);
+    child->position = (this->object->position- previousParentPos)+ child->position;
     this->previousParentPos = this->object->position;
   }
 

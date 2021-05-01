@@ -174,9 +174,9 @@ namespace kNgine
       {
         accessor = ((SpriteList*)compn)->getSpriteList()[i];
       }
-      v2 spriteDimensions = V2MinusV2(posMapper.map(V2AddV2(toV2(object->position),
-                                                            accessor->getSpriteDimensions())),
-                                      posMapper.map(toV2(object->position)));
+      v2 spriteDimensions = posMapper.map(toV2(object->position)+
+                                                            accessor->getSpriteDimensions())-
+                                      posMapper.map(toV2(object->position));
       u8 *buffer = accessor->getSprite()->buffer;
       v2 spriteOffset = accessor->getSpriteLocation();
       spriteOffset.x *= spriteDimensions.x;
@@ -184,13 +184,13 @@ namespace kNgine
 
       if (accessor->hasToSave())
       {
-        v2 pos = V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), accessor->offset), toV2(position))),spriteOffset);
+        v2 pos = posMapper.map((toV2(object->position)+ accessor->offset)- toV2(position))+spriteOffset;
         kRenderer_drawBuffer_defaultShader(buffer, accessor->getSprite()->width, accessor->getSprite()->height, accessor->getSprite()->numChannels,
                                            v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, object->rotation);
       }
       else
       {
-        v2 pos = V2AddV2(posMapper.map(V2MinusV2(V2AddV2(toV2(object->position), accessor->offset), toV2(position))), spriteOffset);
+        v2 pos = posMapper.map((toV2(object->position)+ accessor->offset)- toV2(position))+ spriteOffset;
         SpriteMapAccessor *ref = (SpriteMapAccessor *)accessor;
         kRenderer_drawStoredTexture_defaultShader(ref->spriteList->texIndex[ref->getMapIndex()],
                                                   v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, object->rotation);
