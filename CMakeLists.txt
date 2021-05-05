@@ -36,7 +36,6 @@ endif()
 set(KNGINEFRAMEWORK_HEADER_FILES 
 src/kFramework/utils.h
 src/kFramework/kThread.h
-src/kFramework/kStruct_def.h
 src/kFramework/kRenderer.h
 )
 

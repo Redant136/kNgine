@@ -2,7 +2,6 @@
 
 #define utils_StrManipulation
 #include "utils.h"
-#include "kStruct_def.h"
 
 #define kRenderer_maxWindows 8
 #define kRenderer_maxFonts 32
@@ -11,6 +10,7 @@
 
 #define kRenderer_maxObjectTriangles 128
 #define kRenderer_maxBoundObjects 64
+#define kRenderer_maxObjectElements 16
 
 #ifdef __cplusplus
 extern "C"
@@ -35,7 +35,11 @@ extern "C"
       size_t length;
       struct
       {
-        kStruct_StructDef argsDef;
+        struct {
+          size_t argLength;
+          u32 vecSize[kRenderer_maxObjectElements];
+        } structDef;
+
         size_t length;
         struct
         {
@@ -77,9 +81,9 @@ extern "C"
       struct
       {
         // the data of each triangle point
-        void *arg[3];
+        f32 *arg[3];
         // if the values at that index were updated
-        bool valueUpdated[kStruct_arg_def_max_length];
+        bool valueUpdated[kRenderer_maxObjectElements];
       } triangles[kRenderer_maxObjectTriangles];
     } shaderElements[kRenderer_maxShaderPrograms];
   } kRenderer_RendererObject;
@@ -123,16 +127,18 @@ extern "C"
   //                           void *args[kRenderer_maxShaderPrograms][4]);
   void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer, i32 bufferWidth, i32 bufferHeight, i32 numChannels);
   void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f32 width, f32 height, v3 rotation);
-  void kRenderer_drawStoredTexture(u32 textureIndex, size_t numShaders, u32 *shaders, void **args[4]);
+  void kRenderer_drawStoredTexture(u32 textureIndex, size_t numShaders, u32 *shaders, f32 **args);
   void kRenderer_unbindTexture(u32 textureIndex);
 
+  u32 kRenderer_addObject(u32*index,kRenderer_RendererObject obj);
   u32 kRenderer_bindObject(u32*index,kRenderer_RendererObject obj);
   kRenderer_RendererObject *kRenderer_getBoundObject(u32 index);
+  void kRenderer_loadObject(u32 index);
   void kRenderer_updateObjects();         // updates the values of all objects
   void kRenderer_updateObject(u32 index); // updates the values of a single object
   void kRenderer_drawObject(u32 index);
   void kRenderer_drawObjectWithTexture(u32 objectIndex, u32 **textureIndex);
-  void kRenderer_unbindObject(u32 index);
+  void kRenderer_unloadObject(u32 index);
 
   void kRenderer_setFont(const char *fontName);
   void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale);

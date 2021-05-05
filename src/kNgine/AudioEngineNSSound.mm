@@ -69,7 +69,7 @@ namespace kNgine{
     queue.push_back(AudioQueue(name,buffer));
     queue[queue.size()-1].loop=loop;
   }
-  void AudioEngine::load(std::vector<EngineObject *> objects)
+  void AudioEngine::load()
   {
   }
   void AudioEngine::update(std::vector<msg> msgs)
@@ -106,7 +106,7 @@ namespace kNgine{
       }
     }
   }
-  void AudioEngine::unload(std::vector<EngineObject *> objects)
+  void AudioEngine::unload()
   {
   }
 

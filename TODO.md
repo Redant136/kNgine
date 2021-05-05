@@ -3,9 +3,8 @@
 # main branch
 
 ## currently working on
-- [x] fix openal
 ## testing
-- [ ] stored renderer objects in kNgine
+- [x] stored renderer objects in kNgine
 - [ ] test custom shader in renderer
 ## next step
 - [ ] object info tool
@@ -20,6 +19,7 @@
 - [ ] OpenGL ES (https://jan.newmarch.name/RPi/OpenGLES/, https://www.khronos.org/assets/uploads/books/openglr_es_20_programming_guide_sample.pdf, glfw opengl ES)
 ## procrastinating
 - [ ] map editor tool
+- [ ] camera rotation
 - [ ] OpenGL glut 2.0
 - [ ] tileset auto mapping
 - [ ] tileset prejoin sprites (implement + test)

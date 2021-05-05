@@ -288,7 +288,7 @@ namespace kNgine
     alSourcei(source, AL_BUFFER, ((OpenALBuffer*)buffer)->buffer);
     ((OpenALBuffer*)buffer)->source=source;
   }
-  void AudioEngine::load(std::vector<EngineObject *> objects)
+  void AudioEngine::load()
   {
     for (AudioQueue q : queue)
     {
@@ -357,7 +357,7 @@ namespace kNgine
       }
     }
   }
-  void AudioEngine::unload(std::vector<EngineObject *> objects)
+  void AudioEngine::unload()
   {
     for (AudioQueue q : queue)
     {

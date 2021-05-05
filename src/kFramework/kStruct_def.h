@@ -1,4 +1,5 @@
 #pragma once
+#error this will never work
 
 #include "utils.h"
 #include <stdio.h>
@@ -49,10 +50,6 @@ typedef enum kTypes
 // return the size of the type in terms of how many u8 it takes up
 static inline u8 kType_sizeOf(kTypes t)
 {
-  if (sizeof(bool) != 4)
-  {
-    assert(0 && "size of bool not ok");
-  }
   switch (t)
   {
   case kTYPE_bool:

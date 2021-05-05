@@ -25,6 +25,13 @@ namespace kNgine
 
   extern bool DEBUG;
 
+  static u32 object;
+  static struct
+  {
+    v3 pos;
+    f32 isTex;
+    v4 color;
+  } points[3];
 
   namespace {
     static void includeChildren()
@@ -59,7 +66,7 @@ namespace kNgine
   {
     for (u32 i = 0; i < workingObjectsLength; i++)
     {
-      workingObjects[i]->unload(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
+      workingObjects[i]->unload();
     }
     workingObjectsLength = 0;
     for (EngineObject *obj : objects)
@@ -73,7 +80,7 @@ namespace kNgine
     }
     for (u32 i = 0; i < workingObjectsLength; i++)
     {
-      workingObjects[i]->load(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
+      workingObjects[i]->load();
     }
   }
   static void addObject(EngineObject *object)
@@ -85,7 +92,7 @@ namespace kNgine
     if (!object->isEnabled())
     {
       object->enable();
-      object->load(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
+      object->load();
       workingObjects[workingObjectsLength] = object;
       workingObjectsLength++;
     }
@@ -95,7 +102,7 @@ namespace kNgine
     if (object->isEnabled())
     {
       object->disable();
-      object->unload(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
+      object->unload();
       bool wasInList = false;
       for (u32 i = 0; i < workingObjectsLength; i++)
       {
@@ -187,11 +194,34 @@ namespace kNgine
     if(DEBUG){
       std::string fps = std::to_string(1.0/time);
       kRenderer_displayText(v3(-1,1,1),v3(0,0,0),fps.c_str(),0.5);
+      // kRenderer_drawObject(object);
     }
   }
   static void frameStart()
   {
     reloadObjects();
+    kRenderer_RendererObject obj;
+    obj.length = 1;
+    obj.shaderElements[0].shadersIndex = 0;
+    obj.shaderElements[0].length = 1;
+    obj.shaderElements[0].triangles[0].arg[0] = (f32*)&points[0];
+    obj.shaderElements[0].triangles[0].arg[1] = (f32*)&points[1];
+    obj.shaderElements[0].triangles[0].arg[2] = (f32*)&points[2];
+
+    points[0].pos = v3(-0.5, 0, 0);
+    points[0].isTex = 0;
+    points[0].color = v4(0, 0, 1, 1);
+
+    points[1].pos = v3(0.5, 0, 0);
+    points[1].isTex = 0;
+    points[1].color = v4(0, 1, 0, 1);
+
+    points[2].pos = v3(0, 1, 0);
+    points[2].isTex = 0;
+    points[2].color = v4(1, 0, 0, 1);
+
+    kRenderer_bindObject(&object, obj);
+
     frameUpdate();
   }
   static void start()
@@ -238,7 +268,7 @@ namespace kNgine
     kRenderer_launch();
     for (u32 i = 0; i < workingObjectsLength; i++)
     {
-      workingObjects[i]->unload(std::vector<EngineObject *>(workingObjects, workingObjects + workingObjectsLength));
+      workingObjects[i]->unload();
     }
     for (EngineObject *obj : objects)
     {

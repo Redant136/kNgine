@@ -7,7 +7,7 @@ u32 object;
 struct
 {
   v3 pos;
-  bool isTex;
+  f32 isTex;
   v4 color;
 } points[3];
 
@@ -47,6 +47,7 @@ static void draw()
 
   points[2].pos.y -= 0.001;
   kRenderer_getBoundObject(object)->shaderElements[0].triangles[0].valueUpdated[0] = true;
+  kRenderer_getBoundObject(object)->shaderElements[0].triangles[0].valueUpdated[1] = true;
   kRenderer_getBoundObject(object)->shaderElements[0].triangles[0].valueUpdated[2] = true;
 
   kRenderer_drawObject(object);

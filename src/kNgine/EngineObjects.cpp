@@ -25,8 +25,7 @@ namespace kNgine{
     this->object = base.object;
     this->label = base.label;
   };
-  ObjectComponent::~ObjectComponent() {}
-  void ObjectComponent::update(std::vector<msg> msgs) {}
+  
   ComponentGameObject::ComponentGameObject() {
     components = std::vector<ObjectComponent *>();
     flags |= ObjectFlags::COMPONENT;
@@ -51,14 +50,42 @@ namespace kNgine{
     this->labels.push_back(component->label);
     this->flags |= component->flags;
   }
+
+  void ComponentGameObject::init(std::vector<EngineObject *> objects){
+    for (u32 i = 0; i < components.size(); i++)
+    {
+      components[i]->init(objects);
+    }
+  }
+  void ComponentGameObject::load()
+  {
+    for(u32 i=0;i<components.size();i++){
+      components[i]->load();
+    }
+  }
   void ComponentGameObject::update(std::vector<msg> msgs) {
     for (ObjectComponent *mod : components) {
       mod->update(msgs);
     }
   }
+  void ComponentGameObject::unload()
+  {
+    for (u32 i = 0; i < components.size(); i++)
+    {
+      components[i]->unload();
+    }
+  }
+  void ComponentGameObject::end(std::vector<EngineObject *> objects)
+  {
+    for (u32 i = 0; i < components.size(); i++)
+    {
+      components[i]->end(objects);
+    }
+  }
   void ComponentGameObject::removeComponent(ObjectComponent*component){
     for(u32 i=0;i<components.size();i++){
       if(components[i]==component){
+        components[i]->unload();
         delete components[i];
         components.erase(components.begin()+i);
         break;
@@ -66,7 +93,7 @@ namespace kNgine{
     }
   }
 
-  SpriteAccessor::SpriteAccessor(ComponentGameObject *base) : ObjectComponent(base)
+  SpriteAccessor::SpriteAccessor(ComponentGameObject *base) : Renderable(base)
   {
     this->label = "[sprite]";
     this->flags|=ObjectFlags::RENDERABLE;
@@ -103,9 +130,8 @@ namespace kNgine{
     this->label = "[child]";
     this->flags |= ObjectFlags::PARENT;
   }
-  void NodeObjectComponent::update(std::vector<msg> msgs)
-  {
-    child->position = (this->object->position- previousParentPos)+ child->position;
+  void NodeObjectComponent::update(std::vector<msg> msgs) {
+    child->position = (this->object->position - previousParentPos) + child->position;
     this->previousParentPos = this->object->position;
   }
 

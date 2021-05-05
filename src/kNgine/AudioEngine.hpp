@@ -95,9 +95,9 @@ namespace kNgine
     void setLoop(bool loop, u32 index = 0) { queue[index].loop = loop; }
     void setVolume(f32 volume, u32 index = 0) { queue[index].volume = volume; }
     void terminate(u32 index = 0) { queue[index].stop = true; }
-    virtual void load(std::vector<EngineObject *> objects);
+    virtual void load();
     virtual void update(std::vector<msg>msgs);
-    virtual void unload(std::vector<EngineObject *> objects);
+    virtual void unload();
   };
 
   BaseAudioBuffer *createBuffer(const char *fileName, audiofiletype type);

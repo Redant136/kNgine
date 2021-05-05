@@ -1601,9 +1601,11 @@ inline kiv3::kiv3(const kiv4 &base)
 
 #define toV2(v) v2((v).x, (v).y)
 #define toV3(v) v3((v).x, (v).y, (v).z)
+#define v4xyz(v,w) v4(v.x,v.y,v.z,w)
 #define toV4(v) v4((v).x, (v).y, (v).z, (v).w)
 #define toIV2(v) iv2((v).x, (v).y)
 #define toIV3(v) iv3((v).x, (v).y, (v).z)
+#define iv4xyz(v, w) v4(v.x, v.y, v.z, w)
 #define toIV4(v) iv3((v).x, (v).y, (v).z, (v).w)
 
 static inline float V2Dot(v2 a, v2 b)

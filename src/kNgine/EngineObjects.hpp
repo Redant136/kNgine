@@ -209,11 +209,11 @@ namespace kNgine
     bool isEnabled() { return enabled; }
     virtual void enable() { enabled = true; }
     virtual void disable() { enabled = false; }
-    virtual void update(std::vector<msg> msgs) {}
     virtual void init(std::vector<EngineObject *> objects) {}
+    virtual void load() {}
+    virtual void update(std::vector<msg> msgs) {}
+    virtual void unload() {}
     virtual void end(std::vector<EngineObject *> objects) {}
-    virtual void load(std::vector<EngineObject *> object) {}
-    virtual void unload(std::vector<EngineObject *> object) {}
   };
   // object to be positionned in game
   class GameObject : public EngineObject
@@ -234,14 +234,19 @@ namespace kNgine
     ComponentGameObject();
     ComponentGameObject(const ComponentGameObject &base);
     virtual ~ComponentGameObject();
-    void update(std::vector<msg> msgs);
+    virtual void init(std::vector<EngineObject *> objects);
+    virtual void load();
+    virtual void update(std::vector<msg> msgs);
+    virtual void unload();
+    virtual void end(std::vector<EngineObject *> objects);
     void addComponent(ObjectComponent *component);
-    template <typename T>
+    template <typename T = ObjectComponent>
     T *findComponent(u64 flags);
     template <typename T = ObjectComponent>
-    T *findComponent(std::string flag);
+    T *findComponent(std::string label);
     void removeComponent(ObjectComponent *component);
-    void removeComponent(std::string flag) { removeComponent(findComponent(flag)); }
+    void removeComponent(u64 flags) { removeComponent(findComponent(flags)); }
+    void removeComponent(std::string label) { removeComponent(findComponent(label)); }
   };
   // modular objects for implementations, define modules labels using [name]
   class ObjectComponent
@@ -252,8 +257,12 @@ namespace kNgine
     u64 flags = 0;
     ObjectComponent(ComponentGameObject *base);
     ObjectComponent(const ObjectComponent &base);
-    virtual ~ObjectComponent();
-    virtual void update(std::vector<msg> msgs);
+    virtual ~ObjectComponent(){}
+    virtual void init(std::vector<EngineObject *> objects){}
+    virtual void load() {}
+    virtual void update(std::vector<msg> msgs){}
+    virtual void unload() {}
+    virtual void end(std::vector<EngineObject *> objects){}
   };
   template <typename T>
   T *ComponentGameObject::findComponent(u64 flags)
@@ -280,13 +289,21 @@ namespace kNgine
     return NULL;
   }
 
-  //[sprite]
-  class SpriteAccessor : public ObjectComponent
+  class Renderable : public ObjectComponent
   {
   public:
     bool specialAccessor = false; // if the accessor requires something different before rendering
+    Renderable(ComponentGameObject*base):ObjectComponent(base)
+    {
+      this->flags|=ObjectFlags::RENDERABLE;
+    }
+  };
+  //[sprite]
+  class SpriteAccessor : public Renderable
+  {
+  public:
     cardinal8dir spriteLocation;
-    v2 offset = {0.0f, 0.0f}; // offset in game units
+    v3 offset = {0.0f, 0.0f, 0.0f}; // offset in game units
     SpriteAccessor(ComponentGameObject *base);
     virtual bool hasToSave() = 0;
     virtual Sprite *getSprite() = 0; //pointer for not having to call copy

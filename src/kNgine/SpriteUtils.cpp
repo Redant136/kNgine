@@ -21,7 +21,7 @@ namespace kNgine
   void SpriteMap::end(std::vector<EngineObject *> objects)
   {
   }
-  void SpriteMap::load(std::vector<EngineObject *> objects)
+  void SpriteMap::load()
   {
     texIndex = std::vector<u32>();
     for (u32 i = 0; i < list.size(); i++)
@@ -31,7 +31,7 @@ namespace kNgine
       texIndex.push_back(texture);
     }
   }
-  void SpriteMap::unload(std::vector<EngineObject *> objects)
+  void SpriteMap::unload()
   {
     for (u32 i = 0; i < list.size(); i++)
     {
@@ -192,20 +192,16 @@ namespace kNgine
     return spriteDimensions[frame];
   }
 
-  SpriteRendererObject_base::SpriteRendererObject_base(ComponentGameObject *base, SpriteMap *spriteList) : SpriteMapAccessor(base)
+  RendererObject_base::RendererObject_base(ComponentGameObject *base) : Renderable(base)
   {
     this->label="[RendererObject]";
     this->specialAccessor = true;
-    this->spriteList = spriteList;
-    this->spriteIndexes = std::vector<std::vector<u32>>();
   }
-  SpriteRendererObject_base::SpriteRendererObject_base(ComponentGameObject *base,SpriteMap *spriteList, size_t numShaders,
-    u32 *shaderIndex, size_t *numTriangles, void ***points[3]) : SpriteMapAccessor(base)
+  RendererObject_base::RendererObject_base(ComponentGameObject *base, size_t numShaders,
+    u32 *shaderIndex, size_t *numTriangles, f32 ***points[3]) : Renderable(base)
   {
     this->label = "[RendererObject]";
     this->specialAccessor = true;
-    this->spriteList = spriteList;
-    this->spriteIndexes = std::vector<std::vector<u32>>();
     kRenderer_RendererObject obj;
     obj.length=numShaders;
     for(u32 i=0;i<numShaders;i++){
@@ -217,123 +213,98 @@ namespace kNgine
         obj.shaderElements[i].triangles[j].arg[2] = points[i][j][2];
       }
     }
-    kRenderer_bindObject(&rendererObjectIndex,obj);
-    this->spriteIndexes = std::vector<std::vector<u32>>();
+    kRenderer_addObject(&rendererObjectIndex,obj);
   }
-  SpriteRendererObject_base::SpriteRendererObject_base(ComponentGameObject *base, SpriteMap *spriteList, size_t numShaders,
-                                                       u32 *shaderIndex, size_t *numTriangles, void ***points[3], std::vector<std::vector<u32>> spriteIndexes)
-      : SpriteRendererObject_base(base, spriteList, numShaders, shaderIndex, numTriangles, points)
-  {
-    this->spriteIndexes = spriteIndexes;
+  void RendererObject_base::load(){
+    kRenderer_loadObject(rendererObjectIndex);
   }
-  SpriteRendererObject_base::SpriteRendererObject_base(ComponentGameObject *base, SpriteMap *spriteList, size_t numShaders,
-                                                       u32 *shaderIndex, size_t *numTriangles, void ***points[3], std::vector<std::vector<Sprite>> sprites)
-      : SpriteRendererObject_base(base, spriteList, numShaders, shaderIndex, numTriangles, points)
-  {
-    this->spriteIndexes = std::vector<std::vector<u32>>(sprites.size());
-    for(u32 i=0;i<sprites.size();i++){
-      this->spriteIndexes[i] = std::vector<u32>(sprites[i].size());
-      for(u32 j=0;j<sprites[i].size();j++){
-        this->spriteIndexes[i][j] = this->spriteList->list.size();
-        this->spriteList->list.push_back(sprites[i][j]);
-      }
-    }
+  void RendererObject_base::unload(){
+    kRenderer_unloadObject(rendererObjectIndex);
   }
 
-  SpriteRendererObject::SpriteRendererObject(ComponentGameObject *base, SpriteMap *spriteList, u32 spriteIndex):SpriteRendererObject_base(base,spriteList)
+  RendererObject::RendererObject(ComponentGameObject *base, SpriteMapAccessor *renderable) : RendererObject_base(base)
   {
-    this->spriteIndexes=std::vector<std::vector<u32>>(1);
-    spriteIndexes[0]=std::vector<u32>(1);
-    spriteIndexes[0][0]=spriteIndex;
+    this->label = "[RendererObject]";
+    this->specialAccessor = true;
+    this->renderable = renderable;
 
-    kRenderer_RendererObject object =
-        {1, // num shaders
-         {
-             0, // shader index
-             2, // num triangles
-             {  // triangles
-              // triangle obj 1
-              {
-                  {&default_points[0], &default_points[1], &default_points[3]}, // corners
-                  {false, false, false}                                         // value updated
-              },
-              // triangle obj 2
-              {
-                  {&default_points[0], &default_points[2], &default_points[3]}, // corners
-                  {false, false, false}                                         // value updated
-              }}}};
+    kRenderer_RendererObject object;
+    object.length = 1;
+    object.shaderElements[0].shadersIndex = 0;
+    object.shaderElements[0].length = 2;
+    object.shaderElements[0].triangles[0].arg[0] = (f32 *)&default_points[0];
+    object.shaderElements[0].triangles[0].arg[1] = (f32 *)&default_points[1];
+    object.shaderElements[0].triangles[0].arg[2] = (f32 *)&default_points[3];
+    object.shaderElements[0].triangles[1].arg[0] = (f32 *)&default_points[0];
+    object.shaderElements[0].triangles[1].arg[1] = (f32 *)&default_points[2];
+    object.shaderElements[0].triangles[1].arg[2] = (f32 *)&default_points[3];
 
-    default_points[0].pos = base->position;
-    default_points[1].pos = base->position;
-    default_points[2].pos = base->position;
-    default_points[3].pos = base->position;
+    default_points[0].pos = v3(-0.5, 0.5, 0);
+    default_points[1].pos = v3(0.5, 0.5, 0);
+    default_points[2].pos = v3(-0.5, -0.5, 0);
+    default_points[3].pos = v3(0.5, -0.5, 0);
 
     default_points[0].isTex = 1;
     default_points[1].isTex = 1;
     default_points[2].isTex = 1;
     default_points[3].isTex = 1;
 
-    default_points[0].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);;
-    default_points[1].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);;
-    default_points[2].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);;
-    default_points[3].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);;
+    default_points[0].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);
+    default_points[1].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);
+    default_points[2].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);
+    default_points[3].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);
 
-    kRenderer_bindObject(&rendererObjectIndex,object);
+    kRenderer_addObject(&rendererObjectIndex, object);
   }
-  SpriteRendererObject::SpriteRendererObject(ComponentGameObject *base, SpriteMap *spriteList, Sprite sprite):SpriteRendererObject_base(base,spriteList)
+  RendererObject::RendererObject(ComponentGameObject *base, SpriteMap *spriteList, Sprite sprite) : RendererObject(base, new SpriteReferenceComponent(base,spriteList,sprite))
   {
-    this->spriteIndexes = std::vector<std::vector<u32>>(1);
-    spriteIndexes[0] = std::vector<u32>(1);
-    spriteIndexes[0][0] = spriteList->list.size();
-    spriteList->list.push_back(sprite);
-
-    kRenderer_RendererObject object =
-        {1, // num shaders
-         {
-             0, // shader index
-             2, // num triangles
-             {  // triangles
-              // triangle obj 1
-              {
-                  {&default_points[0], &default_points[1], &default_points[3]}, // corners
-                  {false, false, false}                                         // value updated
-              },
-              // triangle obj 2
-              {
-                  {&default_points[0], &default_points[2], &default_points[3]}, // corners
-                  {false, false, false}                                         // value updated
-              }}}};
-
-    default_points[0].pos = base->position;
-    default_points[1].pos = base->position;
-    default_points[2].pos = base->position;
-    default_points[3].pos = base->position;
-
-    default_points[0].isTex = 1;
-    default_points[1].isTex = 1;
-    default_points[2].isTex = 1;
-    default_points[3].isTex = 1;
-
-    default_points[0].texCoord = v4(0.0f, 1.0f, 0.0f, 1.0f);;
-    default_points[1].texCoord = v4(1.0f, 1.0f, 1.0f, 1.0f);;
-    default_points[2].texCoord = v4(0.0f, 0.0f, 0.0f, 0.0f);;
-    default_points[3].texCoord = v4(1.0f, 0.0f, 1.0f, 0.0f);;
-
-    kRenderer_bindObject(&rendererObjectIndex, object);
   }
-  void SpriteRendererObject::updatePoints(m4 matrix){
-    v2 dimensions = toV2(V4MultiplyM4(v4(object->position.x, object->position.y, object->position.z, 1)+ v4(getSpriteDimensions().x, getSpriteDimensions().y, 0, 1), matrix))- toV2(V4MultiplyM4(v4(object->position.x, object->position.y, object->position.z, 1), matrix));
-    v2 spriteOffset = v2(getSpriteLocation().x*dimensions.x,getSpriteLocation().y*dimensions.y);
+  void RendererObject::updatePoints(m4 matrix)  
+  {
+    v2 spriteDimensions=renderable->getSpriteDimensions();
+    v2 dimensions = toV2(V4MultiplyM4(v4(object->position.x, object->position.y, object->position.z, 1) + v4(spriteDimensions.x, spriteDimensions.y, 0, 0), matrix)) - toV2(V4MultiplyM4(v4(object->position.x, object->position.y, object->position.z, 1), matrix));
+    v3 spriteOffset = v3(-0.5*dimensions.x,-0.5*dimensions.y,0);
     kRenderer_RendererObject*obj= kRenderer_getBoundObject(rendererObjectIndex);
     obj->shaderElements[0].triangles[0].valueUpdated[0] = true;
     obj->shaderElements[0].triangles[1].valueUpdated[0] = true;
 
-    default_points[0].pos = object->position+ v3(spriteOffset.x, spriteOffset.y, 0);
-    default_points[1].pos = object->position+ v3(spriteOffset.x, spriteOffset.y, 0)+ v3(dimensions.x, 0, 0);
-    default_points[2].pos = object->position+ v3(spriteOffset.x, spriteOffset.y, 0)+ v3(0, dimensions.y, 0);
-    default_points[3].pos = object->position+ v3(spriteOffset.x, spriteOffset.y, 0)+ v3(dimensions.x, dimensions.y, 0);
+    default_points[0].pos = toV3(V4MultiplyM4(v4xyz(renderable->offset,0) + v4(object->position.x,object->position.y,object->position.z,1),matrix)) + spriteOffset;
+    default_points[1].pos = toV3(V4MultiplyM4(v4xyz(renderable->offset,0) + v4(object->position.x+spriteDimensions.x,object->position.y,object->position.z,1),matrix)) + spriteOffset;
+    default_points[2].pos = toV3(V4MultiplyM4(v4xyz(renderable->offset,0) + v4(object->position.x,object->position.y+spriteDimensions.y,object->position.z,1),matrix)) + spriteOffset;
+    default_points[3].pos = toV3(V4MultiplyM4(v4xyz(renderable->offset,0) + v4(object->position.x+spriteDimensions.x,object->position.y+spriteDimensions.y,object->position.z,1),matrix)) + spriteOffset;
+
+    m4 rotation=M4InitDiagonal(1);
+    iv2 windowSize=kRenderer_getWindowSize();
+    rotation = M4MultiplyM4(rotation, M4TranslateV3(default_points[0].pos + v3(dimensions.x, dimensions.y, 0)));
+    rotation = M4MultiplyM4(rotation, M4Mapper(v3(-windowSize.x, -windowSize.y, 0),
+                                     v3(windowSize.x, windowSize.y, 1),
+                                     v3(-1,-1,-1),
+                                     v3(1,1,1)));
+    rotation = M4MultiplyM4(rotation, M4Rotate(object->rotation.x, v3(1.0f, 0.0f, 0.0f)));
+    rotation = M4MultiplyM4(rotation, M4Rotate(object->rotation.y, v3(0.0f, 1.0f, 0.0f)));
+    rotation = M4MultiplyM4(rotation, M4Rotate(object->rotation.z, v3(0.0f, 0.0f, 1.0f)));
+    rotation = M4MultiplyM4(rotation, M4Mapper(v3(-1,-1,-1),
+                                     v3(1,1,1),
+                                     v3(-windowSize.x, -windowSize.y, 0),
+                                     v3(windowSize.x, windowSize.y, 1)));
+    rotation = M4MultiplyM4(rotation, M4TranslateV3(default_points[0].pos * -1 - v3(dimensions.x,dimensions.y,0)));
+    
+    default_points[0].pos = toV3(V4MultiplyM4(v4xyz(default_points[0].pos,1),rotation));
+    default_points[1].pos = toV3(V4MultiplyM4(v4xyz(default_points[1].pos,1),rotation));
+    default_points[2].pos = toV3(V4MultiplyM4(v4xyz(default_points[2].pos,1),rotation));
+    default_points[3].pos = toV3(V4MultiplyM4(v4xyz(default_points[3].pos,1),rotation));
+
     kRenderer_updateObject(rendererObjectIndex);
   }
+  std::vector<std::vector<u32>> RendererObject::getSpriteIndexes()
+  {
+    std::vector<std::vector<u32>> res = std::vector<std::vector<u32>>(1);
+    res[0]=std::vector<u32>(2);
+    res[0][0] = renderable->spriteList->texIndex[renderable->getMapIndex()];
+    res[0][1] = renderable->spriteList->texIndex[renderable->getMapIndex()];
+    return res;
+  }
+
   std::vector<Sprite> importSpriteSheet(const char *filename, i32 spriteWidth,
                                         i32 spriteHeight)
   {

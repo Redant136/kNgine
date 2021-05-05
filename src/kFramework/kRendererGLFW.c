@@ -469,7 +469,7 @@ i32 kRenderer_createContext(kRenderer_WindowContext *context)
       {1,                                       // 1 shader
        {                                        // array of shaders
         {                                       // shader def
-         {3, {kTYPE_v3, kTYPE_bool, kTYPE_v4}}, //arg def, input format
+         {3,{3,1,4}},
          2,                                     // number of individual shaders
          {                                      // array of individual shaders
           {kRenderer_SHADER_Vertex, vertexShaderSource},
@@ -486,7 +486,7 @@ i32 kRenderer_createContext(kRenderer_WindowContext *context)
   kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].context = context;
   kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].min = v3(0, 1080, 0);
   kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].max = v3(1920, 0, 1);
-  kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].kRenderer_boundObjects.length = 0;
+  // kRenderer_WindowsContexts.windows[kRenderer_WindowsContexts.length].kRenderer_boundObjects.length = 0;
 
   kRenderer_WindowsContexts.length++;
   return 0;
@@ -929,102 +929,102 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f3
   glUniform4f(glGetUniformLocation(defaultShader, "colorScale"), 1.0, 1.0, 1.0, 1.0);
   glDeleteBuffers(1, &VBO);
 }
-void kRenderer_drawStoredTexture(u32 textureIndex, size_t numShaders, u32 *shaders, void **args[4]) // TODO
+void kRenderer_drawStoredTexture(u32 textureIndex, size_t numShaders, u32 *shaders, f32 **args) // TODO
 {
   // there will be a problem when converting to shaderElement, prob 2 i for loop
 
-  kRenderer_WindowContext *current = kRenderer_WindowsContexts.windows[currentContext].context;
-  for (u32 i = 0; i < numShaders; i++)
-  {
-    u32 VBO, VAO;
-    glBindTexture(GL_TEXTURE_2D, textureIndex);
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    struct shaderElement
-    {
-      u32 numElements;
-      f32 elements[kStruct_arg_def_max_length * 4]; // times 4 because v4
-    };
-    struct shaderElement formatedArgs[4];
-    for (u32 e = 0; e < 4; e++)
-    {
-      formatedArgs[e].numElements = 0;
-      for (u32 j = 0; j < current->windowShaders.programs[shaders[i]].argsDef.length; j++)
-      {
-#ifdef __cplusplus
-        if (current->windowShaders.programs[shaders[i]].argsDef.args[j] >= kTypes::kTYPE_v2)
-#else
-        if (current->windowShaders.programs[shaders[i]].argsDef.args[j] >= kTYPE_v2)
-#endif
-        {
-          if (kType_sizeOf(current->windowShaders.programs[shaders[i]].argsDef.args[j]) == 8)
-          {
-            v2 v;
-            kCastType(v2, v, kStruct_getElementOfObjectAtIndex(j, current->windowShaders.programs[shaders[i]].argsDef, args), current->windowShaders.programs[shaders[i]].argsDef.args[j]);
-            formatedArgs[e].elements[formatedArgs[e].numElements] = v.x;
-            formatedArgs[e].elements[formatedArgs[e].numElements + 1] = v.y;
-            formatedArgs[e].numElements += 2;
-          }
-          else if (kType_sizeOf(current->windowShaders.programs[shaders[i]].argsDef.args[j]) == 12)
-          {
-            v3 v;
-            kCastType(v3, v, kStruct_getElementOfObjectAtIndex(j, current->windowShaders.programs[i].argsDef, args), current->windowShaders.programs[shaders[i]].argsDef.args[j]);
-            formatedArgs[e].elements[formatedArgs[e].numElements] = v.x;
-            formatedArgs[e].elements[formatedArgs[e].numElements + 1] = v.y;
-            formatedArgs[e].elements[formatedArgs[e].numElements + 2] = v.z;
-            formatedArgs[e].numElements += 3;
-          }
-          else if (kType_sizeOf(current->windowShaders.programs[shaders[i]].argsDef.args[j]) == 16)
-          {
-            v4 v;
-            kCastType(v4, v, kStruct_getElementOfObjectAtIndex(j, current->windowShaders.programs[shaders[i]].argsDef, args), current->windowShaders.programs[shaders[i]].argsDef.args[j]);
-            formatedArgs[e].elements[formatedArgs[e].numElements] = v.x;
-            formatedArgs[e].elements[formatedArgs[e].numElements + 1] = v.y;
-            formatedArgs[e].elements[formatedArgs[e].numElements + 2] = v.z;
-            formatedArgs[e].elements[formatedArgs[e].numElements + 3] = v.w;
-            formatedArgs[e].numElements += 4;
-          }
-        }
-        else
-        {
-          kCastType(f32, formatedArgs[e].elements[formatedArgs[e].numElements], kStruct_getElementOfObjectAtIndex(j, current->windowShaders.programs[shaders[i]].argsDef, args), current->windowShaders.programs[shaders[i]].argsDef.args[j]);
-          formatedArgs[e].numElements++;
-        }
-      }
-    }
-    struct shaderElement corners[6] = {formatedArgs[0], formatedArgs[1], formatedArgs[3], formatedArgs[0], formatedArgs[2], formatedArgs[3]};
-    glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 6 * formatedArgs[0].numElements, corners, GL_STATIC_DRAW);
-    u32 currentElementsIndex;
-    for (u32 j = 0; j < current->windowShaders.programs[shaders[i]].argsDef.length; j++)
-    {
-#ifdef __cplusplus
-      if (current->windowShaders.programs[shaders[i]].argsDef.args[j] >= kTypes::kTYPE_v2)
-#else
-      if (current->windowShaders.programs[shaders[i]].argsDef.args[j] >= kTYPE_v2)
-#endif
-      {
-        u8 offset = kType_sizeOf(current->windowShaders.programs[shaders[i]].argsDef.args[j]) / 4;
-        glVertexAttribPointer(j, offset, GL_FLOAT, GL_FALSE, sizeof(f32) * formatedArgs[0].numElements, (void *)(sizeof(f32) * currentElementsIndex));
-        currentElementsIndex += offset;
-      }
-      else
-      {
-        glVertexAttribPointer(j, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * formatedArgs[0].numElements, (void *)(sizeof(f32) * currentElementsIndex));
-        currentElementsIndex++;
-      }
-      glEnableVertexAttribArray(j);
-    }
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBindVertexArray(VAO);
-    glUseProgram(kRenderer_WindowsContexts.windows[currentContext].shaderPrograms[i]);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-  }
+//   kRenderer_WindowContext *current = kRenderer_WindowsContexts.windows[currentContext].context;
+//   for (u32 i = 0; i < numShaders; i++)
+//   {
+//     u32 VBO, VAO;
+//     glBindTexture(GL_TEXTURE_2D, textureIndex);
+//     glGenVertexArrays(1, &VAO);
+//     glGenBuffers(1, &VBO);
+//     glBindVertexArray(VAO);
+//     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//     struct shaderElement
+//     {
+//       u32 numElements;
+//       f32 elements[kStruct_arg_def_max_length * 4]; // times 4 because v4
+//     };
+//     struct shaderElement formatedArgs[4];
+//     for (u32 e = 0; e < 4; e++)
+//     {
+//       formatedArgs[e].numElements = 0;
+//       for (u32 j = 0; j < current->windowShaders.programs[shaders[i]].argsDef.length; j++)
+//       {
+// #ifdef __cplusplus
+//         if (current->windowShaders.programs[shaders[i]].argsDef.args[j] >= kTypes::kTYPE_v2)
+// #else
+//         if (current->windowShaders.programs[shaders[i]].argsDef.args[j] >= kTYPE_v2)
+// #endif
+//         {
+//           if (kType_sizeOf(current->windowShaders.programs[shaders[i]].argsDef.args[j]) == 8)
+//           {
+//             v2 v;
+//             kCastType(v2, v, kStruct_getElementOfObjectAtIndex(j, current->windowShaders.programs[shaders[i]].argsDef, args), current->windowShaders.programs[shaders[i]].argsDef.args[j]);
+//             formatedArgs[e].elements[formatedArgs[e].numElements] = v.x;
+//             formatedArgs[e].elements[formatedArgs[e].numElements + 1] = v.y;
+//             formatedArgs[e].numElements += 2;
+//           }
+//           else if (kType_sizeOf(current->windowShaders.programs[shaders[i]].argsDef.args[j]) == 12)
+//           {
+//             v3 v;
+//             kCastType(v3, v, kStruct_getElementOfObjectAtIndex(j, current->windowShaders.programs[i].argsDef, args), current->windowShaders.programs[shaders[i]].argsDef.args[j]);
+//             formatedArgs[e].elements[formatedArgs[e].numElements] = v.x;
+//             formatedArgs[e].elements[formatedArgs[e].numElements + 1] = v.y;
+//             formatedArgs[e].elements[formatedArgs[e].numElements + 2] = v.z;
+//             formatedArgs[e].numElements += 3;
+//           }
+//           else if (kType_sizeOf(current->windowShaders.programs[shaders[i]].argsDef.args[j]) == 16)
+//           {
+//             v4 v;
+//             kCastType(v4, v, kStruct_getElementOfObjectAtIndex(j, current->windowShaders.programs[shaders[i]].argsDef, args), current->windowShaders.programs[shaders[i]].argsDef.args[j]);
+//             formatedArgs[e].elements[formatedArgs[e].numElements] = v.x;
+//             formatedArgs[e].elements[formatedArgs[e].numElements + 1] = v.y;
+//             formatedArgs[e].elements[formatedArgs[e].numElements + 2] = v.z;
+//             formatedArgs[e].elements[formatedArgs[e].numElements + 3] = v.w;
+//             formatedArgs[e].numElements += 4;
+//           }
+//         }
+//         else
+//         {
+//           kCastType(f32, formatedArgs[e].elements[formatedArgs[e].numElements], kStruct_getElementOfObjectAtIndex(j, current->windowShaders.programs[shaders[i]].argsDef, args), current->windowShaders.programs[shaders[i]].argsDef.args[j]);
+//           formatedArgs[e].numElements++;
+//         }
+//       }
+//     }
+//     struct shaderElement corners[6] = {formatedArgs[0], formatedArgs[1], formatedArgs[3], formatedArgs[0], formatedArgs[2], formatedArgs[3]};
+//     glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 6 * formatedArgs[0].numElements, corners, GL_STATIC_DRAW);
+//     u32 currentElementsIndex;
+//     for (u32 j = 0; j < current->windowShaders.programs[shaders[i]].argsDef.length; j++)
+//     {
+// #ifdef __cplusplus
+//       if (current->windowShaders.programs[shaders[i]].argsDef.args[j] >= kTypes::kTYPE_v2)
+// #else
+//       if (current->windowShaders.programs[shaders[i]].argsDef.args[j] >= kTYPE_v2)
+// #endif
+//       {
+//         u8 offset = kType_sizeOf(current->windowShaders.programs[shaders[i]].argsDef.args[j]) / 4;
+//         glVertexAttribPointer(j, offset, GL_FLOAT, GL_FALSE, sizeof(f32) * formatedArgs[0].numElements, (void *)(sizeof(f32) * currentElementsIndex));
+//         currentElementsIndex += offset;
+//       }
+//       else
+//       {
+//         glVertexAttribPointer(j, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * formatedArgs[0].numElements, (void *)(sizeof(f32) * currentElementsIndex));
+//         currentElementsIndex++;
+//       }
+//       glEnableVertexAttribArray(j);
+//     }
+//     glEnable(GL_BLEND);
+//     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//     glBindVertexArray(VAO);
+//     glUseProgram(kRenderer_WindowsContexts.windows[currentContext].shaderPrograms[i]);
+//     glDrawArrays(GL_TRIANGLES, 0, 6);
+//     glBindVertexArray(0);
+//     glDeleteVertexArrays(1, &VAO);
+//     glDeleteBuffers(1, &VBO);
+//   }
 
   //   for (u32 i = 0; i < current->windowShaders.length; i++)
   //   {
@@ -1122,21 +1122,28 @@ void kRenderer_unbindTexture(u32 textureIndex)
   glDeleteTextures(1, &textureIndex);
 }
 
-u32 kRenderer_bindObject(u32 *indexIn, kRenderer_RendererObject obj)
-{
+u32 kRenderer_addObject(u32*indexIn,kRenderer_RendererObject obj){
   *indexIn = kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.length;
   u32 index = *indexIn;
   assert(index + 1 < kRenderer_maxBoundObjects);
   kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.length++;
   kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects = obj;
+  return index;
+}
+u32 kRenderer_bindObject(u32 *indexIn, kRenderer_RendererObject obj)
+{
+  kRenderer_addObject(indexIn,obj);
+  kRenderer_loadObject(*indexIn);
+  return *indexIn;
+}
+kRenderer_RendererObject *kRenderer_getBoundObject(u32 index)
+{
+  return &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects;
+}
+void kRenderer_loadObject(u32 index){
+  const kRenderer_RendererObject* obj = &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects;
 
-  struct shaderElement
-  {
-    u32 numElements;
-    f32 elements[kStruct_arg_def_max_length * 4]; // times 4 because v4
-  };
-
-  for (u32 s = 0; s < obj.length; s++)
+  for (u32 s = 0; s < obj->length; s++)
   {
     u32 *VBO = &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].shaderData[s].VBO;
     u32 *VAO = &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].shaderData[s].VAO;
@@ -1146,137 +1153,32 @@ u32 kRenderer_bindObject(u32 *indexIn, kRenderer_RendererObject obj)
     glBindBuffer(GL_ARRAY_BUFFER, *VBO);
 
     kRenderer_WindowContext *current = kRenderer_WindowsContexts.windows[currentContext].context;
-    struct shaderElement formatedArgs[3 * kRenderer_maxObjectTriangles];
-    for (u32 e = 0; e < obj.shaderElements[s].length; e++)
+    u32 structSize=0;
+    for(u32 i=0;i<current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.argLength;i++){
+      structSize += current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.vecSize[i];
+    }
+
+    u32 dataSize = structSize * 3 * kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[s].length;
+    f32 *data = malloc(dataSize*sizeof(f32));
+    for(u32 t=0;t<kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[s].length;t++)
     {
-      formatedArgs[3 * e].numElements = 0;
-      formatedArgs[3 * e + 1].numElements = 0;
-      formatedArgs[3 * e + 2].numElements = 0;
-      for (u32 i = 0; i < current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.length; i++)
+      for(u32 i=0;i<3;i++)
       {
-        void *data0 = obj.shaderElements[s].triangles[e].arg[0];
-        void *data1 = obj.shaderElements[s].triangles[e].arg[1];
-        void *data2 = obj.shaderElements[s].triangles[e].arg[2];
-        if (current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i] >= kTYPE_v2)
-        {
-          if (kType_sizeOf(current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]) == kType_sizeOf(kTYPE_v2))
-          {
-            v2 v;
-            kCastType(v2, v, kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data0), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-            formatedArgs[3 * e].elements[formatedArgs[3 * e].numElements] = v.x;
-            formatedArgs[3 * e].elements[formatedArgs[3 * e].numElements + 1] = v.y;
-            formatedArgs[3 * e].numElements += 2;
-
-            kCastType(v2, v, kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data1), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-            formatedArgs[3 * e + 1].elements[formatedArgs[3 * e + 1].numElements] = v.x;
-            formatedArgs[3 * e + 1].elements[formatedArgs[3 * e + 1].numElements + 1] = v.y;
-            formatedArgs[3 * e + 1].numElements += 2;
-
-            kCastType(v2, v, kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data2), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-            formatedArgs[3 * e + 2].elements[formatedArgs[3 * e + 2].numElements] = v.x;
-            formatedArgs[3 * e + 2].elements[formatedArgs[3 * e + 2].numElements + 1] = v.y;
-            formatedArgs[3 * e + 2].numElements += 2;
-          }
-          else if (kType_sizeOf(current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]) == kType_sizeOf(kTYPE_v3))
-          {
-            v3 v;
-            kCastType(v3, v, kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data0), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-            formatedArgs[3 * e].elements[formatedArgs[3 * e].numElements] = v.x;
-            formatedArgs[3 * e].elements[formatedArgs[3 * e].numElements + 1] = v.y;
-            formatedArgs[3 * e].elements[formatedArgs[3 * e].numElements + 2] = v.z;
-            formatedArgs[3 * e].numElements += 3;
-
-            kCastType(v3, v, kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data1), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-            formatedArgs[3 * e + 1].elements[formatedArgs[3 * e + 1].numElements] = v.x;
-            formatedArgs[3 * e + 1].elements[formatedArgs[3 * e + 1].numElements + 1] = v.y;
-            formatedArgs[3 * e + 1].elements[formatedArgs[3 * e + 1].numElements + 2] = v.z;
-            formatedArgs[3 * e + 1].numElements += 3;
-
-            kCastType(v3, v, kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data2), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-            formatedArgs[3 * e + 2].elements[formatedArgs[3 * e + 2].numElements] = v.x;
-            formatedArgs[3 * e + 2].elements[formatedArgs[3 * e + 2].numElements + 1] = v.y;
-            formatedArgs[3 * e + 2].elements[formatedArgs[3 * e + 2].numElements + 2] = v.z;
-            formatedArgs[3 * e + 2].numElements += 3;
-          }
-          else if (kType_sizeOf(current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]) == kType_sizeOf(kTYPE_v4))
-          {
-            v4 v;
-            kCastType(v4, v, kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data0), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-            formatedArgs[3 * e].elements[formatedArgs[3 * e].numElements] = v.x;
-            formatedArgs[3 * e].elements[formatedArgs[3 * e].numElements + 1] = v.y;
-            formatedArgs[3 * e].elements[formatedArgs[3 * e].numElements + 2] = v.z;
-            formatedArgs[3 * e].elements[formatedArgs[3 * e].numElements + 3] = v.w;
-            formatedArgs[3 * e].numElements += 4;
-
-            kCastType(v4, v, kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data1), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-            formatedArgs[3 * e + 1].elements[formatedArgs[3 * e + 1].numElements] = v.x;
-            formatedArgs[3 * e + 1].elements[formatedArgs[3 * e + 1].numElements + 1] = v.y;
-            formatedArgs[3 * e + 1].elements[formatedArgs[3 * e + 1].numElements + 2] = v.z;
-            formatedArgs[3 * e + 1].elements[formatedArgs[3 * e + 1].numElements + 3] = v.w;
-            formatedArgs[3 * e + 1].numElements += 4;
-
-            kCastType(v4, v, kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data2), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-            formatedArgs[3 * e + 2].elements[formatedArgs[3 * e + 2].numElements] = v.x;
-            formatedArgs[3 * e + 2].elements[formatedArgs[3 * e + 2].numElements + 1] = v.y;
-            formatedArgs[3 * e + 2].elements[formatedArgs[3 * e + 2].numElements + 2] = v.z;
-            formatedArgs[3 * e + 2].elements[formatedArgs[3 * e + 2].numElements + 3] = v.w;
-            formatedArgs[3 * e + 2].numElements += 4;
-          }
-        }
-        else
-        {
-          kCastType(f32, formatedArgs[3 * e].elements[formatedArgs[e].numElements], kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data0), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-          kCastType(f32, formatedArgs[3 * e + 1].elements[formatedArgs[e].numElements], kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data1), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-          kCastType(f32, formatedArgs[3 * e + 2].elements[formatedArgs[e].numElements], kStruct_getElementOfObjectAtIndex(i, current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef, data2), current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]);
-          formatedArgs[3 * e].numElements++;
-          formatedArgs[3 * e + 1].numElements++;
-          formatedArgs[3 * e + 2].numElements++;
-        }
+        memcpy(data + t * 3 * structSize + i * structSize, kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[s].triangles[t].arg[i], structSize*sizeof(f32));
       }
     }
 
-    if (1)
-    {
-      size_t sizeOfArg = 0;
-      f32 data[3 * kRenderer_maxObjectTriangles * (kStruct_arg_def_max_length * 4)];
-      for (u32 i = 0; i < 3 * obj.shaderElements[s].length; i++)
-      {
-        for (u32 j = 0; j < formatedArgs[i].numElements; j++)
-        {
-          data[sizeOfArg + j] = formatedArgs[i].elements[j];
-        }
-        sizeOfArg += formatedArgs[i].numElements;
-      }
-      glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * sizeOfArg * 3, data, GL_DYNAMIC_DRAW);
-    }
+    glBufferData(GL_ARRAY_BUFFER,dataSize*sizeof(f32),data,GL_DYNAMIC_DRAW);
+    free(data);
 
-    u32 currentElementsIndex = 0;
-    // number of triangles
-    for (u32 e = 0; e < obj.shaderElements[s].length; e++)
+    u32 offset=0;
+    for (u32 i = 0; i < current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.argLength; i++)
     {
-      // the number of variables per triangles
-      for (u32 i = 0; i < current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.length; i++)
-      {
-        if (current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i] >= kTYPE_v2)
-        {
-          u8 offset = kType_sizeOf(current->windowShaders.programs[obj.shaderElements[s].shadersIndex].argsDef.args[i]) / 4;
-          glVertexAttribPointer(i, offset, GL_FLOAT, GL_FALSE, sizeof(f32) * formatedArgs[3 * e].numElements, (void *)(sizeof(f32) * currentElementsIndex));
-          currentElementsIndex += offset;
-        }
-        else
-        {
-          glVertexAttribPointer(i, 1, GL_FLOAT, GL_FALSE, sizeof(f32) * formatedArgs[3 * e].numElements, (void *)(sizeof(f32) * currentElementsIndex));
-          currentElementsIndex++;
-        }
-        glEnableVertexAttribArray(i);
-      }
+      glVertexAttribPointer(i, current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.vecSize[i], GL_FLOAT, GL_FALSE, sizeof(f32) * structSize, (void *)(sizeof(f32) * offset));
+      glEnableVertexAttribArray(i);
+      offset += current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.vecSize[i];
     }
   }
-  return index;
-}
-kRenderer_RendererObject *kRenderer_getBoundObject(u32 index)
-{
-  return &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects;
 }
 void kRenderer_updateObjects()
 {
@@ -1288,49 +1190,24 @@ void kRenderer_updateObjects()
 void kRenderer_updateObject(u32 index)
 {
   const kRenderer_WindowContext *current = kRenderer_WindowsContexts.windows[currentContext].context;
-  const kRenderer_RendererObject *obj = &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects;
-  for (u32 s = 0; s < obj->length; s++)
-  {
-    const kStruct_StructDef def = kRenderer_WindowsContexts.windows[currentContext].context->windowShaders.programs[obj->shaderElements[s].shadersIndex].argsDef;
-    u32 offset = 0;
-    for (u32 t = 0; t < obj->shaderElements[s].length; t++)
-    {
-      glBindBuffer(GL_ARRAY_BUFFER, kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].shaderData[s].VBO);
-      for (u32 j = 0; j < def.length; j++)
+  kRenderer_RendererObject *obj = &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects;
+  for(u32 s=0;s<obj->length;s++){
+    glBindBuffer(GL_ARRAY_BUFFER, kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].shaderData[s].VBO);
+    for(u32 t=0;t<obj->shaderElements[s].length;t++){
+      u32 structSize=0;
+      for (u32 i = 0; i < current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.argLength;i++){
+        structSize += current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.vecSize[i];
+      }
+      u32 offset=0;
+      for (u32 i = 0; i < current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.argLength; i++)
       {
-        u32 size = 0;
-        if (def.args[j] >= kTYPE_v2)
-        {
-          size = kType_sizeOf(def.args[j]) / 4;
-        }
-        else
-        {
-          size = 1;
-        }
-
-        if (obj->shaderElements[s].triangles[t].valueUpdated[j])
-        {
-          for (u32 l = 0; l < 3; l++)
-          {
-            v4 value;
-            kCastType(v4, value, kStruct_getElementOfObjectAtIndex(j, def, obj->shaderElements[s].triangles[t].arg[l]), def.args[j]);
-            glBufferSubData(GL_ARRAY_BUFFER, sizeof(f32) * (offset + kStruct_unpackVectorsLength(def) * l), sizeof(f32) * size, &value);
+        if (obj->shaderElements[s].triangles[t].valueUpdated[i]){
+          for(u32 j=0;j<3;j++){
+            glBufferSubData(GL_ARRAY_BUFFER, (j * structSize + t * structSize * 3 + offset) * sizeof(f32), current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.vecSize[i] * sizeof(f32), obj->shaderElements[s].triangles[t].arg[j]+offset);
+            obj->shaderElements[s].triangles[t].valueUpdated[i]=false;
           }
-
-          // if((def.args[j]>=kTYPE_v2&&def.args[j]<kTYPE_iv2)||def.args[j]==kTYPE_f32){
-          //   for(u32 l=0;l<3;l++){
-          //     glBufferSubData(GL_ARRAY_BUFFER, sizeof(f32) * (offset + kStruct_unpackVectorsLength(def) * l), sizeof(f32) * size, obj->shaderElements[s].triangles[t].arg[l]);
-          //   }
-          // }else{
-          //   for (u32 l = 0; l < 3; l++)
-          //   {
-          //     v4 value;
-          //     kCastType(v4,value,obj->shaderElements[s].triangles[t].arg[l],def.args[j]);
-          //     glBufferSubData(GL_ARRAY_BUFFER, sizeof(f32) * (offset + kStruct_unpackVectorsLength(def) * l), sizeof(f32) * size, &value);
-          //   }
-          // }
         }
-        offset += size;
+        offset += current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.vecSize[i];
       }
     }
   }
@@ -1339,6 +1216,7 @@ void kRenderer_drawObject(u32 index)
 {
   for (u32 i = 0; i < kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.length; i++)
   {
+    glBindBuffer(GL_ARRAY_BUFFER, kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].shaderData[i].VBO);
     glBindVertexArray(kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].shaderData[i].VAO);
     glUseProgram(kRenderer_WindowsContexts.windows[currentContext].shaderPrograms[kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[i].shadersIndex]);
     glDrawArrays(GL_TRIANGLES, 0, 3 * kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[i].length);
@@ -1351,6 +1229,7 @@ void kRenderer_drawObjectWithTexture(u32 objectIndex, u32 **textureIndex)
   {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindBuffer(GL_ARRAY_BUFFER, kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].shaderData[i].VBO);
     glBindVertexArray(kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].shaderData[i].VAO);
     for (u32 t = 0; t < kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[objectIndex].boundObjects.shaderElements[i].length; t++)
     {
@@ -1361,7 +1240,7 @@ void kRenderer_drawObjectWithTexture(u32 objectIndex, u32 **textureIndex)
   }
   glBindVertexArray(0);
 }
-void kRenderer_unbindObject(u32 index)
+void kRenderer_unloadObject(u32 index)
 {
   const kRenderer_RendererObject *obj = &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects;
   for (u32 s = 0; s < obj->length; s++)

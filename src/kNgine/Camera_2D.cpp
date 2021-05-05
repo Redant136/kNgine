@@ -16,7 +16,7 @@ namespace kNgine
   Camera::Camera(f32 fov, u32 windowWidth, u32 windowHeight)
   {
     this->position = v3(0, 0, 1);
-    this->posMapper = mapper(v2(0,0),v2(0,0),v2(-1,-1),v2(1,1));
+    this->posMapper = mapper(v3(0,0,0),v3(0,0,1),v3(-1,-1,-1),v3(1,1,1));
     if (windowHeight < windowWidth)
     {
       posMapper.min.x = -fov / 2;
@@ -140,36 +140,57 @@ namespace kNgine
 
   void Camera::render(ComponentGameObject *object)
   {
-    SpriteAccessor *compn=object->findComponent<SpriteAccessor>(ObjectFlags::RENDERABLE);
+    Renderable*compn=object->findComponent<Renderable>(ObjectFlags::RENDERABLE);
+    if(compn->label=="[Rend_SYS]"){
+      compn=((RenderableSystem*)compn)->active;
+    }
     u32 numSprite = 1;
     bool isSpriteList = false;
-    if (compn->specialAccessor)
+    if(compn->specialAccessor)
     {
-      if(compn->label=="[sprite_list]")
+      if (compn->label == "[RendererObject]")
       {
-        numSprite = ((SpriteList*)compn)->getSpriteListLength();
-        isSpriteList = true;
-      }
-      else if (compn->label == "[RendererObject]")
-      {
-        SpriteRendererObject *rendObject = (SpriteRendererObject *)compn;
+        RendererObject_base *rendObject = (RendererObject_base *)compn;
         m4 matrix = M4InitDiagonal(1);
-        matrix=M4MultiplyM4(matrix,posMapper.toM4());
-        matrix=M4MultiplyM4(matrix,M4TranslateV3(this->position));
+        matrix = M4MultiplyM4(matrix, posMapper.toM4());
+        matrix = M4MultiplyM4(matrix, M4TranslateV3(v3(this->position.x, this->position.y,0)*-1));
+
+        
+        v4 pos1=V4MultiplyM4(v4xyz(rendObject->object->position,1),matrix);
+        v4 pos3=V4MultiplyM4(v4(10,5,1,1),matrix);
+        v3 pos4 = posMapper.map(v3(10,5,1));
+        v3 pos2=posMapper.map(rendObject->object->position);
 
         rendObject->updatePoints(matrix);
-        u32 *spriteIndexes[kRenderer_maxObjectTriangles];
-        for (u32 i = 0; i < rendObject->spriteIndexes.size(); i++)
-        {
-          spriteIndexes[i] = rendObject->spriteIndexes[i].data();
+        std::vector<std::vector<u32>>objSpritesIndexes = rendObject->getSpriteIndexes();
+        if(objSpritesIndexes.size()){
+          u32 **spriteIndexes = new u32 *[objSpritesIndexes.size()];
+          for (u32 i = 0; i < objSpritesIndexes.size(); i++)
+          {
+            spriteIndexes[i] = new u32[objSpritesIndexes[i].size()];
+            for(u32 j=0;j<objSpritesIndexes[i].size();j++){
+              spriteIndexes[i][j] = objSpritesIndexes[i][j];
+            }
+          }
+          kRenderer_drawObjectWithTexture(rendObject->rendererObjectIndex, spriteIndexes);
+          for (u32 i = 0; i < objSpritesIndexes.size(); i++){
+            delete[] spriteIndexes[i];
+          }
+          delete[] spriteIndexes;
+        }else{
+          kRenderer_drawObject(rendObject->rendererObjectIndex);
         }
-        kRenderer_drawObjectWithTexture(rendObject->rendererObjectIndex, spriteIndexes);
         return;
+      }
+      else if(compn->label=="[sprite_list]")
+      {
+        numSprite = ((SpriteList *)compn)->getSpriteListLength();
+        isSpriteList = true;
       }
     }
     for (u32 i = 0; i < numSprite; i++)
     {
-      SpriteAccessor*accessor=compn;
+      SpriteAccessor*accessor=(SpriteAccessor*)compn;
       if (isSpriteList)
       {
         accessor = ((SpriteList*)compn)->getSpriteList()[i];
@@ -184,13 +205,13 @@ namespace kNgine
 
       if (accessor->hasToSave())
       {
-        v2 pos = posMapper.map((toV2(object->position)+ accessor->offset)- toV2(position))+spriteOffset;
+        v2 pos = toV2(posMapper.map((object->position + accessor->offset) - position))+spriteOffset;
         kRenderer_drawBuffer_defaultShader(buffer, accessor->getSprite()->width, accessor->getSprite()->height, accessor->getSprite()->numChannels,
                                            v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, object->rotation);
       }
       else
       {
-        v2 pos = posMapper.map((toV2(object->position)+ accessor->offset)- toV2(position))+ spriteOffset;
+        v2 pos = toV2(posMapper.map((object->position + accessor->offset) - position)) + spriteOffset;
         SpriteMapAccessor *ref = (SpriteMapAccessor *)accessor;
         kRenderer_drawStoredTexture_defaultShader(ref->spriteList->texIndex[ref->getMapIndex()],
                                                   v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, object->rotation);
