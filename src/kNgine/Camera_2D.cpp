@@ -33,6 +33,7 @@ namespace kNgine
     }
     this->fov = fov;
     this->flags|=ObjectFlags::RENDERER_LAYER;
+    this->engineInfo = { NULL,NULL };
   }
   Camera::~Camera() {}
 
@@ -94,10 +95,10 @@ namespace kNgine
     else if (fovType == DIAGONAL)
     {
       f32 diagonal = sqrtf(windowWidth*windowWidth+windowHeight*windowHeight);
-      posMapper.min.x = -windowWidth / diagonal * fov;
-      posMapper.max.x =  windowWidth / diagonal * fov;
-      posMapper.min.y = -windowHeight / diagonal * fov;
-      posMapper.max.y =  windowHeight / diagonal * fov;
+      posMapper.min.x = -signed(windowWidth) / diagonal * fov;
+      posMapper.max.x =  signed(windowWidth) / diagonal * fov;
+      posMapper.min.y = -signed(windowHeight) / diagonal * fov;
+      posMapper.max.y =  signed(windowHeight) / diagonal * fov;
     }
     else
     {

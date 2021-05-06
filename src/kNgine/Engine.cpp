@@ -11,8 +11,8 @@
 namespace kNgine
 {
   std::vector<EngineObject *> objects = std::vector<EngineObject *>();
-  u64 maxWorkingObjectsLength = 64;
-  u64 workingObjectsLength = 0;
+  size_t maxWorkingObjectsLength = 64;
+  size_t workingObjectsLength = 0;
   EngineObject **workingObjects;
   std::string window_name = "Game";
   v2 window_size = {1920.0f, 1080.0f};

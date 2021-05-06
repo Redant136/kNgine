@@ -2509,6 +2509,12 @@ static inline v3 HSVToRGB(v3 hsv)
     g = 0;
     b = x;
   }
+  else
+  {
+    r = 0;
+    g = 0;
+    b = 0;
+  }
 
   v3 rgb = v3(r + m, g + m, b + m);
   return rgb;

@@ -17,6 +17,7 @@ static void init()
   obj.length = 1;
   obj.shaderElements[0].shadersIndex = 0;
   obj.shaderElements[0].length = 1;
+  obj.shaderElements[0].triangles=malloc(1*sizeof(struct triangle));
   obj.shaderElements[0].triangles[0].arg[0] = &points[0];
   obj.shaderElements[0].triangles[0].arg[1] = &points[1];
   obj.shaderElements[0].triangles[0].arg[2] = &points[2];

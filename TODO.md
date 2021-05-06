@@ -3,6 +3,7 @@
 # main branch
 
 ## currently working on
+- [ ] Box2D causes cmake error during build
 ## testing
 - [x] stored renderer objects in kNgine
 - [ ] test custom shader in renderer

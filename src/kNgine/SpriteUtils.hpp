@@ -257,7 +257,7 @@ namespace kNgine
       }
     }
     SpriteAccessor **getSpriteList() { return accessors.data(); }
-    i32 getSpriteListLength() { return accessors.size(); }
+    u32 getSpriteListLength() { return accessors.size(); }
     bool hasToSave() { return false; }
     Sprite *getSprite() { return accessors[0]->getSprite(); }
     v2 getSpriteDimensions() { return accessors[0]->getSpriteLocation(); }

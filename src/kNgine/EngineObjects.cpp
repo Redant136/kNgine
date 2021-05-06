@@ -142,7 +142,7 @@ namespace kNgine{
     Sprite res;
     if (numChannels == 3) {
       u8 *data2 = new u8[width * height * 4];
-      for (u32 i = 0; i < width * height; i++) {
+      for (u32 i = 0; i < (u64) width * height; i++) {
         data2[4 * i] = data[numChannels * i];
         data2[4 * i + 1] = data[numChannels * i + 1];
         data2[4 * i + 2] = data[numChannels * i + 2];

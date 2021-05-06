@@ -26,7 +26,7 @@ namespace kNgine
     texIndex = std::vector<u32>();
     for (u32 i = 0; i < list.size(); i++)
     {
-      u32 texture, VBO;
+      u32 texture;
       kRenderer_bindTexture(&texture, list[i].buffer, list[i].width, list[i].height, list[i].numChannels);
       texIndex.push_back(texture);
     }
@@ -47,6 +47,7 @@ namespace kNgine
 
   SpriteMapAccessor::SpriteMapAccessor(ComponentGameObject *base) : SpriteAccessor(base)
   {
+    this->spriteList = NULL;
   }
 
   SpriteReferenceComponent::SpriteReferenceComponent(ComponentGameObject *base, SpriteMap *spriteList,
@@ -207,6 +208,7 @@ namespace kNgine
     for(u32 i=0;i<numShaders;i++){
       obj.shaderElements[i].shadersIndex=shaderIndex[i];
       obj.shaderElements[i].length=numTriangles[i];
+      obj.shaderElements[i].triangles=new kRenderer_RendererObject::triangle[numTriangles[i]];
       for(u32 j=0;j<numTriangles[i];j++){
         obj.shaderElements[i].triangles[j].arg[0] = points[i][j][0];
         obj.shaderElements[i].triangles[j].arg[1] = points[i][j][1];
@@ -232,6 +234,7 @@ namespace kNgine
     object.length = 1;
     object.shaderElements[0].shadersIndex = 0;
     object.shaderElements[0].length = 2;
+    object.shaderElements[0].triangles=new kRenderer_RendererObject::triangle[2];
     object.shaderElements[0].triangles[0].arg[0] = (f32 *)&default_points[0];
     object.shaderElements[0].triangles[0].arg[1] = (f32 *)&default_points[1];
     object.shaderElements[0].triangles[0].arg[2] = (f32 *)&default_points[3];
@@ -263,7 +266,7 @@ namespace kNgine
   {
     v2 spriteDimensions=renderable->getSpriteDimensions();
     v2 dimensions = toV2(V4MultiplyM4(v4(object->position.x, object->position.y, object->position.z, 1) + v4(spriteDimensions.x, spriteDimensions.y, 0, 0), matrix)) - toV2(V4MultiplyM4(v4(object->position.x, object->position.y, object->position.z, 1), matrix));
-    v3 spriteOffset = v3(-0.5*dimensions.x,-0.5*dimensions.y,0);
+    v3 spriteOffset = v3(-0.5f*dimensions.x,-0.5f*dimensions.y,0);
     kRenderer_RendererObject*obj= kRenderer_getBoundObject(rendererObjectIndex);
     obj->shaderElements[0].triangles[0].valueUpdated[0] = true;
     obj->shaderElements[0].triangles[1].valueUpdated[0] = true;
@@ -311,14 +314,14 @@ namespace kNgine
     i32 width, height, numChannels;
     unsigned char *data = stbi_load(filename, &width, &height, &numChannels, 0);
 
-    i32 numSpritesHor = width / spriteWidth;
-    i32 numSpritesVert = height / spriteHeight;
+    u32 numSpritesHor = width / spriteWidth;
+    u32 numSpritesVert = height / spriteHeight;
     std::vector<Sprite> sprites = std::vector<Sprite>();
     for (u32 i = 0; i < numSpritesVert; i++)
     {
       for (u32 j = 0; j < numSpritesHor; j++)
       {
-        u8 *sprite = new u8[spriteWidth * spriteHeight * numChannels];
+        u8 *sprite = new u8[(u64)spriteWidth * spriteHeight * numChannels];
         for (i32 y = 0; y < spriteHeight; y++)
         {
           for (i32 x = 0; x < spriteWidth; x++)

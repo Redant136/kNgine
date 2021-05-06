@@ -96,8 +96,8 @@ namespace kNgine
 #define Sprite(width, height, channels, buffer) SpriteInit(width, height, channels, buffer)
   static inline Sprite fillSprite(u32 width, u32 height, rgbcolor fill)
   {
-    u8 *colorMap = new u8[width * height * 4];
-    for (int i = 0; i < width * height * 4; i += 4)
+    u8 *colorMap = new u8[4UL * width * height];
+    for (u32 i = 0; i < 4UL * width * height; i += 4)
     {
       colorMap[i + 0] = fill.r;
       colorMap[i + 1] = fill.g;
@@ -130,11 +130,11 @@ namespace kNgine
       break;
     case SOUTH:
       copyLine = iv2(0, sprite->height - 1);
-      cut.y = -offset;
+      cut.y = -1*offset;
       break;
     case EAST:
       copyLine = iv2(sprite->width - 1, 0);
-      cut.x = -offset;
+      cut.x = -1*offset;
       break;
     case NORTH_WEST:
       copyLine = iv2(0, 0);
@@ -144,35 +144,35 @@ namespace kNgine
     case NORTH_EAST:
       copyLine = iv2(sprite->width - 1, 0);
       cut.y = offset;
-      cut.x = -offset;
+      cut.x = -1*offset;
       break;
     case SOUTH_WEST:
       copyLine = iv2(0, sprite->height - 1);
-      cut.y = -offset;
+      cut.y = -1*offset;
       cut.x = offset;
       break;
     case SOUTH_EAST:
       copyLine = iv2(sprite->width - 1, sprite->height - 1);
-      cut.y = -offset;
-      cut.x = -offset;
+      cut.y = -1*offset;
+      cut.x = -1*offset;
       break;
     default:
       copyLine = iv2(0, 0);
       break;
     }
 
-    u8 *newBuffer = new u8[sprite->width * sprite->height * sprite->numChannels];
+    u8 *newBuffer = new u8[(size_t)sprite->width * sprite->height * sprite->numChannels];
     for (u32 i = 0; i < sprite->height; i++)
     {
       i32 y = i - cut.y;
-      if (y < 0 || y >= sprite->height)
+      if (y < 0 || y >= signed(sprite->height))
       {
         y = copyLine.y;
       }
       for (u32 j = 0; j < sprite->width; j++)
       {
         i32 x = j - cut.x;
-        if (x < 0 || x >= sprite->width)
+        if (x < 0 || x >= signed(sprite->width))
         {
           x = copyLine.x;
         }
@@ -443,7 +443,7 @@ namespace kNgine
     return res;
   };
   template <class T = EngineObject, class I = EngineObject>
-  std::vector<T *> findObject(I **objects, u32 objectsSize,
+  std::vector<T *> findObject(I **objects, size_t objectsSize,
                               u64 flags)
   {
     std::vector<EngineObject *> valid = std::vector<EngineObject *>();

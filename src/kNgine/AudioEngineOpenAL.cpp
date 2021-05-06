@@ -105,7 +105,7 @@ namespace kNgine
         {
           for (u32 j = 0; j < file.samples[i].size(); j++)
           {
-            content[j + i * file.samples[i].size()] = file.samples[i][j]*32767;
+            content[j + i * file.samples[i].size()] = file.samples[i][j]*32767;// max i16
           }
         }
         alGenBuffers(1, &buffer);

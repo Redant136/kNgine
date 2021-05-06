@@ -71,6 +71,13 @@ extern "C"
 
   typedef struct kRenderer_RendererObject
   {
+    struct triangle
+    {
+      // the data of each triangle point
+      f32 *arg[3];
+      // if the values at that index were updated
+      bool valueUpdated[kRenderer_maxObjectElements];
+    };
     // the number of shader programs it uses
     size_t length;
     struct
@@ -78,13 +85,7 @@ extern "C"
       u32 shadersIndex;
       // the number of triangles
       size_t length;
-      struct
-      {
-        // the data of each triangle point
-        f32 *arg[3];
-        // if the values at that index were updated
-        bool valueUpdated[kRenderer_maxObjectElements];
-      } triangles[kRenderer_maxObjectTriangles];
+      struct triangle*triangles;
     } shaderElements[kRenderer_maxShaderPrograms];
   } kRenderer_RendererObject;
 
@@ -118,7 +119,7 @@ extern "C"
   void kRenderer_drawTriangle(v2 points[3]);
   void kRenderer_drawLine(v2 points[2]);
   void kRenderer_drawPoint(v2 point);
-  void kRenderer_drawLineLoop(v2 *points, i32 numPoints);
+  void kRenderer_drawLineLoop(v2 *points, u32 numPoints);
   void kRenderer_drawCircle(v2 startPoint, f32 radius);
 
   void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,

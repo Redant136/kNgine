@@ -14,8 +14,8 @@
 namespace kNgine
 {
   extern std::vector<EngineObject *> objects;
-  extern u64 maxWorkingObjectsLength;
-  extern u64 workingObjectsLength;
+  extern size_t maxWorkingObjectsLength;
+  extern size_t workingObjectsLength;
   extern EngineObject **workingObjects;
   extern std::string window_name;
   extern v2 window_size;
@@ -200,28 +200,6 @@ namespace kNgine
   static void frameStart()
   {
     reloadObjects();
-    kRenderer_RendererObject obj;
-    obj.length = 1;
-    obj.shaderElements[0].shadersIndex = 0;
-    obj.shaderElements[0].length = 1;
-    obj.shaderElements[0].triangles[0].arg[0] = (f32*)&points[0];
-    obj.shaderElements[0].triangles[0].arg[1] = (f32*)&points[1];
-    obj.shaderElements[0].triangles[0].arg[2] = (f32*)&points[2];
-
-    points[0].pos = v3(-0.5, 0, 0);
-    points[0].isTex = 0;
-    points[0].color = v4(0, 0, 1, 1);
-
-    points[1].pos = v3(0.5, 0, 0);
-    points[1].isTex = 0;
-    points[1].color = v4(0, 1, 0, 1);
-
-    points[2].pos = v3(0, 1, 0);
-    points[2].isTex = 0;
-    points[2].color = v4(1, 0, 0, 1);
-
-    kRenderer_bindObject(&object, obj);
-
     frameUpdate();
   }
   static void start()

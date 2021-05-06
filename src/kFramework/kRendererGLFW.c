@@ -795,7 +795,7 @@ void kRenderer_drawLine(v2 points[2])
   glDeleteBuffers(1, &VBO);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
-void kRenderer_drawLineLoop(v2 *points, i32 numPoints)
+void kRenderer_drawLineLoop(v2 *points, u32 numPoints)
 {
   for (u32 i = 0; i < numPoints; i++)
   {
@@ -1122,7 +1122,7 @@ void kRenderer_unbindTexture(u32 textureIndex)
   glDeleteTextures(1, &textureIndex);
 }
 
-u32 kRenderer_addObject(u32*indexIn,kRenderer_RendererObject obj){
+u32 kRenderer_addObject(u32*indexIn, kRenderer_RendererObject obj){
   *indexIn = kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.length;
   u32 index = *indexIn;
   assert(index + 1 < kRenderer_maxBoundObjects);
@@ -1158,7 +1158,7 @@ void kRenderer_loadObject(u32 index){
       structSize += current->windowShaders.programs[obj->shaderElements[s].shadersIndex].structDef.vecSize[i];
     }
 
-    u32 dataSize = structSize * 3 * kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[s].length;
+    size_t dataSize = structSize * 3 * kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[s].length;
     f32 *data = malloc(dataSize*sizeof(f32));
     for(u32 t=0;t<kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects.shaderElements[s].length;t++)
     {
@@ -1266,7 +1266,7 @@ void kRenderer_setFont(const char *fontName)
 }
 void kRenderer_displayText(v3 position, v3 rotation, const char *text, f32 scale)
 {
-  u32 charactersIndexs[1024];
+  u32 charactersIndexs[1024]={0};
   size_t textLength = 0;
   u32 pixWidth = 0;
   u32 pixHeight = 0;

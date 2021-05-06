@@ -49,7 +49,7 @@ ${KNGINEFRAMEWORK_HEADER_FILES}
 src/kNgine/EngineObjects.hpp
 src/kNgine/Camera.hpp
 src/kNgine/SpriteUtils.hpp
-src/kNgine/PhysicsB2.hpp
+# src/kNgine/PhysicsB2.hpp
 src/kNgine/AudioEngine.hpp
 
 src/kNgine/Engine.hpp
@@ -61,7 +61,7 @@ ${KNGINEFRAMEWORK_SOURCE_FILES}
 src/kNgine/EngineObjects.cpp 
 src/kNgine/Camera_2D.cpp
 src/kNgine/SpriteUtils.cpp
-src/kNgine/PhysicsB2.cpp
+# src/kNgine/PhysicsB2.cpp
 src/kNgine/Tilemap.cpp
 src/kNgine/Engine.cpp
 ${OSSpecificFiles}
@@ -79,31 +79,31 @@ add_library(kNgine
 
 
 if(kRenderer_GLFW)
-add_subdirectory(extern/glad/)
-target_link_libraries(kNgineFramework PRIVATE glad)
-target_link_libraries(kNgine PRIVATE glad)
+  add_subdirectory(extern/glad/)
+  target_link_libraries(kNgineFramework PRIVATE glad)
+  target_link_libraries(kNgine PRIVATE glad)
 
-add_subdirectory(extern/glfw)
-target_link_libraries(kNgineFramework PRIVATE glfw)
-target_link_libraries(kNgine PRIVATE glfw)
+  add_subdirectory(extern/glfw)
+  target_link_libraries(kNgineFramework PRIVATE glfw)
+  target_link_libraries(kNgine PRIVATE glfw)
 
 elseif(kRenderer_GLUT)
-add_subdirectory(extern/glad/)
-target_link_libraries(kNgineFramework PRIVATE glad)
-target_link_libraries(kNgine PRIVATE glad)
+  add_subdirectory(extern/glad/)
+  target_link_libraries(kNgineFramework PRIVATE glad)
+  target_link_libraries(kNgine PRIVATE glad)
 
-if(APPLE)
-target_link_libraries(kNgine PRIVATE "-framework OpenGL -framework GLUT")
+  if(APPLE)
+    target_link_libraries(kNgine PRIVATE "-framework OpenGL -framework GLUT")
 
-else()
+  else()
 
-add_subdirectory(extern/FreeGlut/freeglut/freeglut)
-target_include_directories(kNgineFramework PRIVATE extern/FreeGlut/freeglut/freeglut/include)
-target_include_directories(kNgine PRIVATE extern/FreeGlut/freeglut/freeglut/include)
+  add_subdirectory(extern/FreeGlut/freeglut/freeglut)
+  target_include_directories(kNgineFramework PRIVATE extern/FreeGlut/freeglut/freeglut/include)
+  target_include_directories(kNgine PRIVATE extern/FreeGlut/freeglut/freeglut/include)
 
-target_link_libraries(kNgineFramework PRIVATE ${OPENGL_LIBRARIES} freeglut})
-# target_link_libraries(kNgine PRIVATE freeglut)
-target_link_libraries(kNgine PRIVATE ${OPENGL_LIBRARIES} freeglut)
+  target_link_libraries(kNgineFramework PRIVATE ${OPENGL_LIBRARIES} freeglut})
+  # target_link_libraries(kNgine PRIVATE freeglut)
+  target_link_libraries(kNgine PRIVATE ${OPENGL_LIBRARIES} freeglut)
 endif()
 
 else()
@@ -114,10 +114,10 @@ target_link_libraries(kNgineFramework PRIVATE freetype)
 target_link_libraries(kNgine PRIVATE freetype)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/ressources/ DESTINATION ${CMAKE_BINARY_DIR}/ressources/)
 
-set(BOX2D_BUILD_UNIT_TESTS OFF)
-set(BOX2D_BUILD_TESTBED OFF)
-add_subdirectory(extern/box2d)
-target_link_libraries(kNgine PRIVATE box2d)
+# set(BOX2D_BUILD_UNIT_TESTS OFF)
+# set(BOX2D_BUILD_TESTBED OFF)
+# add_subdirectory(extern/box2d)
+# target_link_libraries(kNgine PRIVATE box2d)
 
 add_subdirectory(extern/AudioFile)
 target_link_libraries(kNgine PRIVATE AudioFile)
