@@ -4,8 +4,8 @@
 
 ## currently working on
 - [ ] Box2D causes cmake error during build
+- [ ] use chipmunk
 ## testing
-- [x] stored renderer objects in kNgine
 - [ ] test custom shader in renderer
 ## next step
 - [ ] object info tool

@@ -19,3 +19,6 @@
 [submodule "extern/AudioFile"]
 	path = extern/AudioFile
 	url = https://github.com/adamstark/AudioFile.git
+[submodule "extern/Chipmunk2D"]
+	path = extern/Chipmunk2D
+	url = https://github.com/slembcke/Chipmunk2D.git

@@ -208,7 +208,7 @@ namespace kNgine
     for(u32 i=0;i<numShaders;i++){
       obj.shaderElements[i].shadersIndex=shaderIndex[i];
       obj.shaderElements[i].length=numTriangles[i];
-      obj.shaderElements[i].triangles=new kRenderer_RendererObject::triangle[numTriangles[i]];
+      obj.shaderElements[i].triangles=new kRenderer_triangleInfo[numTriangles[i]];
       for(u32 j=0;j<numTriangles[i];j++){
         obj.shaderElements[i].triangles[j].arg[0] = points[i][j][0];
         obj.shaderElements[i].triangles[j].arg[1] = points[i][j][1];
@@ -234,7 +234,7 @@ namespace kNgine
     object.length = 1;
     object.shaderElements[0].shadersIndex = 0;
     object.shaderElements[0].length = 2;
-    object.shaderElements[0].triangles=new kRenderer_RendererObject::triangle[2];
+    object.shaderElements[0].triangles = new kRenderer_triangleInfo[2];
     object.shaderElements[0].triangles[0].arg[0] = (f32 *)&default_points[0];
     object.shaderElements[0].triangles[0].arg[1] = (f32 *)&default_points[1];
     object.shaderElements[0].triangles[0].arg[2] = (f32 *)&default_points[3];

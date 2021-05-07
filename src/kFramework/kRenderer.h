@@ -69,15 +69,16 @@ extern "C"
     void (*draw)();
   } kRenderer_WindowContext;
 
+  struct kRenderer_triangleInfo
+  {
+    // the data of each triangle point
+    f32 *arg[3];
+    // if the values at that index were updated
+    bool valueUpdated[kRenderer_maxObjectElements];
+  };
+
   typedef struct kRenderer_RendererObject
   {
-    struct triangle
-    {
-      // the data of each triangle point
-      f32 *arg[3];
-      // if the values at that index were updated
-      bool valueUpdated[kRenderer_maxObjectElements];
-    };
     // the number of shader programs it uses
     size_t length;
     struct
@@ -85,7 +86,8 @@ extern "C"
       u32 shadersIndex;
       // the number of triangles
       size_t length;
-      struct triangle*triangles;
+      struct
+      kRenderer_triangleInfo *triangles;
     } shaderElements[kRenderer_maxShaderPrograms];
   } kRenderer_RendererObject;
 

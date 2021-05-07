@@ -513,6 +513,7 @@ i32 kRenderer_createWindow(kRenderer_WindowContext *context)
     return -1;
   }
   glfwMakeContextCurrent(window);
+  // glfwSetWindowPos(window, 0, 0);
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
   {
     assert(0 && "could not initialize GLAD");
@@ -1191,7 +1192,8 @@ void kRenderer_updateObject(u32 index)
 {
   const kRenderer_WindowContext *current = kRenderer_WindowsContexts.windows[currentContext].context;
   kRenderer_RendererObject *obj = &kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].boundObjects;
-  for(u32 s=0;s<obj->length;s++){
+  for(u32 s=0;s<obj->length;s++)
+  {
     glBindBuffer(GL_ARRAY_BUFFER, kRenderer_WindowsContexts.windows[currentContext].kRenderer_boundObjects.objectData[index].shaderData[s].VBO);
     for(u32 t=0;t<obj->shaderElements[s].length;t++){
       u32 structSize=0;

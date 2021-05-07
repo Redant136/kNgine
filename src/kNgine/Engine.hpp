@@ -219,7 +219,7 @@ namespace kNgine
     kRenderer_createWindow(&context);
     kRenderer_setStartFunction(frameStart);
     kRenderer_setDrawFunction(frameUpdate);
-    sleepMillis(10);
+    //sleepMillis(10);
     if (renderingLayerOrder.length <= 0)
     {
       renderingLayerOrder = LayerOrder();
