@@ -52,8 +52,9 @@ bool check_alc_errors(const std::string &filename, const std::uint_fast32_t line
 
 namespace kNgine
 {
-  ALCcontext *openALContext;
-  ALCdevice *openALDevice;
+  bool hasAudioEngine=false;
+  ALCcontext *openALContext = NULL;
+  ALCdevice *openALDevice = NULL;
 
   class OpenALBuffer : public BaseAudioBuffer
   {
@@ -105,7 +106,7 @@ namespace kNgine
         {
           for (u32 j = 0; j < file.samples[i].size(); j++)
           {
-            content[j + i * file.samples[i].size()] = file.samples[i][j]*32767;// max i16
+            content[j + i * file.samples[i].size()] = file.samples[i][j] * 32767; // max i16
           }
         }
         alGenBuffers(1, &buffer);
@@ -160,7 +161,7 @@ namespace kNgine
   }
   SoundListenerComponent::~SoundListenerComponent()
   {
-    if (openALDevice)
+    if (openALDevice && !hasAudioEngine)
     {
       alcMakeContextCurrent(nullptr);
       if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
@@ -174,6 +175,8 @@ namespace kNgine
       if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
       {
       }
+      openALContext = NULL;
+      openALDevice = NULL;
     }
   }
 
@@ -249,7 +252,7 @@ namespace kNgine
     {
       delete queue[i].buffer;
     }
-    if (!(openALDevice))
+    if (openALDevice)
     {
       alcMakeContextCurrent(nullptr);
       if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
@@ -263,6 +266,8 @@ namespace kNgine
       if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
       {
       }
+      openALContext = NULL;
+      openALDevice = NULL;
     }
   }
 
@@ -280,13 +285,10 @@ namespace kNgine
   void AudioEngine::queueBuffer(const char *name, BaseAudioBuffer *buffer, bool loop)
   {
     this->queue.push_back(AudioQueue(name, buffer));
-    ALuint source;
-    alGenSources(1, &source);
-    alSourcef(source, AL_PITCH, 1);
-    alSource3f(source, AL_POSITION, 0, 0, 0);
-    alSource3f(source, AL_VELOCITY, 0, 0, 0);
-    alSourcei(source, AL_BUFFER, ((OpenALBuffer*)buffer)->buffer);
-    ((OpenALBuffer*)buffer)->source=source;
+    this->queue[this->queue.size() - 1].loop = loop;
+  }
+  void AudioEngine::init(std::vector<EngineObject *> obj){
+    hasAudioEngine=true;
   }
   void AudioEngine::load()
   {
@@ -362,6 +364,8 @@ namespace kNgine
     for (AudioQueue q : queue)
     {
       OpenALBuffer *buffer = (OpenALBuffer *)q.buffer;
+      alSourceStop(buffer->source);
+      alSourcei(buffer->source, AL_BUFFER, 0);
       alDeleteSources(1, &buffer->source);
       buffer->source = 0;
     }

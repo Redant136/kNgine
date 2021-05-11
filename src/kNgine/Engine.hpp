@@ -208,7 +208,6 @@ namespace kNgine
     DEBUG=true;
 #endif
     seedRandomNumberGenerator();
-    includeChildren();
     kRenderer_init(0, NULL);
     kRenderer_createContext(&context);
     context.vSync = 1;
@@ -239,6 +238,8 @@ namespace kNgine
     addEvent({"getEngineRendererLayers", [](void *arg) -> void * {
                 return &renderingLayerOrder;
               }});
+
+    includeChildren();
     for (EngineObject *obj : objects)
     {
       obj->init(objects);

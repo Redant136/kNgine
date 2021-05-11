@@ -51,7 +51,7 @@ namespace kNgine
   }
 
   SpriteReferenceComponent::SpriteReferenceComponent(ComponentGameObject *base, SpriteMap *spriteList,
-                                                     i32 index)
+                                                     u32 index)
       : SpriteMapAccessor(base)
   {
     this->spriteLocation = CENTER;

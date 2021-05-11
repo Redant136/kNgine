@@ -49,7 +49,8 @@ ${KNGINEFRAMEWORK_HEADER_FILES}
 src/kNgine/EngineObjects.hpp
 src/kNgine/Camera.hpp
 src/kNgine/SpriteUtils.hpp
-src/kNgine/PhysicsB2.hpp
+# src/kNgine/PhysicsB2.hpp
+src/kNgine/PhysicsChipmunk.hpp
 src/kNgine/AudioEngine.hpp
 
 src/kNgine/Engine.hpp
@@ -61,9 +62,11 @@ ${KNGINEFRAMEWORK_SOURCE_FILES}
 src/kNgine/EngineObjects.cpp 
 src/kNgine/Camera_2D.cpp
 src/kNgine/SpriteUtils.cpp
-src/kNgine/PhysicsB2.cpp
+# src/kNgine/PhysicsB2.cpp
+src/kNgine/PhysicsChipmunk.cpp
 src/kNgine/Tilemap.cpp
 src/kNgine/Engine.cpp
+
 ${OSSpecificFiles}
 )
 
@@ -114,10 +117,10 @@ target_link_libraries(kNgineFramework PRIVATE freetype)
 target_link_libraries(kNgine PRIVATE freetype)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/ressources/ DESTINATION ${CMAKE_BINARY_DIR}/ressources/)
 
-set(BOX2D_BUILD_UNIT_TESTS OFF)
-set(BOX2D_BUILD_TESTBED OFF)
-add_subdirectory(extern/box2d)
-target_link_libraries(kNgine PRIVATE box2d)
+# set(BOX2D_BUILD_UNIT_TESTS OFF)
+# set(BOX2D_BUILD_TESTBED OFF)
+# add_subdirectory(extern/box2d)
+# target_link_libraries(kNgine PRIVATE box2d)
 
 set(BUILD_DEMOS OFF)
 set(INSTALL_DEMOS OFF)
@@ -125,7 +128,7 @@ set(BUILD_SHARED OFF)
 set(BUILD_STATIC ON)
 set(INSTALL_STATIC OFF)
 add_subdirectory(extern/chipmunk2D)
-target_include_directories(kNgine PRIVATE extern/Chipmunk2D/include)
+target_include_directories(kNgine PUBLIC extern/Chipmunk2D/include)
 target_link_libraries(kNgine PRIVATE chipmunk_static)
 
 add_subdirectory(extern/AudioFile)

@@ -95,6 +95,7 @@ namespace kNgine
     void setLoop(bool loop, u32 index = 0) { queue[index].loop = loop; }
     void setVolume(f32 volume, u32 index = 0) { queue[index].volume = volume; }
     void terminate(u32 index = 0) { queue[index].stop = true; }
+    virtual void init(std::vector<EngineObject*>obj);
     virtual void load();
     virtual void update(std::vector<msg>msgs);
     virtual void unload();

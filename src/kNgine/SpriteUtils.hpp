@@ -25,14 +25,14 @@ namespace kNgine
     SpriteMap *spriteList;
     SpriteMapAccessor(ComponentGameObject *base);
     bool hasToSave() { return false; }
-    virtual u32 getMapIndex(){return 0;};
+    virtual u32 getMapIndex() { return 0; };
   };
   class SpriteReferenceComponent : public SpriteMapAccessor
   {
   public:
     u32 mapIndex;
     v2 spriteDimension;
-    SpriteReferenceComponent(ComponentGameObject *base, SpriteMap *spriteList, i32 index);
+    SpriteReferenceComponent(ComponentGameObject *base, SpriteMap *spriteList, u32 index);
     SpriteReferenceComponent(ComponentGameObject *base, SpriteMap *spriteList, Sprite sprite);
     SpriteReferenceComponent(const SpriteComponent &base, SpriteMap *spriteList);
     SpriteReferenceComponent(const SpriteReferenceComponent &base);
@@ -42,6 +42,7 @@ namespace kNgine
     Sprite *getSprite();
     v2 getSpriteDimensions();
   };
+  
   class SpriteAnimation : public SpriteMapAccessor
   {
   private:
@@ -79,9 +80,9 @@ namespace kNgine
 
     RendererObject_base(ComponentGameObject *base);
     RendererObject_base(ComponentGameObject *base, size_t numShaders,
-      u32 *shaderIndex, size_t *numTriangles, f32 ***points[3]);
-    
-    virtual void updatePoints(m4 matrix){}
+                        u32 *shaderIndex, size_t *numTriangles, f32 ***points[3]);
+
+    virtual void updatePoints(m4 matrix) {}
     virtual std::vector<std::vector<u32>> getSpriteIndexes() { return std::vector<std::vector<u32>>(); }
     virtual void load();
     virtual void unload();
@@ -97,19 +98,28 @@ namespace kNgine
       f32 isTex;
       v4 texCoord;
     } default_points[4];
+
   public:
     SpriteMapAccessor *renderable;
 
     RendererObject(ComponentGameObject *base, SpriteMapAccessor *renderable);
     RendererObject(ComponentGameObject *base, SpriteMap *spriteList, Sprite sprite);
-    virtual ~RendererObject(){delete renderable;}
+    virtual ~RendererObject() { delete renderable; }
     virtual void updatePoints(m4 matrix);
     virtual std::vector<std::vector<u32>> getSpriteIndexes();
-    virtual void init(std::vector<EngineObject *> objects){renderable->init(objects);}
-    virtual void load() { RendererObject_base::load(); renderable->load(); }
+    virtual void init(std::vector<EngineObject *> objects) { renderable->init(objects); }
+    virtual void load()
+    {
+      RendererObject_base::load();
+      renderable->load();
+    }
     virtual void update(std::vector<msg> msgs) { renderable->update(msgs); }
-    virtual void unload() { RendererObject_base::unload(); renderable->unload(); }
-    virtual void end(std::vector<EngineObject *> objects){renderable->end(objects);}
+    virtual void unload()
+    {
+      RendererObject_base::unload();
+      renderable->unload();
+    }
+    virtual void end(std::vector<EngineObject *> objects) { renderable->end(objects); }
   };
 
   //[animation_system]
@@ -179,7 +189,7 @@ namespace kNgine
     {
       active = NULL;
       spriteDimension = v2(1, 1);
-      this->label="[Rend_SYS]";
+      this->label = "[Rend_SYS]";
     }
     void addSprite(Renderable *accessor, std::string name)
     {
@@ -212,9 +222,9 @@ namespace kNgine
         accessors[i].accessor->init(objects);
       }
     }
-    virtual void load() {active->load();}
+    virtual void load() { active->load(); }
     virtual void update(std::vector<msg> msgs) { active->update(msgs); }
-    virtual void unload() {active->unload();}
+    virtual void unload() { active->unload(); }
     virtual void end(std::vector<EngineObject *> objects)
     {
       for (u32 i = 0; i < accessors.size(); i++)
@@ -229,6 +239,7 @@ namespace kNgine
   {
   protected:
     std::vector<SpriteAccessor *> accessors;
+
   public:
     v2 spriteDimension;
     SpriteList(ComponentGameObject *base, SpriteMap *spriteList) : SpriteList(base, std::vector<SpriteAccessor *>(), spriteList)
