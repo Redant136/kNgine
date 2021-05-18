@@ -1,4 +1,7 @@
 #pragma once
+#define utils_version 0.000
+#ifndef utils_h
+#define utils_h utils_version
 
 // general utils functions, can work with both c and c++
 
@@ -33,7 +36,34 @@
 #include <unistd.h>
 #endif
 
-#define ArrayCount(a) (sizeof(a) / sizeof((a)[0]))
+#define sizeofArr(a) (sizeof(a) / sizeof((a)[0]))
+#ifdef __cplusplus
+template <typename T,typename L = size_t>
+struct Array
+{
+  L length;
+  T *arr;
+  T& operator[](unsigned long long i)
+  {
+    assert(i < length);
+    return arr[i];
+  }
+  Array<T> clone()
+  {
+    T *a = new T[length];
+    memcpy(a, arr, sizeof(T) * length);
+    return {length, a};
+  }
+  void free()
+  {
+    delete[] arr;
+    arr = NULL;
+  }
+};
+#endif
+
+#define fCompare(a, b) (fabsf(a - b) < 0.0001)
+#define fCompareN(a, b, n) (fabsf(a - b) < n)
 
 #define PIf 3.1415926535897f
 #define ONE_OVER_SQUARE_ROOT_OF_TWO_PI 0.3989422804
@@ -41,7 +71,7 @@
 #define EULERS_NUMBER 2.7182818284590452353602874713527
 #define EULERS_NUMBERf 2.7182818284590452353602874713527f
 
-#ifndef utils_utils_FastCalcPrecision
+#ifndef utils_FastCalcPrecision
 #define utils_FastCalcPrecision 9
 #endif
 
@@ -61,7 +91,6 @@ typedef u8 b8;
 #define bool u8
 #define true 1
 #define false 0
-
 #endif
 #endif
 
@@ -257,26 +286,6 @@ union v4
   }
 };
 
-static v2 V2Init(float x, float y)
-{
-  v2 v = {x, y};
-  return v;
-}
-#define v2(x, y) V2Init(x, y)
-static v3 V3Init(float x, float y, float z)
-{
-  v3 v = {x, y, z};
-  return v;
-}
-#define v3(x, y, z) V3Init(x, y, z)
-static v4 V4Init(float x, float y, float z, float w)
-{
-  v4 v = {x, y, z, w};
-  return v;
-}
-#define v4(x, y, z, w) V4Init(x, y, z, w)
-#define v4u(x) v4(x, x, x, x)
-
 union iv2
 {
   struct
@@ -452,24 +461,6 @@ union iv4
   bool operator==(const iv4 &a) { return x == a.x && y == a.y && z == a.z && w == a.w; }
   bool operator!=(const iv4 &a) { return !(x == a.x && y == a.y && z == a.z && w == a.w); }
 };
-static iv2 IV2Init(int32_t x, int32_t y)
-{
-  iv2 v = {x, y};
-  return v;
-}
-#define iv2(x, y) IV2Init(x, y)
-static iv3 IV3Init(int32_t x, int32_t y, int32_t z)
-{
-  iv3 v = {x, y, z};
-  return v;
-}
-#define iv3(x, y, z) IV3Init(x, y, z)
-static iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
-{
-  iv4 v = {x, y, z, w};
-  return v;
-}
-#define iv4(x, y, z, w) IV4Init(x, y, z, w)
 
 #else
 typedef union v2
@@ -542,26 +533,6 @@ typedef union v4
   float elements[4];
 } v4;
 
-static v2 V2Init(float x, float y)
-{
-  v2 v = {x, y};
-  return v;
-}
-#define v2(x, y) V2Init(x, y)
-static v3 V3Init(float x, float y, float z)
-{
-  v3 v = {x, y, z};
-  return v;
-}
-#define v3(x, y, z) V3Init(x, y, z)
-static v4 V4Init(float x, float y, float z, float w)
-{
-  v4 v = {x, y, z, w};
-  return v;
-}
-#define v4(x, y, z, w) V4Init(x, y, z, w)
-#define v4u(x) v4(x, x, x, x)
-
 typedef union iv2
 {
   struct
@@ -609,28 +580,48 @@ typedef union iv4
 
   int32_t elements[4];
 } iv4;
-static iv2 IV2Init(int32_t x, int32_t y)
+#endif
+
+static inline v2 V2Init(float x, float y)
+{
+  v2 v = {x, y};
+  return v;
+}
+static inline v3 V3Init(float x, float y, float z)
+{
+  v3 v = {x, y, z};
+  return v;
+}
+static inline v4 V4Init(float x, float y, float z, float w)
+{
+  v4 v = {x, y, z, w};
+  return v;
+}
+#define v2(x, y) V2Init(x, y)
+#define v3(x, y, z) V3Init(x, y, z)
+#define v4(x, y, z, w) V4Init(x, y, z, w)
+#define v4u(x) v4(x, x, x, x)
+#define v4xyz(v, w) v4(v.x, v.y, v.z, w)
+static inline iv2 IV2Init(int32_t x, int32_t y)
 {
   iv2 v = {x, y};
   return v;
 }
-#define iv2(x, y) IV2Init(x, y)
-static iv3 IV3Init(int32_t x, int32_t y, int32_t z)
+static inline iv3 IV3Init(int32_t x, int32_t y, int32_t z)
 {
   iv3 v = {x, y, z};
   return v;
 }
-#define iv3(x, y, z) IV3Init(x, y, z)
-static iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
+static inline iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
 {
   iv4 v = {x, y, z, w};
   return v;
 }
+#define iv2(x, y) IV2Init(x, y)
+#define iv3(x, y, z) IV3Init(x, y, z)
 #define iv4(x, y, z, w) IV4Init(x, y, z, w)
-#endif
+#define iv4xyz(v, w) v4(v.x, v.y, v.z, w)
 
-#define utils_VectorObjects
-// #define __cplusplus
 #if defined(utils_VectorObjects) && defined(__cplusplus)
 struct kv2;
 struct kv3;
@@ -1601,12 +1592,10 @@ inline kiv3::kiv3(const kiv4 &base)
 
 #define toV2(v) v2((v).x, (v).y)
 #define toV3(v) v3((v).x, (v).y, (v).z)
-#define v4xyz(v,w) v4(v.x,v.y,v.z,w)
 #define toV4(v) v4((v).x, (v).y, (v).z, (v).w)
 #define toIV2(v) iv2((v).x, (v).y)
 #define toIV3(v) iv3((v).x, (v).y, (v).z)
-#define iv4xyz(v, w) v4(v.x, v.y, v.z, w)
-#define toIV4(v) iv3((v).x, (v).y, (v).z, (v).w)
+#define toIV4(v) iv4((v).x, (v).y, (v).z, (v).w)
 
 static inline float V2Dot(v2 a, v2 b)
 {
@@ -2014,9 +2003,6 @@ static inline m4 M4Mapper(v3 min, v3 max, v3 targetMin, v3 targetMax)
 
   return transform;
 }
-
-#define fCompare(a, b) (fabsf(a - b) < 0.0001)
-#define fCompareN(a, b, n) (fabsf(a - b) < n)
 
 static inline bool CharIsSpace(char c)
 {
@@ -2891,7 +2877,7 @@ typedef enum cardinal8dir
 #ifndef utils_NoRand
 static inline void seedRandomNumberGenerator(void)
 {
-  srand((uint32_t)time(0));
+  srand(time(NULL));
 }
 static inline float randf()
 {
@@ -3221,3 +3207,10 @@ public:
   }
 };
 #endif
+
+#else
+#if utils_h < utils_version
+#error "trying to include more recent utils.h file"
+#endif
+#endif
+#undef utils_version
