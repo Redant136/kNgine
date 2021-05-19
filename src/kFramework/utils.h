@@ -45,7 +45,8 @@ struct Array
   T *arr;
   T& operator[](unsigned long long i)
   {
-    assert(i < length);
+    assert(arr);
+    assert(i < length + 1);
     return arr[i];
   }
   Array<T> clone()

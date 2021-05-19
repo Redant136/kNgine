@@ -1,5 +1,3 @@
-#pragma once
-
 #include <vector>
 #include "../kFramework/utils.h"
 #include "EngineObjects.hpp"
