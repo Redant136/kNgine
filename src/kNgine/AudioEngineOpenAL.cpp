@@ -96,22 +96,36 @@ namespace kNgine
           assert(0);
         }
 
-        i16 *content = new i16[file.samples.size() * file.samples[0].size()];
-        // for(u32 i=0;i<file.getNumSamplesPerChannel();i++){
-        //   for(u32 j=0;j<file.getNumChannels();j++){
-        //     content[j+i*file.getNumChannels()]=file.samples[j][i];
-        //   }
-        // }
-        for (u32 i = 0; i < file.samples.size(); i++)
+        if (bitdepth == 8)
         {
-          for (u32 j = 0; j < file.samples[i].size(); j++)
+          u8 *content = new u8[file.getNumChannels() * file.getNumSamplesPerChannel()];
+          for (u32 i = 0; i < file.getNumChannels(); i++)
           {
-            content[j + i * file.samples[i].size()] = file.samples[i][j] * 32767; // max i16
+            for (u32 j = 0; j < file.getNumSamplesPerChannel(); j++)
+            {
+              // content[j + i * file.getNumSamplesPerChannel()] = file.samples[i][j] * 127 + 128; // max u8
+              content[i + j * file.getNumChannels()] = file.samples[i][j] * 127 + 128; // max u8
+            }
           }
+          alGenBuffers(1, &buffer);
+          alBufferData(buffer, format, content, file.getNumSamplesPerChannel() * file.getNumChannels() * sizeof(i8), file.getSampleRate());
+          delete[] content;
         }
-        alGenBuffers(1, &buffer);
-        alBufferData(buffer, format, content, file.getNumSamplesPerChannel() * file.getNumChannels() * sizeof(i16), file.getSampleRate());
-        delete[] content;
+        else if (bitdepth == 16)
+        {
+          i16 *content = new i16[file.getNumChannels() * file.getNumSamplesPerChannel()];
+          for (u32 i = 0; i < file.getNumChannels(); i++)
+          {
+            for (u32 j = 0; j < file.getNumSamplesPerChannel(); j++)
+            {
+              // content[j + i * file.getNumSamplesPerChannel()] = file.samples[i][j] * 32767; // max i16
+              content[i + j * file.getNumChannels()] = file.samples[i][j] * 32767; // max i16
+            }
+          }
+          alGenBuffers(1, &buffer);
+          alBufferData(buffer, format, content, file.getNumSamplesPerChannel() * file.getNumChannels() * sizeof(i16), file.getSampleRate());
+          delete[] content;
+        }
         if (!check_alc_errors(__FILE__, __LINE__, openALDevice) || buffer == AL_NONE)
         {
           std::cerr << "ERROR: Could not load file" << std::endl;
@@ -180,7 +194,7 @@ namespace kNgine
     }
   }
 
-  SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, const char *fileName, audiofiletype type, SoundListenerComponent *player) : SoundEmiterComponent(object, createBuffer(fileName, type), player)
+  SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, const char *fileName, audiofiletype type, SoundListenerComponent *player) : SoundEmiterComponent(object, createAudioBuffer(fileName, type), player)
   {
   }
   SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player) : ObjectComponent(object)
@@ -271,9 +285,33 @@ namespace kNgine
     }
   }
 
+  void loadBuffer(BaseAudioBuffer *buffer)
+  {
+    ALuint albuffer = ((OpenALBuffer *)buffer)->buffer;
+    ALuint source;
+    alGenSources(1, &source);
+    alSourcef(source, AL_PITCH, 1);
+    alSource3f(source, AL_POSITION, 0, 0, 0);
+    alSource3f(source, AL_VELOCITY, 0, 0, 0);
+    alSourcei(source, AL_BUFFER, albuffer);
+    if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+    {
+      std::cerr << "gen source" << std::endl;
+    }
+    ((OpenALBuffer *)buffer)->source = source;
+  }
+  void unloadBuffer(BaseAudioBuffer *b)
+  {
+    OpenALBuffer *buffer = (OpenALBuffer *)b;
+    alSourceStop(buffer->source);
+    alSourcei(buffer->source, AL_BUFFER, 0);
+    alDeleteSources(1, &buffer->source);
+    buffer->source = 0;
+  }
+
   void AudioEngine::play(const char *fileName, audiofiletype type)
   {
-    BaseAudioBuffer *buffer = createBuffer(fileName, type);
+    BaseAudioBuffer *buffer = createAudioBuffer(fileName, type);
     play(buffer);
   }
   void AudioEngine::play(BaseAudioBuffer *buffer)
@@ -286,7 +324,11 @@ namespace kNgine
   {
     this->queue.push_back(AudioQueue(name, buffer));
     this->queue[this->queue.size() - 1].loop = loop;
+    if(callEvent("isRunning") && enabled){
+      loadBuffer(buffer);
+    }
   }
+
   void AudioEngine::init(std::vector<EngineObject *> obj){
     hasAudioEngine=true;
   }
@@ -294,18 +336,19 @@ namespace kNgine
   {
     for (AudioQueue q : queue)
     {
-      ALuint albuffer = ((OpenALBuffer *)q.buffer)->buffer;
-      ALuint source;
-      alGenSources(1, &source);
-      alSourcef(source, AL_PITCH, 1);
-      alSource3f(source, AL_POSITION, 0, 0, 0);
-      alSource3f(source, AL_VELOCITY, 0, 0, 0);
-      alSourcei(source, AL_BUFFER, albuffer);
-      if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
-      {
-        std::cerr << "gen source" << std::endl;
-      }
-      ((OpenALBuffer *)q.buffer)->source = source;
+      loadBuffer(q.buffer);
+      // ALuint albuffer = ((OpenALBuffer *)q.buffer)->buffer;
+      // ALuint source;
+      // alGenSources(1, &source);
+      // alSourcef(source, AL_PITCH, 1);
+      // alSource3f(source, AL_POSITION, 0, 0, 0);
+      // alSource3f(source, AL_VELOCITY, 0, 0, 0);
+      // alSourcei(source, AL_BUFFER, albuffer);
+      // if (!check_alc_errors(__FILE__, __LINE__, openALDevice))
+      // {
+      //   std::cerr << "gen source" << std::endl;
+      // }
+      // ((OpenALBuffer *)q.buffer)->source = source;
     }
   }
   void AudioEngine::update(std::vector<msg> msgs)
@@ -327,10 +370,11 @@ namespace kNgine
       {
         std::cerr << "gen source" << std::endl;
       }
+      
       if (q->start)
       {
-        alSourcePlay(buffer->source);
         q->start = false;
+        alSourcePlay(buffer->source);
         q->isPlaying = true;
       }
       if (q->stop)
@@ -363,15 +407,16 @@ namespace kNgine
   {
     for (AudioQueue q : queue)
     {
-      OpenALBuffer *buffer = (OpenALBuffer *)q.buffer;
-      alSourceStop(buffer->source);
-      alSourcei(buffer->source, AL_BUFFER, 0);
-      alDeleteSources(1, &buffer->source);
-      buffer->source = 0;
+      unloadBuffer(q.buffer);
+      // OpenALBuffer *buffer = (OpenALBuffer *)q.buffer;
+      // alSourceStop(buffer->source);
+      // alSourcei(buffer->source, AL_BUFFER, 0);
+      // alDeleteSources(1, &buffer->source);
+      // buffer->source = 0;
     }
   }
 
-  BaseAudioBuffer *createBuffer(const char *fileName, audiofiletype type)
+  BaseAudioBuffer *createAudioBuffer(const char *fileName, audiofiletype type)
   {
     return new OpenALBuffer(fileName, type);
   }

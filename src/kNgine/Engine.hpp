@@ -15,8 +15,7 @@ namespace kNgine
 {
   extern std::vector<EngineObject *> objects;
   extern size_t maxWorkingObjectsLength;
-  extern size_t workingObjectsLength;
-  extern EngineObject **workingObjects;
+  extern Array<EngineObject*>workingObjects;
   extern std::string window_name;
   extern v2 window_size;
   extern LayerOrder renderingLayerOrder; // layer order must have a DEFAULT_LAYER layer at index 0
@@ -64,21 +63,21 @@ namespace kNgine
   // runtime execution functions
   static void reloadObjects() // slower, called during screen transition or stuff
   {
-    for (u32 i = 0; i < workingObjectsLength; i++)
+    for (u32 i = 0; i < workingObjects.length; i++)
     {
       workingObjects[i]->unload();
     }
-    workingObjectsLength = 0;
+    workingObjects.length = 0;
     for (EngineObject *obj : objects)
     {
       if (obj->isEnabled())
       {
-        assert(workingObjectsLength < maxWorkingObjectsLength);
-        workingObjects[workingObjectsLength] = obj;
-        workingObjectsLength++;
+        assert(workingObjects.length < maxWorkingObjectsLength);
+        workingObjects[workingObjects.length] = obj;
+        workingObjects.length++;
       }
     }
-    for (u32 i = 0; i < workingObjectsLength; i++)
+    for (u32 i = 0; i < workingObjects.length; i++)
     {
       workingObjects[i]->load();
     }
@@ -93,8 +92,8 @@ namespace kNgine
     {
       object->enable();
       object->load();
-      workingObjects[workingObjectsLength] = object;
-      workingObjectsLength++;
+      workingObjects[workingObjects.length] = object;
+      workingObjects.length++;
     }
   }
   static void disableObject(EngineObject *object)
@@ -104,16 +103,16 @@ namespace kNgine
       object->disable();
       object->unload();
       bool wasInList = false;
-      for (u32 i = 0; i < workingObjectsLength; i++)
+      for (u32 i = 0; i < workingObjects.length; i++)
       {
         if (workingObjects[i] == object)
         {
-          workingObjects[i] = workingObjects[workingObjectsLength - 1];
+          workingObjects[i] = workingObjects[workingObjects.length - 1];
           wasInList = true;
         }
       }
       if (wasInList)
-        workingObjectsLength--;
+        workingObjects.length--;
     }
   }
   static void enableObject(u32 index)
@@ -172,14 +171,14 @@ namespace kNgine
       msgs.push_back(non_ascii_msg);
     }
     kRenderer_clear(v4(0, 0, 0, 0));
-    for (u32 i = 0; i < workingObjectsLength; i++)
+    for (u32 i = 0; i < workingObjects.length; i++)
     {
       workingObjects[i]->update(msgs);
     }
-    if (workingObjectsLength > 0)
+    if (workingObjects.length > 0)
     {
       iv2 windowSize = kRenderer_getWindowSize();
-      std::vector<LayerRenderer *> renderers = findObject<LayerRenderer>(workingObjects, workingObjectsLength, ObjectFlags::RENDERER_LAYER);
+      std::vector<LayerRenderer *> renderers = findObject<LayerRenderer>(workingObjects, ObjectFlags::RENDERER_LAYER);
       for (u32 i = 0; i < renderingLayerOrder.length; i++)
       {
         std::vector<LayerRenderer *> layer = orderObjectsByZ<LayerRenderer>(getRenderersAtLayer(renderers, renderingLayerOrder.order[i]));
@@ -228,15 +227,15 @@ namespace kNgine
       u32 order[3] = {layerO(renderingLayerOrder, BACKGROUND), layerO(renderingLayerOrder, DEFAULT_LAYER), layerO(renderingLayerOrder, UI)};
       setLayerOrder(renderingLayerOrder,order);
     }
-    workingObjects = new EngineObject *[maxWorkingObjectsLength];
+    workingObjects.arr = new EngineObject *[maxWorkingObjectsLength];
     addEvent({"getEngineObjects", [](void *arg) -> void * {
-                return workingObjects;
-              }});
-    addEvent({"getEngineObjectsSize", [](void *arg) -> void * {
-                return &workingObjectsLength;
+                return &workingObjects;
               }});
     addEvent({"getEngineRendererLayers", [](void *arg) -> void * {
                 return &renderingLayerOrder;
+              }});
+    addEvent({"isRunning", [](void *arg) -> void * {
+                return (void *)1;
               }});
 
     includeChildren();
@@ -245,7 +244,7 @@ namespace kNgine
       obj->init(objects);
     }
     kRenderer_launch();
-    for (u32 i = 0; i < workingObjectsLength; i++)
+    for (u32 i = 0; i < workingObjects.length; i++)
     {
       workingObjects[i]->unload();
     }
@@ -253,7 +252,10 @@ namespace kNgine
     {
       obj->end(objects);
     }
-    delete[] workingObjects;
+    getEvent("isRunning").event = [](void *arg) -> void * {
+      return NULL;
+    };
+    workingObjects.free();
   }
   static void cleanup()
   {

@@ -24,7 +24,7 @@ namespace kNgine
       DIAGONAL//idk what I will use this for
     } fovType = MAX_WH;
     bool showDebugHitBox = false;
-    struct{size_t*engineObjectLength;EngineObject**engineObjects;}engineInfo;
+    Array<EngineObject*>*engineInfo;
     Camera();
     Camera(f32 fov, u32 windowWidth, u32 windowHeight);
     ~Camera();

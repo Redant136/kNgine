@@ -88,6 +88,9 @@ namespace kNgine
     void play(const char *fileName, audiofiletype type);
     void play(BaseAudioBuffer *buffer);
     void queueBuffer(const char *name, BaseAudioBuffer *buffer, bool loop = false);
+    // if engine is already running while playing sound
+    // void loadBuffer(BaseAudioBuffer *buffer);
+    // void unloadBuffer(BaseAudioBuffer *buffer);
 
     void play(u32 index = 0) { queue[index].start=true; }
     void play(const char*name);// TODO(AC) implement this
@@ -101,5 +104,5 @@ namespace kNgine
     virtual void unload();
   };
 
-  BaseAudioBuffer *createBuffer(const char *fileName, audiofiletype type);
+  BaseAudioBuffer *createAudioBuffer(const char *fileName, audiofiletype type);
 } // namespace kNgine

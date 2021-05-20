@@ -169,6 +169,25 @@ namespace kNgine{
     }
     return NULL;
   }
+  EngineEvent &getEvent(std::string name){
+    for (u32 i = 0; i < events.size(); i++)
+    {
+      if (events[i].name == name)
+      {
+        return events[i];
+      }
+    }
+    assert(0 && "no such event");
+  }
+  void removeEvent(std::string name){
+    for (u32 i = 0; i < events.size(); i++)
+    {
+      if (events[i].name == name)
+      {
+        events.erase(events.begin()+i);
+      }
+    }
+  }
 
   #ifdef PNG_H
   Sprite [[deprecated]] importPNG(const char *filename) {

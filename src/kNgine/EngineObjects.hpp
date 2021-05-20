@@ -383,6 +383,8 @@ namespace kNgine
   };
   void addEvent(EngineEvent event);
   void *callEvent(std::string name, void *arg = NULL);
+  EngineEvent& getEvent(std::string name);
+  void removeEvent(std::string name);
 
   template <class T = EngineObject, class I = EngineObject>
   std::vector<T *> findObject(std::vector<I *> objects,
@@ -413,6 +415,7 @@ namespace kNgine
     }
     return res;
   };
+  
   template <class T = EngineObject, class I = EngineObject>
   std::vector<T *> findObjectBlacklist(std::vector<I *> objects,
                                        std::string label) // returns all objects that dont have the label
@@ -442,18 +445,19 @@ namespace kNgine
     }
     return res;
   };
+  
   template <class T = EngineObject, class I = EngineObject>
-  std::vector<T *> findObject(I **objects, size_t objectsSize,
+  std::vector<T *> findObject(Array<I*>objects,
                               u64 flags)
   {
     std::vector<EngineObject *> valid = std::vector<EngineObject *>();
     if (flags == ~ObjectFlags::NONE)
     {
-      valid = std::vector<EngineObject *>(objects, objects + objectsSize);
+      valid = std::vector<EngineObject *>(objects.arr, objects.arr + objects.length);
     }
     else
     {
-      for (u32 i = 0; i < objectsSize; i++)
+      for (u32 i = 0; i < objects.length; i++)
       {
         if (objects[i]->flags & flags)
         {
@@ -468,11 +472,12 @@ namespace kNgine
     }
     return res;
   };
+  
   template <class T = EngineObject, class I = EngineObject>
   std::vector<T *> findObject(std::vector<I *> objects,
                               u64 flags)
   {
-    return findObject<T,I>(objects.data(), objects.size(), flags);
+    return findObject<T, I>({objects.size(), objects.data()}, flags);
   };
 
   Sprite importSprite(const char *filename);

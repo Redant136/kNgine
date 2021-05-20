@@ -12,8 +12,7 @@ namespace kNgine
 {
   std::vector<EngineObject *> objects = std::vector<EngineObject *>();
   size_t maxWorkingObjectsLength = 64;
-  size_t workingObjectsLength = 0;
-  EngineObject **workingObjects;
+  Array<EngineObject *> workingObjects={0,NULL};
   std::string window_name = "Game";
   v2 window_size = {1920.0f, 1080.0f};
   LayerOrder renderingLayerOrder = LayerOrder();

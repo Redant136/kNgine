@@ -33,12 +33,13 @@ namespace kNgine
     }
     this->fov = fov;
     this->flags|=ObjectFlags::RENDERER_LAYER;
-    this->engineInfo = { NULL,NULL };
+    this->engineInfo = NULL;
   }
   Camera::~Camera() {}
 
   void Camera::init(std::vector<EngineObject *> objects){
-    this->engineInfo = {(size_t *)callEvent("getEngineObjectsSize"), (EngineObject **)callEvent("getEngineObjects")};
+    this->engineInfo = (Array<EngineObject*>*)callEvent("getEngineObjects");
+    // this->engineInfo = {(size_t *)callEvent("getEngineObjectsSize"), (EngineObject **)callEvent("getEngineObjects")};
     this->layer = layerO(*(LayerOrder *)callEvent("getEngineRendererLayers"), DEFAULT_LAYER);
   }
 
@@ -132,7 +133,7 @@ namespace kNgine
 
   void Camera::render()
   {
-    std::vector<ComponentGameObject *> objects = findObject<ComponentGameObject>(this->engineInfo.engineObjects, *this->engineInfo.engineObjectLength, ObjectFlags::RENDERABLE);
+    std::vector<ComponentGameObject *> objects = findObject<ComponentGameObject>(*this->engineInfo, ObjectFlags::RENDERABLE);
     objects = findObjectBlacklist<ComponentGameObject>(orderObjectsByZ<ComponentGameObject>(objects),"");
     for(u32 i=0;i<objects.size();i++){
       render(objects[i]);

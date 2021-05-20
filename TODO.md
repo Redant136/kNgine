@@ -3,12 +3,11 @@
 # main branch
 
 ## currently working on
-- [x] Box2D causes cmake error during build
-- [x] use chipmunk
 ## testing
 - [ ] test custom shader in renderer
 ## next step
 - [ ] finish tilemap
+- [ ] chipmunk hitboxes, elasticity
 - [ ] object info tool
 - [ ] c thread (unix + windows) is broken
 ## research

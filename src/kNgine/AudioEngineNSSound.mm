@@ -6,7 +6,8 @@
 
 #include <stdio.h>
 
-namespace kNgine{
+namespace kNgine
+{
   struct NSSoundBuffer:public BaseAudioBuffer
   {
   public:
@@ -45,7 +46,8 @@ namespace kNgine{
 
   }
 
-  AudioEngine::AudioEngine(){
+  AudioEngine::AudioEngine()
+  {
     this->flags|=AUDIO;
     this->labels.push_back("AudioEngine");
   }
@@ -56,11 +58,13 @@ namespace kNgine{
     }
   }
 
-  void AudioEngine::play(const char* fileName,audiofiletype type){
+  void AudioEngine::play(const char* fileName,audiofiletype type)
+  {
     BaseAudioBuffer*buffer=createBuffer(fileName,type);
     play(buffer);
   }
-  void AudioEngine::play(BaseAudioBuffer* buffer){
+  void AudioEngine::play(BaseAudioBuffer* buffer)
+  {
     queueBuffer("",buffer,false);
     play(queue.size()-1);
   }
@@ -69,7 +73,14 @@ namespace kNgine{
     queue.push_back(AudioQueue(name,buffer));
     queue[queue.size()-1].loop=loop;
   }
-  void AudioEngine::init(std::vector<EngineObject *> obj){
+  void AudioEngine::loadBuffer(BaseAudioBuffer *buffer)
+  {
+  }
+  void AudioEngine::unloadBuffer(BaseAudioBuffer*buffer)
+  {
+  }
+  void AudioEngine::init(std::vector<EngineObject *> obj)
+  {
   }
   void AudioEngine::load()
   {
