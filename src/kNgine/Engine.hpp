@@ -15,7 +15,7 @@ namespace kNgine
 {
   extern std::vector<EngineObject *> objects;
   extern size_t maxWorkingObjectsLength;
-  extern Array<EngineObject*>workingObjects;
+  extern Array<EngineObject *> workingObjects;
   extern std::string window_name;
   extern v2 window_size;
   extern LayerOrder renderingLayerOrder; // layer order must have a DEFAULT_LAYER layer at index 0
@@ -32,23 +32,27 @@ namespace kNgine
     v4 color;
   } points[3];
 
-  namespace {
+  namespace
+  {
     static void includeChildren()
     {
       bool addedParent = false;
       for (ComponentGameObject *parent : findObject<ComponentGameObject>(objects, ObjectFlags::PARENT))
       {
-        for (ObjectComponent*compn:parent->components)
+        for (ObjectComponent *compn : parent->components)
         {
-          if(compn->flags&ObjectFlags::PARENT){
-            GameObject *child = ((NodeObjectComponent*)compn)->child;
-            bool included=false;
-            for(EngineObject*obj:objects){
-              included|=child==obj;
+          if (compn->flags & ObjectFlags::PARENT)
+          {
+            GameObject *child = ((NodeObjectComponent *)compn)->child;
+            bool included = false;
+            for (EngineObject *obj : objects)
+            {
+              included |= child == obj;
             }
-            if(!included){
+            if (!included)
+            {
               objects.push_back(child);
-              addedParent|=child->flags&ObjectFlags::PARENT;
+              addedParent |= child->flags & ObjectFlags::PARENT;
             }
           }
         }
@@ -91,7 +95,10 @@ namespace kNgine
     if (!object->isEnabled())
     {
       object->enable();
-      object->load();
+      if (callEvent("isRunning"))
+      {
+        object->load();
+      }
       workingObjects[workingObjects.length] = object;
       workingObjects.length++;
     }
@@ -101,7 +108,8 @@ namespace kNgine
     if (object->isEnabled())
     {
       object->disable();
-      if(callEvent("isRunning")){
+      if (callEvent("isRunning"))
+      {
         object->unload();
       }
       bool wasInList = false;
@@ -133,7 +141,7 @@ namespace kNgine
 
   static void frameUpdate()
   {
-    f32 time=kRenderer_getTimeSinceLastFrame();
+    f32 time = kRenderer_getTimeSinceLastFrame();
     std::vector<msg> msgs;
     msgs.push_back({msg::TIME_ELAPSED, time});
     { //mouse location
@@ -144,18 +152,19 @@ namespace kNgine
       msgs.push_back(m);
     }
     { //window size
-      iv2 windowSize=kRenderer_getWindowSize();
-      msg m=msg();
-      m.msgType=msg::WINDOW_SIZE;
-      m.window_size=windowSize;
+      iv2 windowSize = kRenderer_getWindowSize();
+      msg m = msg();
+      m.msgType = msg::WINDOW_SIZE;
+      m.window_size = windowSize;
       msgs.push_back(m);
     }
     { // key msgs
-      u64 ascii_key=0;
-      u64 nonAscii_key=0;
+      u64 ascii_key = 0;
+      u64 nonAscii_key = 0;
       for (u32 i = 0; i < Key::ASCII_KEY_LAST; i++)
       {
-        if (kRenderer_keyStatusPressed((Key)i)){
+        if (kRenderer_keyStatusPressed((Key)i))
+        {
           ascii_key |= KeyBitmap((Key)i);
         }
       }
@@ -164,7 +173,8 @@ namespace kNgine
       ascii_msg.key = ascii_key;
       msgs.push_back(ascii_msg);
 
-      for(u32 i=Key::ASCII_KEY_LAST;i<Key::KEY_LAST;i++){
+      for (u32 i = Key::ASCII_KEY_LAST; i < Key::KEY_LAST; i++)
+      {
         if (kRenderer_keyStatusPressed((Key)i))
         {
           nonAscii_key |= KeyBitmap((Key)i);
@@ -172,7 +182,8 @@ namespace kNgine
       }
       for (u32 i = Key::KEY_LAST; i < Key::MOUSE_LAST; i++)
       {
-        if (kRenderer_mouseStatusPressed((Key)i)){
+        if (kRenderer_mouseStatusPressed((Key)i))
+        {
           nonAscii_key |= KeyBitmap((Key)i);
         }
       }
@@ -182,7 +193,7 @@ namespace kNgine
       msgs.push_back(non_ascii_msg);
     }
     kRenderer_clear(v4(0, 0, 0, 0));
-    Array<EngineObject*>tempWorking=workingObjects.clone();
+    Array<EngineObject *> tempWorking = workingObjects.clone();
     for (u32 i = 0; i < tempWorking.length; i++)
     {
       tempWorking[i]->update(msgs);
@@ -202,9 +213,10 @@ namespace kNgine
     }
     tempWorking.free();
 
-    if(DEBUG){
-      std::string fps = std::to_string(1.0/time);
-      kRenderer_displayText(v3(-1,1,1),v3(0,0,0),fps.c_str(),0.5);
+    if (DEBUG)
+    {
+      std::string fps = std::to_string(1.0 / time);
+      kRenderer_displayText(v3(-1, 1, 1), v3(0, 0, 0), fps.c_str(), 0.5);
       // kRenderer_drawObject(object);
     }
   }
@@ -216,7 +228,7 @@ namespace kNgine
   static void start()
   {
 #ifdef kNgine_DEBUG
-    DEBUG=true;
+    DEBUG = true;
 #endif
     seedRandomNumberGenerator();
     kRenderer_init(0, NULL);
@@ -224,8 +236,8 @@ namespace kNgine
     context.vSync = 1;
     kRenderer_setWindowName(window_name.c_str());
     kRenderer_setWindowSize(window_size.x, window_size.y);
-    kRenderer_setWindowBoundsScale(v3(-1,-1,-1),v3(1,1,1));
-    
+    kRenderer_setWindowBoundsScale(v3(-1, -1, -1), v3(1, 1, 1));
+
     kRenderer_createWindow(&context);
     kRenderer_setStartFunction(frameStart);
     kRenderer_setDrawFunction(frameUpdate);
