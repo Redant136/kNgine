@@ -3,9 +3,9 @@
 #include <functional>
 #include <random>
 #include <ctime>
-#include "../kFramework/utils.h"
+#include "kutils.h"
 #include "EngineObjects.hpp"
-#include "../kFramework/kRenderer.h"
+#include "kRenderer.h"
 #include "Engine.hpp"
 
 namespace kNgine

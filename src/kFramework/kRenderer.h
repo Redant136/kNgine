@@ -1,7 +1,7 @@
 #pragma once
 
 #define utils_StrManipulation
-#include "utils.h"
+#include "kutils.h"
 
 #define kRenderer_maxWindows 8
 #define kRenderer_maxFonts 32

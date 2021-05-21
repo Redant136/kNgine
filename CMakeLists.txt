@@ -26,15 +26,15 @@ option(kRenderer_GLUT "sets if you link kRenderer GLUT (glut has problems on mac
 option(kNgine_includeOpenAL "if openal is to be comiled and linked or not" ON)
 
 if(kRenderer_GLFW)
-set(kRendererSource "src/kFramework/kRendererGLFW.c")
+  set(kRendererSource "src/kFramework/kRendererGLFW.c")
 elseif(kRenderer_GLUT)
-set(kRendererSource "src/kFramework/kRendererGLUT.cpp")
+  set(kRendererSource "src/kFramework/kRendererGLUT.cpp")
 else()
-set(kRendererSource "src/kFramework/kRendererSoftwareRenderer.c")
+  set(kRendererSource "src/kFramework/kRendererSoftwareRenderer.c")
 endif()
 
 set(KNGINEFRAMEWORK_HEADER_FILES 
-src/kFramework/utils.h
+src/kFramework/kutils.h
 src/kFramework/kThread.h
 src/kFramework/kRenderer.h
 )
@@ -75,11 +75,18 @@ add_library(kNgineFramework
   ${KNGINEFRAMEWORK_HEADER_FILES}
 )
 
+target_include_directories(kNgineFramework PUBLIC src/kFramework)
+
 add_library(kNgine
   ${KNGINE_SOURCE_FILES}
   ${KNGINE_HEADER_FILES}
 )
 
+target_include_directories(kNgine PUBLIC src/kFramework)
+target_include_directories(kNgine PUBLIC src/kNgine)
+
+target_include_directories(kNgineFramework PRIVATE extern/stb/)
+target_include_directories(kNgine PRIVATE extern/stb/)
 
 if(kRenderer_GLFW)
   add_subdirectory(extern/glad/)
@@ -154,10 +161,6 @@ elseif(UNIX)
 endif()
 
 target_include_directories(kNgineFramework PUBLIC include/)
-target_include_directories(kNgineFramework PUBLIC src/kFramework)
 
 target_include_directories(kNgine PUBLIC include/)
-target_include_directories(kNgine PUBLIC src/kFramework)
-target_include_directories(kNgine PUBLIC src/kNgine)
-
 

@@ -1,10 +1,10 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include "../kFramework/utils.h"
+#include "kutils.h"
 #include "EngineObjects.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include "../../extern/stb/stb_image.h"
+#include <stb_image.h>
 
 namespace kNgine{
   std::vector<EngineEvent> events;
@@ -178,6 +178,7 @@ namespace kNgine{
       }
     }
     assert(0 && "no such event");
+    return events[0];
   }
   void removeEvent(std::string name){
     for (u32 i = 0; i < events.size(); i++)

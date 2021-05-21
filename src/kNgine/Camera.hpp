@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include "EngineObjects.hpp"
-#include "../kFramework/utils.h"
+#include "kutils.h"
 
 namespace kNgine
 {

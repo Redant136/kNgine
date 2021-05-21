@@ -1,9 +1,9 @@
 #include <vector>
 #include <string>
 #include "EngineObjects.hpp"
-#include "../kFramework/utils.h"
+#include "kutils.h"
 #include "AudioEngine.hpp"
-#include "../../extern/stb/stb_vorbis.c"
+#include <stb_vorbis.c>
 
 #ifndef __APPLE__
 #include <AL/al.h>

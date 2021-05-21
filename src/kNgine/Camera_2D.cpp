@@ -2,9 +2,9 @@
 #include <string>
 #include <cmath>
 #define utils_print
-#include "../kFramework/utils.h"
+#include "kutils.h"
 #include "EngineObjects.hpp"
-#include "../kFramework/kRenderer.h"
+#include "kRenderer.h"
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
 

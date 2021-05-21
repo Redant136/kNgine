@@ -5,9 +5,9 @@
 #include <functional>
 #include <random>
 #include <ctime>
-#include "../kFramework/utils.h"
+#include "kutils.h"
 #include "EngineObjects.hpp"
-#include "../kFramework/kRenderer.h"
+#include "kRenderer.h"
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"
 
@@ -23,14 +23,6 @@ namespace kNgine
   extern kRenderer_WindowContext context;
 
   extern bool DEBUG;
-
-  static u32 object;
-  static struct
-  {
-    v3 pos;
-    f32 isTex;
-    v4 color;
-  } points[3];
 
   namespace
   {

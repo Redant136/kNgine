@@ -1,7 +1,7 @@
 #include <math.h>
 #include <glad/glad.h>
 #define utils_StrManipulation
-#include "utils.h"
+#include "kutils.h"
 #ifndef kRenderer_HeaderOnly
 #include "kRenderer.h"
 #endif

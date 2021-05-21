@@ -12,6 +12,7 @@
 - [ ] c thread (unix + windows) is broken
 ## research
 - [ ] https://thebookofshaders.com/
+- [ ] https://github.com/cocos2d/cocos2d-x
 - [ ] https://github.com/Dawoodoz/DFPSR
 - [ ] quaternions
 - [ ] https://handmade.network/library/resource/9

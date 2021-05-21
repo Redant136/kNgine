@@ -1,6 +1,6 @@
 #include <math.h>
 #define utils_StrManipulation
-#include "utils.h"
+#include "kutils.h"
 #include "kRenderer.h"
 #define GL_SILENCE_DEPRECATION
 #include <glad/glad.h>

@@ -1,7 +1,7 @@
 #pragma once
-#define utils_version 0.001
-#ifndef utils_h
-#define utils_h utils_version
+#define kutils_version 0.001
+#ifndef kutils_h
+#define kutils_h kutils_version
 
 // general utils functions, can work with both c and c++
 
@@ -98,14 +98,14 @@ typedef u8 b8;
 #ifdef __cplusplus
 union v2
 {
-  struct
-  {
-    float x;
-    float y;
-  };
   float elements[2];
-  v2 operator+(const v2 &a) { return {x + a.x, y + a.y}; }
-  v2 operator-(const v2 &a) { return {x - a.x, y - a.y}; }
+  struct
+    {
+      float x;
+      float y;
+    };
+  v2 operator+(const v2 &a) { return {{x + a.x, y + a.y}}; }
+  v2 operator-(const v2 &a) { return {{x - a.x, y - a.y}}; }
   void operator+=(const v2 &a)
   {
     x += a.x;
@@ -116,10 +116,10 @@ union v2
     x -= a.x;
     y -= a.y;
   }
-  v2 operator+(const float &a) { return {x + a, y + a}; }
-  v2 operator-(const float &a) { return {x - a, y - a}; }
-  v2 operator*(const float &a) { return {x * a, y * a}; }
-  v2 operator/(const float &a) { return {x / a, y / a}; }
+  v2 operator+(const float &a) { return {{x + a, y + a}}; }
+  v2 operator-(const float &a) { return {{x - a, y - a}}; }
+  v2 operator*(const float &a) { return {{x * a, y * a}}; }
+  v2 operator/(const float &a) { return {{x / a, y / a}}; }
   void operator+=(const float &a)
   {
     x += a;
@@ -147,21 +147,21 @@ union v2
 };
 union v3
 {
-  struct
-  {
-    float x;
-    float y;
-    float z;
-  };
-  struct
-  {
-    float r;
-    float g;
-    float b;
-  };
   float elements[3];
-  v3 operator+(const v3 &a) { return {x + a.x, y + a.y, z + a.z}; }
-  v3 operator-(const v3 &a) { return {x - a.x, y - a.y, z - a.z}; }
+  struct
+    {
+      float x;
+      float y;
+      float z;
+    };
+  struct
+    {
+      float r;
+      float g;
+      float b;
+    };
+  v3 operator+(const v3 &a) { return {{x + a.x, y + a.y, z + a.z}}; }
+  v3 operator-(const v3 &a) { return {{x - a.x, y - a.y, z - a.z}}; }
   void operator+=(const v3 &a)
   {
     x += a.x;
@@ -174,10 +174,10 @@ union v3
     y -= a.y;
     z -= a.z;
   }
-  v3 operator+(const float &a) { return {x + a, y + a, z + a}; }
-  v3 operator-(const float &a) { return {x - a, y - a, z - a}; }
-  v3 operator*(const float &a) { return {x * a, y * a, z * a}; }
-  v3 operator/(const float &a) { return {x / a, y / a, z / a}; }
+  v3 operator+(const float &a) { return {{x + a, y + a, z + a}}; }
+  v3 operator-(const float &a) { return {{x - a, y - a, z - a}}; }
+  v3 operator*(const float &a) { return {{x * a, y * a, z * a}}; }
+  v3 operator/(const float &a) { return {{x / a, y / a, z / a}}; }
   void operator+=(const float &a)
   {
     x += a;
@@ -214,44 +214,44 @@ union v3
 };
 union v4
 {
+  float elements[4];
   struct
-  {
-    float x;
-    float y;
-    union
     {
-      struct
+      float x;
+      float y;
+      union
       {
-        float z;
-
-        union
+        struct
         {
-          float w;
-          float radius;
+          float z;
+
+          union
+          {
+            float w;
+            float radius;
+          };
+        };
+        struct
+        {
+          float width;
+          float height;
         };
       };
-      struct
-      {
-        float width;
-        float height;
-      };
     };
-  };
   struct
-  {
-    v3 xyz;
-    float _unused;
-  };
+    {
+      v3 xyz;
+      float _unused;
+    };
   struct
-  {
-    float r;
-    float g;
-    float b;
-    float a;
-  };
-  float elements[4];
-  v4 operator+(const v4 &a) { return {x + a.x, y + a.y, z + a.z, w + a.w}; }
-  v4 operator-(const v4 &a) { return {x - a.x, y - a.y, z - a.z, w - a.w}; }
+    {
+      float r;
+      float g;
+      float b;
+      float a;
+    };
+  v4 operator+(const v4 &a) { return {{x + a.x, y + a.y, z + a.z, w + a.w}}; }
+  v4 operator-(const v4 &a) { return {{x - a.x, y - a.y, z - a.z, w - a.w}}; }
   void operator+=(const v4 &a)
   {
     x += a.x;
@@ -266,10 +266,10 @@ union v4
     z -= a.z;
     w -= a.w;
   }
-  v4 operator+(const float &a) { return {x + a, y + a, z + a, w + a}; }
-  v4 operator-(const float &a) { return {x - a, y - a, z - a, w - a}; }
-  v4 operator*(const float &a) { return {x * a, y * a, z * a, w * a}; }
-  v4 operator/(const float &a) { return {x / a, y / a, z / a, w / a}; }
+  v4 operator+(const float &a) { return {{x + a, y + a, z + a, w + a}}; }
+  v4 operator-(const float &a) { return {{x - a, y - a, z - a, w - a}}; }
+  v4 operator*(const float &a) { return {{x * a, y * a, z * a, w * a}}; }
+  v4 operator/(const float &a) { return {{x / a, y / a, z / a, w / a}}; }
   void operator+=(const float &a)
   {
     x += a;
@@ -317,14 +317,14 @@ union v4
 
 union iv2
 {
+  int32_t elements[2];
   struct
   {
     int32_t x;
     int32_t y;
   };
-  int32_t elements[2];
-  iv2 operator+(const iv2 &a) { return {x + a.x, y + a.y}; }
-  iv2 operator-(const iv2 &a) { return {x - a.x, y - a.y}; }
+  iv2 operator+(const iv2 &a) { return {{x + a.x, y + a.y}}; }
+  iv2 operator-(const iv2 &a) { return {{x - a.x, y - a.y}}; }
   void operator+=(const iv2 &a)
   {
     x += a.x;
@@ -335,10 +335,10 @@ union iv2
     x -= a.x;
     y -= a.y;
   }
-  iv2 operator+(const int32_t &a) { return {x + a, y + a}; }
-  iv2 operator-(const int32_t &a) { return {x - a, y - a}; }
-  iv2 operator*(const int32_t &a) { return {x * a, y * a}; }
-  iv2 operator/(const int32_t &a) { return {x / a, y / a}; }
+  iv2 operator+(const int32_t &a) { return {{x + a, y + a}}; }
+  iv2 operator-(const int32_t &a) { return {{x - a, y - a}}; }
+  iv2 operator*(const int32_t &a) { return {{x * a, y * a}}; }
+  iv2 operator/(const int32_t &a) { return {{x / a, y / a}}; }
   void operator+=(const int32_t &a)
   {
     x += a;
@@ -368,6 +368,7 @@ union iv2
 };
 union iv3
 {
+  int32_t elements[3];
   struct
   {
     int32_t x;
@@ -380,9 +381,8 @@ union iv3
     int32_t g;
     int32_t b;
   };
-  int32_t elements[3];
-  iv3 operator+(const iv3 &a) { return {x + a.x, y + a.y, z + a.z}; }
-  iv3 operator-(const iv3 &a) { return {x - a.x, y - a.y, z - a.z}; }
+  iv3 operator+(const iv3 &a) { return {{x + a.x, y + a.y, z + a.z}}; }
+  iv3 operator-(const iv3 &a) { return {{x - a.x, y - a.y, z - a.z}}; }
   void operator+=(const iv3 &a)
   {
     x += a.x;
@@ -395,10 +395,10 @@ union iv3
     y -= a.y;
     z -= a.z;
   }
-  iv3 operator+(const int32_t &a) { return {x + a, y + a, z + a}; }
-  iv3 operator-(const int32_t &a) { return {x - a, y - a, z - a}; }
-  iv3 operator*(const int32_t &a) { return {x * a, y * a, z * a}; }
-  iv3 operator/(const int32_t &a) { return {x / a, y / a, z / a}; }
+  iv3 operator+(const int32_t &a) { return {{x + a, y + a, z + a}}; }
+  iv3 operator-(const int32_t &a) { return {{x - a, y - a, z - a}}; }
+  iv3 operator*(const int32_t &a) { return {{x * a, y * a, z * a}}; }
+  iv3 operator/(const int32_t &a) { return {{x / a, y / a, z / a}}; }
   void operator+=(const int32_t &a)
   {
     x += a;
@@ -437,6 +437,7 @@ union iv3
 };
 union iv4
 {
+  int32_t elements[4];
   struct
   {
     int32_t x;
@@ -451,9 +452,8 @@ union iv4
     int32_t b;
     int32_t a;
   };
-  int32_t elements[4];
-  iv4 operator+(const iv4 &a) { return {x + a.x, y + a.y, z + a.z, w + a.w}; }
-  iv4 operator-(const iv4 &a) { return {x - a.x, y - a.y, z - a.z, w - a.w}; }
+  iv4 operator+(const iv4 &a) { return {{x + a.x, y + a.y, z + a.z, w + a.w}}; }
+  iv4 operator-(const iv4 &a) { return {{x - a.x, y - a.y, z - a.z, w - a.w}}; }
   void operator+=(const iv4 &a)
   {
     x += a.x;
@@ -468,10 +468,10 @@ union iv4
     z -= a.z;
     w -= a.w;
   }
-  iv4 operator+(const int32_t &a) { return {x + a, y + a, z + a, w + a}; }
-  iv4 operator-(const int32_t &a) { return {x - a, y - a, z - a, w - a}; }
-  iv4 operator*(const int32_t &a) { return {x * a, y * a, z * a, w * a}; }
-  iv4 operator/(const int32_t &a) { return {x / a, y / a, z / a, w / a}; }
+  iv4 operator+(const int32_t &a) { return {{x + a, y + a, z + a, w + a}}; }
+  iv4 operator-(const int32_t &a) { return {{x - a, y - a, z - a, w - a}}; }
+  iv4 operator*(const int32_t &a) { return {{x * a, y * a, z * a, w * a}}; }
+  iv4 operator/(const int32_t &a) { return {{x / a, y / a, z / a, w / a}}; }
   void operator+=(const int32_t &a)
   {
     x += a;
@@ -641,17 +641,17 @@ typedef union iv4
 
 static inline v2 V2Init(float x, float y)
 {
-  v2 v = {x, y};
+  v2 v = {{x, y}};
   return v;
 }
 static inline v3 V3Init(float x, float y, float z)
 {
-  v3 v = {x, y, z};
+  v3 v = {{x, y, z}};
   return v;
 }
 static inline v4 V4Init(float x, float y, float z, float w)
 {
-  v4 v = {x, y, z, w};
+  v4 v = {{x, y, z, w}};
   return v;
 }
 #define v2(x, y) V2Init(x, y)
@@ -661,17 +661,17 @@ static inline v4 V4Init(float x, float y, float z, float w)
 #define v4xyz(v, w) v4(v.x, v.y, v.z, w)
 static inline iv2 IV2Init(int32_t x, int32_t y)
 {
-  iv2 v = {x, y};
+  iv2 v = {{x, y}};
   return v;
 }
 static inline iv3 IV3Init(int32_t x, int32_t y, int32_t z)
 {
-  iv3 v = {x, y, z};
+  iv3 v = {{x, y, z}};
   return v;
 }
 static inline iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
 {
-  iv4 v = {x, y, z, w};
+  iv4 v = {{x, y, z, w}};
   return v;
 }
 #define iv2(x, y) IV2Init(x, y)
@@ -1795,7 +1795,7 @@ static m4 M4InitDiagonal(float diagonal)
 }
 static inline m4 M4MultiplyM4(m4 a, m4 b)
 {
-  m4 c = {0};
+  m4 c = {{{0}}};
 
   for (int32_t j = 0; j < 4; ++j)
   {
@@ -1876,7 +1876,7 @@ static inline m4 M4ScaleV3(v3 scale)
 }
 static inline m4 M4Perspective(float fov, float aspect_ratio, float near_z, float far_z)
 {
-  m4 result = {0};
+  m4 result = {{{0}}};
   float tan_theta_over_2 = tanf(fov * (PIf / 360.f));
   result.elements[0][0] = 1.f / tan_theta_over_2;
   result.elements[1][1] = aspect_ratio / tan_theta_over_2;
@@ -1888,7 +1888,7 @@ static inline m4 M4Perspective(float fov, float aspect_ratio, float near_z, floa
 }
 static inline m4 M4Orthographic(float left, float right, float bottom, float top, float near_depth, float far_depth)
 {
-  m4 result = {0};
+  m4 result = {{{0}}};
 
   result.elements[0][0] = 2.f / (right - left);
   result.elements[1][1] = 2.f / (top - bottom);
@@ -3266,8 +3266,8 @@ public:
 #endif
 
 #else
-#if utils_h < utils_version
+#if kutils_h < kutils_version
 #error "trying to include more recent utils.h file"
 #endif
 #endif
-#undef utils_version
+#undef kutils_version

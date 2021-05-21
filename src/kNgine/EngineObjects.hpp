@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include "../kFramework/utils.h"
+#include "kutils.h"
 
 namespace kNgine
 {
@@ -303,7 +303,7 @@ namespace kNgine
   {
   public:
     cardinal8dir spriteLocation;
-    v3 offset = {0.0f, 0.0f, 0.0f}; // offset in game units
+    v3 offset = {{0.0f, 0.0f, 0.0f}}; // offset in game units
     SpriteAccessor(ComponentGameObject *base);
     virtual bool hasToSave() = 0;
     virtual Sprite *getSprite() = 0; //pointer for not having to call copy
