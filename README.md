@@ -4,7 +4,7 @@ https://github.com/Redant136/kNgine.git
 
 # Installation
 
-- run git submodule init from kNgine folder, then git submodule update
+- run ``git submodule update --init --recursive --remote``
 - if using linux install glfw
 - add using cmake ``add_subdirectory(kNgine)``, ``target_link_libraries([PROJECT NAME] PRIVATE kNgine)``
 
