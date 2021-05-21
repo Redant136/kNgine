@@ -5,7 +5,7 @@ https://github.com/Redant136/kNgine.git
 # Installation
 
 - run git submodule init from kNgine folder, then git submodule update
-- install openAl, if using linux install glfw
+- if using linux install glfw
 - add using cmake ``add_subdirectory(kNgine)``, ``target_link_libraries([PROJECT NAME] PRIVATE kNgine)``
 
 # Usage
@@ -36,9 +36,9 @@ https://github.com/Redant136/kNgine.git
 - SoundEmiterComponent: Component to be added to object emiting sound
 - AudioEngine: object to play global sound or music
 ## Physics
-- b2PhysicsBodyComponent: when adding a physics body something to an object
-- b2PhysicsEngine: has to be included to use physics, handles all physics setup
-- b2Rect: rectangular body
+- cpPhysicsBodyComponent: when adding a physics body something to an object
+- cpPhysicsEngine: has to be included to use physics, handles all physics setup
+- cpRect: rectangular body
 ## Tilesets
 - Tileset: object to hold a tileset/tilemap
 - Tileset::TileDef : a definition of a tile. add a tile using the position in the array of it's definition
