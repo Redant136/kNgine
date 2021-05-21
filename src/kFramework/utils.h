@@ -1,5 +1,5 @@
 #pragma once
-#define utils_version 0.000
+#define utils_version 0.001
 #ifndef utils_h
 #define utils_h utils_version
 
@@ -38,12 +38,12 @@
 
 #define sizeofArr(a) (sizeof(a) / sizeof((a)[0]))
 #ifdef __cplusplus
-template <typename T,typename L = size_t>
+template <typename T, typename L = size_t>
 struct Array
 {
   L length;
   T *arr;
-  T& operator[](unsigned long long i)
+  T &operator[](unsigned long long i)
   {
     assert(arr);
     assert(i < length + 1);
@@ -140,6 +140,10 @@ union v2
     x /= a;
     y /= a;
   }
+  void operator=(const float &a)
+  {
+    x = a;
+  }
 };
 union v3
 {
@@ -197,6 +201,15 @@ union v3
     x /= a;
     y /= a;
     z /= a;
+  }
+  void operator=(const float &a)
+  {
+    x = a;
+  }
+  void operator=(const v2 &a)
+  {
+    x = a.x;
+    y = a.y;
   }
 };
 union v4
@@ -285,6 +298,21 @@ union v4
     z /= a;
     z /= a;
   }
+  void operator=(const float &a)
+  {
+    x = a;
+  }
+  void operator=(const v2 &a)
+  {
+    x = a.x;
+    y = a.y;
+  }
+  void operator=(const v3 &a)
+  {
+    x = a.x;
+    y = a.y;
+    z = a.z;
+  }
 };
 
 union iv2
@@ -333,6 +361,10 @@ union iv2
   }
   bool operator==(const iv2 &a) { return x == a.x && y == a.y; }
   bool operator!=(const iv2 &a) { return !(x == a.x && y == a.y); }
+  void operator=(const int32_t &a)
+  {
+    x = a;
+  }
 };
 union iv3
 {
@@ -393,6 +425,15 @@ union iv3
   }
   bool operator==(const iv3 &a) { return x == a.x && y == a.y && z == a.z; }
   bool operator!=(const iv3 &a) { return !(x == a.x && y == a.y && z == a.z); }
+  void operator=(const int32_t &a)
+  {
+    x = a;
+  }
+  void operator=(const iv2 &a)
+  {
+    x = a.x;
+    y = a.y;
+  }
 };
 union iv4
 {
@@ -461,6 +502,21 @@ union iv4
   }
   bool operator==(const iv4 &a) { return x == a.x && y == a.y && z == a.z && w == a.w; }
   bool operator!=(const iv4 &a) { return !(x == a.x && y == a.y && z == a.z && w == a.w); }
+  void operator=(const int32_t &a)
+  {
+    x = a;
+  }
+  void operator=(const iv2 &a)
+  {
+    x = a.x;
+    y = a.y;
+  }
+  void operator=(const iv3 &a)
+  {
+    x = a.x;
+    y = a.y;
+    z = a.z;
+  }
 };
 
 #else

@@ -152,8 +152,8 @@ extern "C"
   bool kRenderer_mouseStatusPressed(Key e);
 
   // utils methods
-  i32 kRenderer_getWindowWidth();
-  i32 kRenderer_getWindowHeight();
+  u32 kRenderer_getWindowWidth();
+  u32 kRenderer_getWindowHeight();
   iv2 kRenderer_getWindowSize();
   f64 kRenderer_getTimeSinceLastFrame();
   m4 kRenderer_getMapper();

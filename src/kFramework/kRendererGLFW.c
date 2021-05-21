@@ -1395,13 +1395,13 @@ bool kRenderer_mouseStatusPressed(Key e)
   return glfwGetMouseButton(kRenderer_WindowsContexts.windows[currentContext].window, MouseToGLFW(e)) == GLFW_PRESS;
 }
 
-i32 kRenderer_getWindowWidth()
+u32 kRenderer_getWindowWidth()
 {
   i32 width, height;
   glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
   return width;
 }
-i32 kRenderer_getWindowHeight()
+u32 kRenderer_getWindowHeight()
 {
   i32 width, height;
   glfwGetWindowSize(kRenderer_WindowsContexts.windows[currentContext].window, &width, &height);
