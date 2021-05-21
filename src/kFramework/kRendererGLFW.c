@@ -680,6 +680,10 @@ void kRenderer_loadFont(const char *fontPath, const char *fontName)
       fontMaps.fonts[fontMaps.length].character[c + 128].width = face->glyph->bitmap.width;
       fontMaps.fonts[fontMaps.length].character[c + 128].height = face->glyph->bitmap.rows;
       fontMaps.fonts[fontMaps.length].character[c + 128].advance = (u8)face->glyph->advance.x >> 6;
+      if (fontMaps.fonts[fontMaps.length].character[c + 128].advance + fontMaps.fonts[fontMaps.length].character[c + 128].width == 0)
+      {
+        fontMaps.fonts[fontMaps.length].character[c + 128].advance = 10;
+      }
     }
     glBindTexture(GL_TEXTURE_2D, 0);
   }

@@ -31,7 +31,7 @@ namespace kNgine
   SoundListenerComponent::~SoundListenerComponent(){
   }
 
-  SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, const char* fileName,audiofiletype type, SoundListenerComponent *player) : SoundEmiterComponent(object, createBuffer(fileName,type),player)
+  SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, const char* fileName,audiofiletype type, SoundListenerComponent *player) : SoundEmiterComponent(object, createAudioBuffer(fileName,type),player)
   {
   }
   SoundEmiterComponent::SoundEmiterComponent(ComponentGameObject *object, BaseAudioBuffer *buffer, SoundListenerComponent *player) : ObjectComponent(object)
@@ -60,7 +60,7 @@ namespace kNgine
 
   void AudioEngine::play(const char* fileName,audiofiletype type)
   {
-    BaseAudioBuffer*buffer=createBuffer(fileName,type);
+    BaseAudioBuffer*buffer=createAudioBuffer(fileName,type);
     play(buffer);
   }
   void AudioEngine::play(BaseAudioBuffer* buffer)
@@ -73,10 +73,10 @@ namespace kNgine
     queue.push_back(AudioQueue(name,buffer));
     queue[queue.size()-1].loop=loop;
   }
-  void AudioEngine::loadBuffer(BaseAudioBuffer *buffer)
+  void loadBuffer(BaseAudioBuffer *buffer)
   {
   }
-  void AudioEngine::unloadBuffer(BaseAudioBuffer*buffer)
+  void unloadBuffer(BaseAudioBuffer*buffer)
   {
   }
   void AudioEngine::init(std::vector<EngineObject *> obj)
@@ -123,7 +123,7 @@ namespace kNgine
   {
   }
 
-  BaseAudioBuffer *createBuffer(const char* fileName,audiofiletype type){
+  BaseAudioBuffer *createAudioBuffer(const char* fileName,audiofiletype type){
     return new NSSoundBuffer(fileName);
   }
 }

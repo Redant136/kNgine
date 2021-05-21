@@ -101,7 +101,9 @@ namespace kNgine
     if (object->isEnabled())
     {
       object->disable();
-      object->unload();
+      if(callEvent("isRunning")){
+        object->unload();
+      }
       bool wasInList = false;
       for (u32 i = 0; i < workingObjects.length; i++)
       {
@@ -118,6 +120,15 @@ namespace kNgine
   static void enableObject(u32 index)
   {
     enableObject(objects[index]);
+  }
+  static void setupDefaultLayers()
+  {
+    renderingLayerOrder = LayerOrder();
+    addLayerOrderDef(renderingLayerOrder, DEFAULT_LAYER);
+    addLayerOrderDef(renderingLayerOrder, BACKGROUND);
+    addLayerOrderDef(renderingLayerOrder, UI);
+    u32 order[3] = {layerO(renderingLayerOrder, BACKGROUND), layerO(renderingLayerOrder, DEFAULT_LAYER), layerO(renderingLayerOrder, UI)};
+    setLayerOrder(renderingLayerOrder, order);
   }
 
   static void frameUpdate()
@@ -171,14 +182,14 @@ namespace kNgine
       msgs.push_back(non_ascii_msg);
     }
     kRenderer_clear(v4(0, 0, 0, 0));
-    for (u32 i = 0; i < workingObjects.length; i++)
+    Array<EngineObject*>tempWorking=workingObjects.clone();
+    for (u32 i = 0; i < tempWorking.length; i++)
     {
-      workingObjects[i]->update(msgs);
+      tempWorking[i]->update(msgs);
     }
-    if (workingObjects.length > 0)
+    if (tempWorking.length > 0)
     {
-      iv2 windowSize = kRenderer_getWindowSize();
-      std::vector<LayerRenderer *> renderers = findObject<LayerRenderer>(workingObjects, ObjectFlags::RENDERER_LAYER);
+      std::vector<LayerRenderer *> renderers = findObject<LayerRenderer>(tempWorking, ObjectFlags::RENDERER_LAYER);
       for (u32 i = 0; i < renderingLayerOrder.length; i++)
       {
         std::vector<LayerRenderer *> layer = orderObjectsByZ<LayerRenderer>(getRenderersAtLayer(renderers, renderingLayerOrder.order[i]));
@@ -189,7 +200,8 @@ namespace kNgine
         }
       }
     }
-    
+    tempWorking.free();
+
     if(DEBUG){
       std::string fps = std::to_string(1.0/time);
       kRenderer_displayText(v3(-1,1,1),v3(0,0,0),fps.c_str(),0.5);
@@ -217,15 +229,9 @@ namespace kNgine
     kRenderer_createWindow(&context);
     kRenderer_setStartFunction(frameStart);
     kRenderer_setDrawFunction(frameUpdate);
-    //sleepMillis(10);
     if (renderingLayerOrder.length <= 0)
     {
-      renderingLayerOrder = LayerOrder();
-      addLayerOrderDef(renderingLayerOrder, DEFAULT_LAYER);
-      addLayerOrderDef(renderingLayerOrder, BACKGROUND);
-      addLayerOrderDef(renderingLayerOrder, UI);
-      u32 order[3] = {layerO(renderingLayerOrder, BACKGROUND), layerO(renderingLayerOrder, DEFAULT_LAYER), layerO(renderingLayerOrder, UI)};
-      setLayerOrder(renderingLayerOrder,order);
+      setupDefaultLayers();
     }
     workingObjects.arr = new EngineObject *[maxWorkingObjectsLength];
     addEvent({"getEngineObjects", [](void *arg) -> void * {
