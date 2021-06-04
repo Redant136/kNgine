@@ -12,68 +12,6 @@
 #include <math.h>
 #include <time.h>
 
-#ifdef utils_print
-#ifndef __cplusplus
-#include <stdio.h>
-#define print(x) _Generic((x),                                           \
-                          v2                                             \
-                          : printf("{%f,%f}", v.x, v.y),                 \
-                            v3                                           \
-                          : printf("{%f,%f,%f}", v.x, v.y, v.z),         \
-                            v4                                           \
-                          : printf("{%f,%f,%f,%f}", v.x, v.y, v.z, v.w), \
-                            char                                         \
-                          : printf("%c\n", x),                           \
-                            unsigned char                                \
-                          : printf("%c\n", x),                           \
-                            signed char                                  \
-                          : printf("%c\n", x),                           \
-                            short                                        \
-                          : printf("%i\n", x),                           \
-                            unsigned short                               \
-                          : printf("%i\n", x),                           \
-                            int                                          \
-                          : printf("%i\n", x),                           \
-                            unsigned int                                 \
-                          : printf("%i\n", x),                           \
-                            long                                         \
-                          : printf("%i\n", x),                           \
-                            unsigned long                                \
-                          : printf("%i\n", x),                           \
-                            unsigned long long                           \
-                          : printf("%i\n", x),                           \
-                            long long                                    \
-                          : printf("%i\n", x),                           \
-                            float                                        \
-                          : printf("%f\n", x),                           \
-                            double                                       \
-                          : printf("%f\n", x),                           \
-                            long double                                  \
-                          : printf("%f\n", x),                           \
-                            const char *const                            \
-                          : printf("%s\n", x),                           \
-                            char *                                       \
-                          : printf("%s\n", x),                           \
-                            const char *                                 \
-                          : printf("%s\n", x),                           \
-                            char *const                                  \
-                          : printf("%s\n", x),                           \
-                            default                                      \
-                          : printf("%s\n", x))
-#else
-#include <iostream>
-#define print(x) _Generic((x),                                                                                     \
-                          v2                                                                                       \
-                          : std::cout << "{" << v.x << "," << v.y << "}" << std::endl,                             \
-                            v3                                                                                     \
-                          : std::cout << "{" << v.x << "," << v.y << "," << v.z << "}" << std::endl,               \
-                            v4                                                                                     \
-                          : std::cout << "{" << v.x << "," << v.y << "," << v.z << "," << v.w << "}" << std::endl, \
-                            default                                                                                \
-                          : std::cout << x << std::endl)
-#endif
-#endif
-
 #ifdef _WIN32
 #define NOMINMAX
 #include <Windows.h>
@@ -83,6 +21,7 @@
 
 #define sizeofArr(a) (sizeof(a) / sizeof((a)[0]))
 #ifdef __cplusplus
+// #include <vector>
 template <typename T, typename L = size_t>
 struct Array
 {
@@ -105,7 +44,9 @@ struct Array
     delete[] arr;
     arr = NULL;
   }
+  // std::vector<T>toVector(){return std::vector<T>(arr,arr+length);}
 };
+#define ArrayObjToSTDVector(Type,A) std::vector<Type>(A.arr,A.arr+A.length)
 #endif
 
 #define fCompare(a, b) (fabsf(a - b) < 0.0001)
@@ -723,6 +664,78 @@ static inline iv4 IV4Init(int32_t x, int32_t y, int32_t z, int32_t w)
 #define iv3(x, y, z) IV3Init(x, y, z)
 #define iv4(x, y, z, w) IV4Init(x, y, z, w)
 #define iv4xyz(v, w) v4(v.x, v.y, v.z, w)
+
+#ifdef utils_print
+#ifndef __cplusplus
+#include <stdio.h>
+#define print(x) _Generic((x),                                           \
+                          v2                                             \
+                          : printf("{%f,%f}", v.x, v.y),                 \
+                            v3                                           \
+                          : printf("{%f,%f,%f}", v.x, v.y, v.z),         \
+                            v4                                           \
+                          : printf("{%f,%f,%f,%f}", v.x, v.y, v.z, v.w), \
+                            char                                         \
+                          : printf("%c\n", x),                           \
+                            unsigned char                                \
+                          : printf("%c\n", x),                           \
+                            signed char                                  \
+                          : printf("%c\n", x),                           \
+                            short                                        \
+                          : printf("%i\n", x),                           \
+                            unsigned short                               \
+                          : printf("%i\n", x),                           \
+                            int                                          \
+                          : printf("%i\n", x),                           \
+                            unsigned int                                 \
+                          : printf("%i\n", x),                           \
+                            long                                         \
+                          : printf("%i\n", x),                           \
+                            unsigned long                                \
+                          : printf("%i\n", x),                           \
+                            unsigned long long                           \
+                          : printf("%i\n", x),                           \
+                            long long                                    \
+                          : printf("%i\n", x),                           \
+                            float                                        \
+                          : printf("%f\n", x),                           \
+                            double                                       \
+                          : printf("%f\n", x),                           \
+                            long double                                  \
+                          : printf("%f\n", x),                           \
+                            const char *const                            \
+                          : printf("%s\n", x),                           \
+                            char *                                       \
+                          : printf("%s\n", x),                           \
+                            const char *                                 \
+                          : printf("%s\n", x),                           \
+                            char *const                                  \
+                          : printf("%s\n", x),                           \
+                            default                                      \
+                          : printf("%s\n", x))
+#else
+#include <iostream>
+
+static inline void print(v2 v)
+{
+  std::cout << "{" << v.x << "," << v.y << "}" << std::endl;
+}
+static inline void print(v3 v)
+{
+  std::cout << "{" << v.x << "," << v.y << "," << v.z << "}" << std::endl;
+}
+static inline void print(v4 v)
+{
+  std::cout << "{" << v.x << "," << v.y << "," << v.z << "," << v.w << "}" << std::endl;
+}
+template <typename T>
+static inline void print(T x)
+{
+  std::cout << x << std::endl;
+}
+
+#endif
+#endif
 
 #if defined(utils_VectorObjects) && defined(__cplusplus)
 struct kv2;

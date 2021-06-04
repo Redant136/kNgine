@@ -1,8 +1,5 @@
-#include <vector>
-#include "kutils.h"
-#include "EngineObjects.hpp"
-#include "kRenderer.h"
 #include "SpriteUtils.hpp"
+#include "kRenderer.h"
 #include <stb_image.h>
 
 namespace kNgine

@@ -1,11 +1,3 @@
-#include <vector>
-#include <string>
-#include <functional>
-#include <random>
-#include <ctime>
-#include "kutils.h"
-#include "EngineObjects.hpp"
-#include "kRenderer.h"
 #include "Engine.hpp"
 
 namespace kNgine

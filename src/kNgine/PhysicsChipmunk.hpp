@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-#include "kutils.h"
 #include "EngineObjects.hpp"
 #include <chipmunk/chipmunk.h>
 
@@ -9,19 +7,43 @@ namespace kNgine
 {
   namespace physics
   {
-    // [cp_physics_body]
-    class cpPhysicsBodyComponent : public ObjectComponent
+    class kHitBox
+    {
+    public:
+      std::vector<cpShape *> shapes;
+      kHitBox(){shapes=std::vector<cpShape *>();}
+      kHitBox(std::vector<cpShape*>shapes){this->shapes=shapes;}
+      kHitBox(cpShape *shape){ this->shapes = std::vector<cpShape *>(&shape, &shape + 1);}
+      void setShapesBody(cpBody *body){
+        for(u32 i=0;i<shapes.size();i++){
+          cpShapeSetBody(shapes[i], body);
+        }
+      }
+      void free(){
+        for (u32 i = 0; i < shapes.size(); i++)
+        {
+          cpShapeFree(shapes[i]);
+        }
+      }
+    };
+
+    // [k_physics_body]
+    class kPhysicsBodyComponent : public ObjectComponent
     {
     protected:
     public:
-      std::vector<cpShape *> shapes;
+      kHitBox hitbox;
       cpBody *body;
-      cpPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, std::vector<cpShape *> shapes);
-      cpPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, cpShape *shape);
-      virtual ~cpPhysicsBodyComponent();
-      void addShape(cpShape *shape);
-      static cpPhysicsBodyComponent *staticBody(ComponentGameObject *base, std::vector<cpShape *> shapes);
-      static cpPhysicsBodyComponent *staticBody(ComponentGameObject *base, cpShape *shape) { return staticBody(base, std::vector<cpShape *>(&shape, &shape+1)); }
+      kPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, kHitBox shape);
+      kPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, std::vector<cpShape *> shapes):kPhysicsBodyComponent(base,body,kHitBox(shapes))
+      {
+      }
+      kPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, cpShape *shape):kPhysicsBodyComponent(base, body,kHitBox(shape))
+      {
+      }
+      virtual ~kPhysicsBodyComponent();
+      static kPhysicsBodyComponent *kPhysRect(ComponentGameObject *base,v2 size = v2(1,1), f32 weight = 1.f, f32 friction = 0.f);
+      static kPhysicsBodyComponent *staticBody(ComponentGameObject *base, kHitBox hitbot);
       v2 getVelocity();// get velocity of object
       void setVelocity(v2 vel);// set velocity
       void addVelocity(v2 vel);// add to the velocity
@@ -34,15 +56,14 @@ namespace kNgine
       virtual void end(std::vector<EngineObject *> objects);
     };
 
-    class cpRect : public cpPhysicsBodyComponent
+    static inline kHitBox kHitBoxRect(v2 size = {1, 1}, f32 weight = 1.f, f32 friction = 0.f)
     {
-    public:
-      cpRect(ComponentGameObject *base, v2 size, f32 weight = 1.f, f32 friction = 0.f) : cpPhysicsBodyComponent(base, cpBodyNew(weight, cpMomentForBox(weight, size.x, size.y)), cpBoxShapeNew(NULL, size.x, size.y, 0.001))
-      {
-        cpShapeSetFriction(shapes[0],friction);
-      }
-      static cpPhysicsBodyComponent *staticBody(ComponentGameObject *base, v2 size, f32 friction = 1.f);
-    };
+      kHitBox h=kHitBox(cpBoxShapeNew(NULL, size.x, size.y, 0.001));
+      cpShapeSetFriction(h.shapes[0],friction);
+      return h;
+    }
+
+    // class 
 
     class cpPhysicsEngine : public EngineObject
     {

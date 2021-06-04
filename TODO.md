@@ -3,11 +3,11 @@
 # main branch
 
 ## currently working on
+- [ ] chipmunk hitboxes, elasticity
 ## testing
 - [ ] test custom shader in renderer
 ## next step
 - [ ] finish tilemap
-- [ ] chipmunk hitboxes, elasticity
 - [ ] object info tool
 - [ ] c thread (unix + windows) is broken
 ## research

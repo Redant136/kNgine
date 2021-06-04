@@ -1,8 +1,5 @@
 #pragma once
 
-#include <vector>
-#include "kutils.h"
-#include "EngineObjects.hpp"
 #include "SpriteUtils.hpp"
 
 namespace kNgine{

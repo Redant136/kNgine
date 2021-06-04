@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-#include "kutils.h"
 #include "EngineObjects.hpp"
 
 namespace kNgine

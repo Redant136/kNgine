@@ -1,7 +1,6 @@
 #include <math.h>
 #include <glad/glad.h>
 #define utils_StrManipulation
-#include "kutils.h"
 #ifndef kRenderer_HeaderOnly
 #include "kRenderer.h"
 #endif
@@ -596,8 +595,8 @@ void kRenderer_launch()
     assert(0 && "ERROR::FREETYPE: Could not init FreeType Library");
   }
   fontMaps.currentFont = 0;
-  kRenderer_loadFont("ressources/fonts/roboto/Roboto-Regular.ttf", "roboto");
-  kRenderer_loadFont("ressources/fonts/rainyhearts/rainyhearts.ttf", "rainyhearts");
+  kRenderer_loadFont("kNgine_ressources/fonts/roboto/Roboto-Regular.ttf", "roboto");
+  kRenderer_loadFont("kNgine_ressources/fonts/rainyhearts/rainyhearts.ttf", "rainyhearts");
   for (u32 i = 0; i < kRenderer_WindowsContexts.length; i++)
   {
     glfwMakeContextCurrent(kRenderer_WindowsContexts.windows[i].window);

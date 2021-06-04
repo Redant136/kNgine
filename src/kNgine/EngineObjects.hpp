@@ -386,6 +386,13 @@ namespace kNgine
   EngineEvent& getEvent(std::string name);
   void removeEvent(std::string name);
 
+  template <class T = EngineObject, class I = EngineObject, typename L = size_t>
+  std::vector<T *> findObject(Array<T *, L> objects,
+                              std::string label)
+  {
+    return findObject<T, I>(objects.toVector(), label);
+  }
+  
   template <class T = EngineObject, class I = EngineObject>
   std::vector<T *> findObject(std::vector<I *> objects,
                               std::string label)
@@ -445,19 +452,26 @@ namespace kNgine
     }
     return res;
   };
+
+  template <class T = EngineObject, class I = EngineObject, typename L = size_t>
+  std::vector<T *> findObject(Array<I *, L> objects,
+                              u64 flags)
+  {
+    return findObject<T,I>(ArrayObjToSTDVector(I*,objects),flags);
+  };
   
   template <class T = EngineObject, class I = EngineObject>
-  std::vector<T *> findObject(Array<I*>objects,
+  std::vector<T *> findObject(std::vector<I *> objects,
                               u64 flags)
   {
     std::vector<EngineObject *> valid = std::vector<EngineObject *>();
     if (flags == ~ObjectFlags::NONE)
     {
-      valid = std::vector<EngineObject *>(objects.arr, objects.arr + objects.length);
+      valid = objects;
     }
     else
     {
-      for (u32 i = 0; i < objects.length; i++)
+      for (u32 i = 0; i < objects.size(); i++)
       {
         if (objects[i]->flags & flags)
         {
@@ -471,13 +485,6 @@ namespace kNgine
       res.push_back((T *)obj);
     }
     return res;
-  };
-  
-  template <class T = EngineObject, class I = EngineObject>
-  std::vector<T *> findObject(std::vector<I *> objects,
-                              u64 flags)
-  {
-    return findObject<T, I>({objects.size(), objects.data()}, flags);
   };
 
   Sprite importSprite(const char *filename);

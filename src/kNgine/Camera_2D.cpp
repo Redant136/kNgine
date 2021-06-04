@@ -1,9 +1,5 @@
-#include <vector>
-#include <string>
-#include <cmath>
 #define utils_print
 #include "kutils.h"
-#include "EngineObjects.hpp"
 #include "kRenderer.h"
 #include "Camera.hpp"
 #include "SpriteUtils.hpp"

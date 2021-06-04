@@ -1,94 +1,78 @@
-#include <vector>
+#define utils_print
 #include "kutils.h"
-#include "EngineObjects.hpp"
 #include "PhysicsChipmunk.hpp"
-#include <chipmunk/chipmunk.h>
 #include <chipmunk/chipmunk_structs.h>
 
+#include <iostream>
 #define toCPV(v) cpv((v).x,(v).y)
 
 namespace kNgine
 {
   namespace physics
   {
-    cpPhysicsBodyComponent::cpPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, std::vector<cpShape *> shapes) : ObjectComponent(base)
+    kPhysicsBodyComponent::kPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, kHitBox shape) : ObjectComponent(base)
     {
       this->flags |= ObjectFlags::Physics;
-      this->label = "[cp_physics_body]";
-      for (u32 i = 0; i < shapes.size(); i++)
-      {
-        cpShapeSetBody(shapes[i],body);
-      }
+      this->label = "[k_physics_body]";
+      shape.setShapesBody(body);
       this->body = body;
-      this->shapes = shapes;
+      this->hitbox = shape;
     }
-    cpPhysicsBodyComponent::cpPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, cpShape *shape) : cpPhysicsBodyComponent(base, body, std::vector<cpShape *>(&shape, &shape+1))
+    kPhysicsBodyComponent::~kPhysicsBodyComponent()
     {
-    }
-    cpPhysicsBodyComponent::~cpPhysicsBodyComponent()
-    {
-      for (u32 i = 0; i < shapes.size(); i++)
-      {
-        cpShapeFree(shapes[i]);
-      }
+      hitbox.free();
       cpBodyFree(body);
     }
-    void cpPhysicsBodyComponent::addShape(cpShape *shape)
+    kPhysicsBodyComponent *kPhysicsBodyComponent::kPhysRect(ComponentGameObject *base, v2 size, f32 weight, f32 friction)
     {
-      shapes.push_back(shape);
-      shape->body = this->body;
+      return new kPhysicsBodyComponent(base, cpBodyNew(weight, cpMomentForBox(weight, size.x, size.y)), kHitBoxRect(size, weight, friction));
     }
-    cpPhysicsBodyComponent *cpPhysicsBodyComponent::staticBody(ComponentGameObject *base, std::vector<cpShape *> shapes)
+    kPhysicsBodyComponent *kPhysicsBodyComponent::staticBody(ComponentGameObject *base, kHitBox hitbox)
     {
-      return new cpPhysicsBodyComponent(base, cpBodyNewStatic(), shapes);
+      return new kPhysicsBodyComponent(base, cpBodyNewStatic(), hitbox);
     }
-    v2 cpPhysicsBodyComponent::getVelocity()
+    
+    v2 kPhysicsBodyComponent::getVelocity()
     {
       return toV2(cpBodyGetVelocity(body));
     }
-    void cpPhysicsBodyComponent::setVelocity(v2 vel)
+    void kPhysicsBodyComponent::setVelocity(v2 vel)
     {
       cpBodySetVelocity(body,toCPV(vel));
     }
-    void cpPhysicsBodyComponent::addVelocity(v2 vel)
+    void kPhysicsBodyComponent::addVelocity(v2 vel)
     {
       cpBodySetVelocity(body, cpBodyGetVelocity(body) + toCPV(vel));
     }
-    v2 cpPhysicsBodyComponent::getForce()
+    v2 kPhysicsBodyComponent::getForce()
     {
       return toV2(cpBodyGetForce(body));
     }
-    void cpPhysicsBodyComponent::setForce(v2 f)
+    void kPhysicsBodyComponent::setForce(v2 f)
     {
       cpBodySetForce(body,toCPV(f));
     }
-    void cpPhysicsBodyComponent::applyForce(v2 f)
+    void kPhysicsBodyComponent::applyForce(v2 f)
     {
       cpBodySetForce(body,cpBodyGetForce(body)+toCPV(f));
     }
 
-    void cpPhysicsBodyComponent::init(std::vector<EngineObject *> objects)
+    void kPhysicsBodyComponent::init(std::vector<EngineObject *> objects)
     {
       cpBodySetPosition(body, toCPV(object->position));
       cpBodySetAngle(body, object->rotation.z);
     }
-    void cpPhysicsBodyComponent::update(std::vector<msg> msgs)
+    void kPhysicsBodyComponent::update(std::vector<msg> msgs)
     {
+      // std::cout<<cpShapeGetCollisionType(shapes[0])<<std::endl;
       object->position = v3(body->p.x, body->p.y, object->position.z);
       object->rotation.z = body->a;
     }
-    void cpPhysicsBodyComponent::end(std::vector<EngineObject *> objects)
+    void kPhysicsBodyComponent::end(std::vector<EngineObject *> objects)
     {
 
     }
 
-    cpPhysicsBodyComponent *cpRect::staticBody(ComponentGameObject *base, v2 size, f32 friction)
-    {
-      cpBody*bod=cpBodyNewStatic();
-      cpPhysicsBodyComponent *r = new cpPhysicsBodyComponent(base, bod, cpBoxShapeNew(bod, size.x, size.y, 0.001));
-      cpShapeSetFriction(r->shapes[0], friction);
-      return r;
-    }
 
     cpPhysicsEngine::cpPhysicsEngine() : cpPhysicsEngine(v2(0, 0))
     {
@@ -101,14 +85,14 @@ namespace kNgine
     }
     void cpPhysicsEngine::init(std::vector<EngineObject *> objects)
     {
-      std::vector<ComponentGameObject *> list = findObject<ComponentGameObject>(objects, "[cp_physics_body]");
+      std::vector<ComponentGameObject *> list = findObject<ComponentGameObject>(objects, "[k_physics_body]");
       for (u32 i = 0; i < list.size(); i++)
       {
-        cpPhysicsBodyComponent *compn = list[i]->findComponent<cpPhysicsBodyComponent>("[cp_physics_body]");
+        kPhysicsBodyComponent *compn = list[i]->findComponent<kPhysicsBodyComponent>("[k_physics_body]");
         compn->body = cpSpaceAddBody(space, compn->body);
-        for (u32 j = 0; j < compn->shapes.size(); j++)
+        for (u32 j = 0; j < compn->hitbox.shapes.size(); j++)
         {
-          compn->shapes[j] = cpSpaceAddShape(space, compn->shapes[j]);
+          compn->hitbox.shapes[j] = cpSpaceAddShape(space, compn->hitbox.shapes[j]);
         }
       }
     }
@@ -122,7 +106,6 @@ namespace kNgine
           timeStep = msgs[i].time;
         }
       }
-      // timeStep=1/60.0;
       cpSpaceStep(space, timeStep);
     }
     void cpPhysicsEngine::end(std::vector<EngineObject *> objects)

@@ -51,6 +51,7 @@ src/kNgine/Camera.hpp
 src/kNgine/SpriteUtils.hpp
 # src/kNgine/PhysicsB2.hpp
 src/kNgine/PhysicsChipmunk.hpp
+src/kNgine/PhysicsChipmunkRenderer.hpp
 src/kNgine/AudioEngine.hpp
 
 src/kNgine/Engine.hpp
@@ -64,6 +65,7 @@ src/kNgine/Camera_2D.cpp
 src/kNgine/SpriteUtils.cpp
 # src/kNgine/PhysicsB2.cpp
 src/kNgine/PhysicsChipmunk.cpp
+src/kNgine/PhysicsChipmunkRenderer.cpp
 src/kNgine/Tilemap.cpp
 src/kNgine/Engine.cpp
 
@@ -122,7 +124,7 @@ endif()
 add_subdirectory(extern/freetype/)
 target_link_libraries(kNgineFramework PRIVATE freetype)
 target_link_libraries(kNgine PRIVATE freetype)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/ressources/ DESTINATION ${CMAKE_BINARY_DIR}/ressources/)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/kNgine_ressources/ DESTINATION ${CMAKE_BINARY_DIR}/kNgine_ressources/)
 
 # set(BOX2D_BUILD_UNIT_TESTS OFF)
 # set(BOX2D_BUILD_TESTBED OFF)

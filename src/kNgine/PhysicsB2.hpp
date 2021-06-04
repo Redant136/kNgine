@@ -5,6 +5,8 @@
 #include "EngineObjects.hpp"
 #include "../../extern/box2d/include/box2d/box2d.h"
 
+#error deprecated
+
 namespace kNgine{
   //this cannot be used with custom physics engine
   namespace physics

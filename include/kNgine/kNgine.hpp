@@ -8,6 +8,7 @@
 #include "../../src/kNgine/Camera.hpp"
 // #include "../../src/kNgine/PhysicsB2.hpp"
 #include "../../src/kNgine/PhysicsChipmunk.hpp"
+#include "../../src/kNgine/PhysicsChipmunkRenderer.hpp"
 #include "../../src/kNgine/SpriteUtils.hpp"
 #include "../../src/kNgine/AudioEngine.hpp"
 #include "../../src/kNgine/Tilemap.hpp"
