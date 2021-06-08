@@ -232,46 +232,5 @@ namespace kNgine
     }
   };
 
-  //[sprite_list]
-  class SpriteList : public SpriteAccessor
-  {
-  protected:
-    std::vector<SpriteAccessor *> accessors;
-
-  public:
-    v2 spriteDimension;
-    SpriteList(ComponentGameObject *base, SpriteMap *spriteList) : SpriteList(base, std::vector<SpriteAccessor *>(), spriteList)
-    {
-    }
-    SpriteList(ComponentGameObject *base, std::vector<SpriteAccessor *> accessors, SpriteMap *spriteList) : SpriteAccessor(base)
-    {
-      this->label = "[sprite_list]";
-      this->specialAccessor = true;
-      this->accessors = accessors;
-      spriteDimension = v2(1, 1);
-    }
-    virtual ~SpriteList()
-    {
-      for (SpriteAccessor *spr : accessors)
-      {
-        delete spr;
-      }
-    }
-    void addAccessor(SpriteAccessor *accessor) { accessors.push_back(accessor); }
-    virtual void update(std::vector<msg> msgs)
-    {
-      for (SpriteAccessor *spr : accessors)
-      {
-        spr->update(msgs);
-      }
-    }
-    SpriteAccessor **getSpriteList() { return accessors.data(); }
-    u32 getSpriteListLength() { return accessors.size(); }
-    bool hasToSave() { return false; }
-    Sprite *getSprite() { return accessors[0]->getSprite(); }
-    v2 getSpriteDimensions() { return accessors[0]->getSpriteLocation(); }
-    v2 getSpriteLocation() { return accessors[0]->getSpriteLocation(); }
-  };
-
   std::vector<Sprite> importSpriteSheet(const char *filename, i32 spriteWidth, i32 spriteHeight);
 } // namespace kNgine
