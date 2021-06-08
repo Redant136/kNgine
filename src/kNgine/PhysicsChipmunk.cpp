@@ -1,116 +1,203 @@
+#include <iostream>
 #define utils_print
 #include "kutils.h"
 #include "PhysicsChipmunk.hpp"
 #include <chipmunk/chipmunk_structs.h>
 
 #include <iostream>
-#define toCPV(v) cpv((v).x,(v).y)
+#define toCPV(v) cpv((v).x, (v).y)
+
+#define GlobalCollisionCategory 1 << 0
+#define HitBoxCollisionCategory 1 << 1
 
 namespace kNgine
 {
-  namespace physics
+  kHitBox::kHitBox(std::vector<cpShape *> shapes)
   {
-    kPhysicsBodyComponent::kPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, kHitBox shape) : ObjectComponent(base)
+    this->shapes = shapes;
+    for (u32 i = 0; i < this->shapes.size(); i++)
     {
-      this->flags |= ObjectFlags::Physics;
-      this->label = "[k_physics_body]";
-      shape.setShapesBody(body);
-      this->body = body;
-      this->hitbox = shape;
+      cpShapeSetCollisionType(this->shapes[i], GlobalCollisionCategory);
+      cpShapeSetElasticity(this->shapes[i],0);
     }
-    kPhysicsBodyComponent::~kPhysicsBodyComponent()
+  }
+
+  kPhysicsBodyComponent::kPhysicsBodyComponent(ComponentGameObject *base, cpBody *body, kHitBox shape) : ObjectComponent(base)
+  {
+    this->flags |= ObjectFlags::Physics;
+    this->label = "[k_physics_body]";
+    shape.setShapesBody(body);
+    this->body = body;
+    this->hitbox = shape;
+    cpBodySetUserData(this->body, this);
+    for (u32 i = 0; i < this->hitbox.shapes.size(); i++)
     {
-      hitbox.free();
-      cpBodyFree(body);
+      cpShapeFilter filter = cpShapeGetFilter(this->hitbox.shapes[i]);
+      filter.group = (uintptr_t)base;
+      filter.categories = GlobalCollisionCategory;
+      filter.mask ^= HitBoxCollisionCategory;
+      cpShapeSetFilter(this->hitbox.shapes[i], filter);
     }
-    kPhysicsBodyComponent *kPhysicsBodyComponent::kPhysRect(ComponentGameObject *base, v2 size, f32 weight, f32 friction)
+  }
+  kPhysicsBodyComponent::~kPhysicsBodyComponent()
+  {
+    hitbox.free();
+    cpBodyFree(body);
+  }
+  kPhysicsBodyComponent *kPhysicsBodyComponent::kPhysRect(ComponentGameObject *base, v2 size, f32 weight, f32 friction)
+  {
+    return new kPhysicsBodyComponent(base, cpBodyNew(weight, cpMomentForBox(weight, size.x, size.y)), kHitBoxRect(size, weight, friction));
+  }
+  kPhysicsBodyComponent *kPhysicsBodyComponent::staticBody(ComponentGameObject *base, kHitBox hitbox)
+  {
+    return new kPhysicsBodyComponent(base, cpBodyNewStatic(), hitbox);
+  }
+
+  v2 kPhysicsBodyComponent::getVelocity()
+  {
+    return toV2(cpBodyGetVelocity(body));
+  }
+  void kPhysicsBodyComponent::setVelocity(v2 vel)
+  {
+    cpBodySetVelocity(body, toCPV(vel));
+  }
+  void kPhysicsBodyComponent::addVelocity(v2 vel)
+  {
+    cpBodySetVelocity(body, cpBodyGetVelocity(body) + toCPV(vel));
+  }
+  f32 kPhysicsBodyComponent::getElasticity()
+  {
+    return cpShapeGetElasticity(this->hitbox.shapes[0]);
+  }
+  void kPhysicsBodyComponent::setElasticity(f32 elasticity)
+  {
+    for (u32 i = 0; i < this->hitbox.shapes.size(); i++)
     {
-      return new kPhysicsBodyComponent(base, cpBodyNew(weight, cpMomentForBox(weight, size.x, size.y)), kHitBoxRect(size, weight, friction));
-    }
-    kPhysicsBodyComponent *kPhysicsBodyComponent::staticBody(ComponentGameObject *base, kHitBox hitbox)
-    {
-      return new kPhysicsBodyComponent(base, cpBodyNewStatic(), hitbox);
-    }
-    
-    v2 kPhysicsBodyComponent::getVelocity()
-    {
-      return toV2(cpBodyGetVelocity(body));
-    }
-    void kPhysicsBodyComponent::setVelocity(v2 vel)
-    {
-      cpBodySetVelocity(body,toCPV(vel));
-    }
-    void kPhysicsBodyComponent::addVelocity(v2 vel)
-    {
-      cpBodySetVelocity(body, cpBodyGetVelocity(body) + toCPV(vel));
-    }
-    v2 kPhysicsBodyComponent::getForce()
-    {
-      return toV2(cpBodyGetForce(body));
-    }
-    void kPhysicsBodyComponent::setForce(v2 f)
-    {
-      cpBodySetForce(body,toCPV(f));
-    }
-    void kPhysicsBodyComponent::applyForce(v2 f)
-    {
-      cpBodySetForce(body,cpBodyGetForce(body)+toCPV(f));
+      cpShapeSetElasticity(this->hitbox.shapes[i],elasticity);
     }
 
-    void kPhysicsBodyComponent::init(std::vector<EngineObject *> objects)
+  }
+
+  v2 kPhysicsBodyComponent::getForce()
+  {
+    return toV2(cpBodyGetForce(body));
+  }
+  void kPhysicsBodyComponent::setForce(v2 f)
+  {
+    cpBodySetForce(body, toCPV(f));
+  }
+  void kPhysicsBodyComponent::applyForce(v2 f)
+  {
+    cpBodySetForce(body, cpBodyGetForce(body) + toCPV(f));
+  }
+  kPhysicsBodyComponent *kPhysicsBodyComponent::toIntangibleHitBox()
+  {
+    cpBodySetType(this->body, cpBodyType::CP_BODY_TYPE_KINEMATIC);
+    for (u32 i = 0; i < this->hitbox.shapes.size(); i++)
     {
-      cpBodySetPosition(body, toCPV(object->position));
-      cpBodySetAngle(body, object->rotation.z);
+      cpShapeFilter filter = cpShapeGetFilter(this->hitbox.shapes[i]);
+      filter.categories |= HitBoxCollisionCategory;
+      filter.mask ^= HitBoxCollisionCategory;
+      filter.mask ^= GlobalCollisionCategory;
+      cpShapeSetFilter(this->hitbox.shapes[i], filter);
     }
-    void kPhysicsBodyComponent::update(std::vector<msg> msgs)
+
+    
+    return this;
+  }
+
+  void kPhysicsBodyComponent::enable()
+  {
+    if (!enabled)
     {
-      // std::cout<<cpShapeGetCollisionType(shapes[0])<<std::endl;
-      object->position = v3(body->p.x, body->p.y, object->position.z);
+      ObjectComponent::enable();
+      cpSpace *space = body->space;
+      cpSpaceRemoveBody(space, body);
+      body->space = space;
+    }
+  }
+  void kPhysicsBodyComponent::disable()
+  {
+    if (enabled)
+    {
+      ObjectComponent::disable();
+      cpSpace *space = body->space;
+      body->space = NULL;
+      cpSpaceAddBody(space, body);
+    }
+  }
+  void kPhysicsBodyComponent::init(std::vector<EngineObject *> objects)
+  {
+    cpBodySetPosition(body, toCPV(object->position));
+    cpBodySetAngle(body, object->rotation.z);
+  }
+  void kPhysicsBodyComponent::update(std::vector<msg> msgs)
+  {
+    if (dependentPosition)
+    {
+      object->position = toV2(body->p);
       object->rotation.z = body->a;
     }
-    void kPhysicsBodyComponent::end(std::vector<EngineObject *> objects)
+    else
     {
-
+      body->p = toCPV(object->position);
+      body->a = object->rotation.z;
     }
+  }
+  void kPhysicsBodyComponent::end(std::vector<EngineObject *> objects)
+  {
+  }
 
-
-    cpPhysicsEngine::cpPhysicsEngine() : cpPhysicsEngine(v2(0, 0))
+  cpPhysicsEngine::cpPhysicsEngine() : cpPhysicsEngine(v2(0, 0))
+  {
+  }
+  static cpBool findPreCollider(cpArbiter *arb, cpSpace *space, cpDataPointer data)
+  {
+    ((kPhysicsBodyComponent *)arb->body_a->userData)->preCollision(((kPhysicsBodyComponent *)arb->body_b->userData)->object);
+    ((kPhysicsBodyComponent *)arb->body_b->userData)->preCollision(((kPhysicsBodyComponent *)arb->body_a->userData)->object);
+    return cpTrue;
+  }
+  static void findPostCollider(cpArbiter *arb, cpSpace *space, cpDataPointer data)
+  {
+    ((kPhysicsBodyComponent *)arb->body_a->userData)->preCollision(((kPhysicsBodyComponent *)arb->body_b->userData)->object);
+    ((kPhysicsBodyComponent *)arb->body_b->userData)->preCollision(((kPhysicsBodyComponent *)arb->body_a->userData)->object);
+  }
+  cpPhysicsEngine::cpPhysicsEngine(v2 gravity)
+  {
+    space = cpSpaceNew();
+    this->gravity = gravity;
+    cpSpaceSetGravity(space, cpv(gravity.x, gravity.y));
+    space->defaultHandler.preSolveFunc = findPreCollider;
+    space->defaultHandler.postSolveFunc = findPostCollider;
+  }
+  void cpPhysicsEngine::init(std::vector<EngineObject *> objects)
+  {
+    // engineData=(Array<EngineObject*>*)callEvent("getEngineObjects");
+    std::vector<ComponentGameObject *> list = findObject<ComponentGameObject>(objects, "[k_physics_body]");
+    for (u32 i = 0; i < list.size(); i++)
     {
-    }
-    cpPhysicsEngine::cpPhysicsEngine(v2 gravity)
-    {
-      space = cpSpaceNew();
-      this->gravity=gravity;
-      cpSpaceSetGravity(space, cpv(gravity.x, gravity.y));
-    }
-    void cpPhysicsEngine::init(std::vector<EngineObject *> objects)
-    {
-      std::vector<ComponentGameObject *> list = findObject<ComponentGameObject>(objects, "[k_physics_body]");
-      for (u32 i = 0; i < list.size(); i++)
+      kPhysicsBodyComponent *compn = list[i]->findComponent<kPhysicsBodyComponent>("[k_physics_body]");
+      compn->body = cpSpaceAddBody(space, compn->body);
+      for (u32 j = 0; j < compn->hitbox.shapes.size(); j++)
       {
-        kPhysicsBodyComponent *compn = list[i]->findComponent<kPhysicsBodyComponent>("[k_physics_body]");
-        compn->body = cpSpaceAddBody(space, compn->body);
-        for (u32 j = 0; j < compn->hitbox.shapes.size(); j++)
-        {
-          compn->hitbox.shapes[j] = cpSpaceAddShape(space, compn->hitbox.shapes[j]);
-        }
+        compn->hitbox.shapes[j] = cpSpaceAddShape(space, compn->hitbox.shapes[j]);
       }
     }
-    void cpPhysicsEngine::update(std::vector<msg> msgs)
+  }
+  void cpPhysicsEngine::update(std::vector<msg> msgs)
+  {
+    f32 timeStep = 0;
+    for (u32 i = 0; i < msgs.size(); i++)
     {
-      f32 timeStep = 0;
-      for (u32 i = 0; i < msgs.size(); i++)
+      if (msgs[i].msgType == msg::TIME_ELAPSED)
       {
-        if (msgs[i].msgType == msg::TIME_ELAPSED)
-        {
-          timeStep = msgs[i].time;
-        }
+        timeStep = msgs[i].time;
       }
-      cpSpaceStep(space, timeStep);
     }
-    void cpPhysicsEngine::end(std::vector<EngineObject *> objects)
-    {
-      cpSpaceDestroy(space);
-    }
+    cpSpaceStep(space, timeStep);
+  }
+  void cpPhysicsEngine::end(std::vector<EngineObject *> objects)
+  {
+    cpSpaceDestroy(space);
   }
 }

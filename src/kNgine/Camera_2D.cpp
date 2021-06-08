@@ -138,6 +138,17 @@ namespace kNgine
 
   void Camera::render(ComponentGameObject *object)
   {
+
+    // Renderable *compn = object->findComponent<Renderable>(ObjectFlags::RENDERABLE);
+    // u32 i=0;
+    // while(compn)
+    // {
+
+    //   compn = object->findComponent<Renderable>(ObjectFlags::RENDERABLE,i);
+    //   i++;
+    // }
+
+
     Renderable*compn=object->findComponent<Renderable>(ObjectFlags::RENDERABLE);
     if(compn->label=="[Rend_SYS]"){
       compn=((RenderableSystem*)compn)->active;
@@ -152,7 +163,6 @@ namespace kNgine
         m4 matrix = M4InitDiagonal(1);
         matrix = M4MultiplyM4(matrix, posMapper.toM4());
         matrix = M4MultiplyM4(matrix, M4TranslateV3(v3(this->position.x, this->position.y,0)*-1));
-
         
         v4 pos1=V4MultiplyM4(v4xyz(rendObject->object->position,1),matrix);
         v4 pos3=V4MultiplyM4(v4(10,5,1,1),matrix);

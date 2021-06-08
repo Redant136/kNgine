@@ -234,16 +234,22 @@ namespace kNgine
     ComponentGameObject();
     ComponentGameObject(const ComponentGameObject &base);
     virtual ~ComponentGameObject();
+    virtual void enable();
+    virtual void disable();
     virtual void init(std::vector<EngineObject *> objects);
     virtual void load();
     virtual void update(std::vector<msg> msgs);
     virtual void unload();
     virtual void end(std::vector<EngineObject *> objects);
     void addComponent(ObjectComponent *component);
+    template<class Component,class ...Args>
+    void addComponent(Args...args){
+      this->addComponent(new Component(this,args...));
+    }
     template <typename T = ObjectComponent>
-    T *findComponent(u64 flags);
+    T *findComponent(u64 flags,u32 componentNumber=0);
     template <typename T = ObjectComponent>
-    T *findComponent(std::string label);
+    T *findComponent(std::string label,u32 componentNumber=0);
     void removeComponent(ObjectComponent *component);
     void removeComponent(u64 flags) { removeComponent(findComponent(flags)); }
     void removeComponent(std::string label) { removeComponent(findComponent(label)); }
@@ -251,6 +257,8 @@ namespace kNgine
   // modular objects for implementations, define modules labels using [name]
   class ObjectComponent
   {
+  protected:
+    bool enabled = true;
   public:
     ComponentGameObject *object;
     std::string label;
@@ -258,6 +266,9 @@ namespace kNgine
     ObjectComponent(ComponentGameObject *base);
     ObjectComponent(const ObjectComponent &base);
     virtual ~ObjectComponent(){}
+    virtual void enable(){enabled=true;}
+    virtual void disable(){enabled=false;}
+    bool isEnabled() { return enabled; }
     virtual void init(std::vector<EngineObject *> objects){}
     virtual void load() {}
     virtual void update(std::vector<msg> msgs){}
@@ -265,26 +276,28 @@ namespace kNgine
     virtual void end(std::vector<EngineObject *> objects){}
   };
   template <typename T>
-  T *ComponentGameObject::findComponent(u64 flags)
+  T *ComponentGameObject::findComponent(u64 flags,u32 componentNumber)
   {
-    for (ObjectComponent *mod : components)
-    {
-      if (mod->flags & flags)
+    for(u32 i=0;i<components.size();i++){
+      if (components[i]->flags & flags)
       {
-        return (T *)mod;
+        if(componentNumber==0){
+          return (T *)components[i];
+        }
+        componentNumber--;
       }
     }
     return NULL;
   }
   template <typename T>
-  T *ComponentGameObject::findComponent(std::string flag)
+  T *ComponentGameObject::findComponent(std::string flag,u32 componentNumber)
   {
-    for (ObjectComponent *mod : components)
-    {
-      if (mod->label == flag)
-      {
-        return (T *)mod;
-      }
+    for(u32 i=0;i<components.size();i++){
+      if(signed(components[i]->label.find(flag))!=-1){
+        if(componentNumber==0){
+          return (T *)components[i];
+        }
+        componentNumber--;      }
     }
     return NULL;
   }
@@ -387,10 +400,10 @@ namespace kNgine
   void removeEvent(std::string name);
 
   template <class T = EngineObject, class I = EngineObject, typename L = size_t>
-  std::vector<T *> findObject(Array<T *, L> objects,
+  std::vector<T *> findObject(Array<I *, L> objects,
                               std::string label)
   {
-    return findObject<T, I>(objects.toVector(), label);
+    return findObject<T, I>(ArrayObjToSTDVector(I*,objects), label);
   }
   
   template <class T = EngineObject, class I = EngineObject>

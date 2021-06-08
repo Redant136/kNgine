@@ -43,11 +43,39 @@ namespace kNgine{
   }
   void ComponentGameObject::addComponent(ObjectComponent *component)
   {
-    components.push_back(component);
-    this->labels.push_back(component->label);
+    ObjectComponent *compn = findComponent(component->label);
+    if (!compn)
+    {
+      this->labels.push_back(component->label);
+    }
+    else
+    {
+      u32 i = 0;
+      while (compn)
+      {
+        i++;
+        compn = findComponent(component->label + std::to_string(i));
+      }
+      component->label = component->label + std::to_string(i);
+    }
     this->flags |= component->flags;
+    components.push_back(component);
   }
 
+  void ComponentGameObject::enable(){
+    this->enabled = true;
+    for (u32 i = 0; i < components.size(); i++)
+    {
+      this->components[i]->enable();
+    }
+  }
+  void ComponentGameObject::disable(){
+    this->enabled = false;
+    for (u32 i = 0; i < components.size(); i++)
+    {
+      this->components[i]->disable();
+    }
+  }
   void ComponentGameObject::init(std::vector<EngineObject *> objects){
     for (u32 i = 0; i < components.size(); i++)
     {
@@ -60,9 +88,14 @@ namespace kNgine{
       components[i]->load();
     }
   }
-  void ComponentGameObject::update(std::vector<msg> msgs) {
-    for (ObjectComponent *mod : components) {
-      mod->update(msgs);
+  void ComponentGameObject::update(std::vector<msg> msgs)
+  {
+    for (u32 i = 0; i < components.size(); i++)
+    {
+      if (this->components[i]->isEnabled())
+      {
+        this->components[i]->update(msgs);
+      }
     }
   }
   void ComponentGameObject::unload()

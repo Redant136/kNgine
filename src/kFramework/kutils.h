@@ -1,7 +1,6 @@
 #pragma once
-#define kutils_version 0.001
 #ifndef kutils_h
-#define kutils_h kutils_version
+#define kutils_h
 
 // general utils functions, can work with both c and c++
 
@@ -3263,9 +3262,4 @@ public:
 };
 #endif
 
-#else
-#if kutils_h < kutils_version
-#error "trying to include more recent utils.h file"
 #endif
-#endif
-#undef kutils_version

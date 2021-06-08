@@ -201,9 +201,9 @@ namespace kNgine
 
     if (DEBUG)
     {
+      kRenderer_setDrawColor(v4(1,1,1,1));
       std::string fps = std::to_string(1.0 / time);
       kRenderer_displayText(v3(-1, 1, 1), v3(0, 0, 0), fps.c_str(), 0.5);
-      // kRenderer_drawObject(object);
     }
   }
   static void frameStart()
