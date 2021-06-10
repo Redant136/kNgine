@@ -189,6 +189,12 @@ namespace kNgine
   {
     return spriteDimensions[frame];
   }
+  void SpriteAnimation::setSpriteDimensions(v2 size)
+  {
+    for(u32 i=0;i<spriteDimensions.size();i++){
+      spriteDimensions[i] = size;
+    }
+  }
 
   RendererObject_base::RendererObject_base(ComponentGameObject *base) : Renderable(base)
   {

@@ -32,9 +32,8 @@ namespace kNgine
   // [k_physics_body]
   class kPhysicsBodyComponent : public ObjectComponent
   {
-  protected:
-    bool dependentPosition = true;
   public:
+    bool dependentPosition = true;
     kHitBox hitbox;
     cpBody *body;
     std::function<void(GameObject *)> preCollision = [](GameObject *obj) {};  // before physics calculation
@@ -66,8 +65,6 @@ namespace kNgine
     virtual void enable();
     virtual void disable();
     virtual void init(std::vector<EngineObject *> objects);
-    virtual void update(std::vector<msg> msgs);
-    virtual void end(std::vector<EngineObject *> objects);
   };
 
   static inline kHitBox kHitBoxRect(v2 size = {1, 1}, f32 weight = 1.f, f32 friction = 0.f)
@@ -76,6 +73,10 @@ namespace kNgine
     cpShapeSetFriction(h.shapes[0], friction);
     return h;
   }
+
+  cpBool findPreCollider(cpArbiter *arb, cpSpace *space, cpDataPointer data);
+  void findPostCollider(cpArbiter *arb, cpSpace *space, cpDataPointer data);
+
 
   class cpPhysicsEngine : public EngineObject
   {

@@ -822,11 +822,11 @@ void kRenderer_drawCircle(v2 startPoint, f32 radius)
 }
 
 void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-                                        v3 position, f32 width, f32 height, v3 rotation)
+                                        v3 position, f32 width, f32 height,v3 centerOfRotation, v3 rotation)
 {
   u32 texture;
   kRenderer_bindTexture(&texture, buffer, bufferWidth, bufferHeight, numChannels);
-  kRenderer_drawStoredTexture_defaultShader(texture, position, width, height, rotation);
+  kRenderer_drawStoredTexture_defaultShader(texture, position, width, height,centerOfRotation, rotation);
   kRenderer_unbindTexture(texture);
 }
 // void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
@@ -844,8 +844,8 @@ void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer, i32 realWidth, i32 rea
   glBindTexture(GL_TEXTURE_2D, *textureIndex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
   if (numChannels == 1)
   {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, realWidth, realHeight, 0, GL_RED,
@@ -863,7 +863,7 @@ void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer, i32 realWidth, i32 rea
   }
   glGenerateMipmap(GL_TEXTURE_2D);
 }
-void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f32 width, f32 height, v3 rotation)
+void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f32 width, f32 height,v3 centerOfRotation, v3 rotation)
 {
   struct corner
   {
@@ -878,8 +878,7 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f3
 
   m4 mat = M4InitDiagonal(1.0f);
   mat = M4MultiplyM4(mat, kRenderer_getMapper());
-  mat = M4MultiplyM4(mat,M4TranslateV3(v3(width/2.f,height/2,0)));
-  mat = M4MultiplyM4(mat,M4TranslateV3(position));
+  mat = M4MultiplyM4(mat,M4TranslateV3(centerOfRotation));
   mat = M4MultiplyM4(mat, M4Mapper(v3(-windowSize.x, -windowSize.y, 0),
                                    v3(windowSize.x, windowSize.y, 1),
                                    kRenderer_WindowsContexts.windows[currentContext].min,
@@ -891,8 +890,7 @@ void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f3
                                    kRenderer_WindowsContexts.windows[currentContext].max,
                                    v3(-windowSize.x, -windowSize.y, 0),
                                    v3(windowSize.x, windowSize.y, 1)));
-  mat = M4MultiplyM4(mat,M4TranslateV3(V3MultiplyF32(position,-1)));
-  mat = M4MultiplyM4(mat,M4TranslateV3(v3(-width/2.f,-height/2,0)));
+  mat = M4MultiplyM4(mat,M4TranslateV3(V3MultiplyF32(centerOfRotation,-1)));
 
   for (u32 i = 0; i < 4; i++)
   {

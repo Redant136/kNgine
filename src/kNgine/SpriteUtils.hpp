@@ -66,6 +66,7 @@ namespace kNgine
     u32 getMapIndex();
     Sprite *getSprite();
     v2 getSpriteDimensions();
+    void setSpriteDimensions(v2 size);
   };
 
   // [RendererObject]
@@ -118,6 +119,13 @@ namespace kNgine
       renderable->unload();
     }
     virtual void end(std::vector<EngineObject *> objects) { renderable->end(objects); }
+    v2 getSpriteDimensions(){
+      return renderable->getSpriteDimensions();
+    }
+    void setSpriteDimensions(v2 size){
+      renderable->setSpriteDimensions(size);
+    }
+
   };
 
   //[animation_system]
@@ -182,14 +190,20 @@ namespace kNgine
 
   public:
     Renderable *active;
-    v2 spriteDimension;
+    // v2 spriteDimension=v2(1,1);
     RenderableSystem(ComponentGameObject *base) : Renderable(base)
     {
       active = NULL;
-      spriteDimension = v2(1, 1);
       this->label = "[Rend_SYS]";
     }
-    void addSprite(Renderable *accessor, std::string name)
+    ~RenderableSystem()
+    {
+      for (u32 i = 0; i < accessors.size(); i++)
+      {
+        delete accessors[i].accessor;
+      }
+    }
+    void addRenderable(Renderable *accessor, std::string name)
     {
       struct accessor_pair a = {name, accessor};
       accessors.push_back(a);
@@ -230,6 +244,8 @@ namespace kNgine
         accessors[i].accessor->end(objects);
       }
     }
+    v2 getSpriteDimensions() { return active->getSpriteDimensions(); }
+    void setSpriteDimensions(v2 size) { active->setSpriteDimensions(size); }
   };
 
   std::vector<Sprite> importSpriteSheet(const char *filename, i32 spriteWidth, i32 spriteHeight);

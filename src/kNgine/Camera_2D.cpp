@@ -35,7 +35,6 @@ namespace kNgine
 
   void Camera::init(std::vector<EngineObject *> objects){
     this->engineInfo = (Array<EngineObject*>*)callEvent("getEngineObjects");
-    // this->engineInfo = {(size_t *)callEvent("getEngineObjectsSize"), (EngineObject **)callEvent("getEngineObjects")};
     this->layer = layerO(*(LayerOrder *)callEvent("getEngineRendererLayers"), DEFAULT_LAYER);
   }
 
@@ -206,15 +205,19 @@ namespace kNgine
         if (accessor->hasToSave())
         {
           v2 pos = toV2(posMapper.map((object->position + accessor->offset) - position)) + spriteOffset;
+          v3 centerRot = v3(0,0,0);
+          centerRot = posMapper.map(toV2(object->position) - toV2(position));
           kRenderer_drawBuffer_defaultShader(buffer, accessor->getSprite()->width, accessor->getSprite()->height, accessor->getSprite()->numChannels,
-                                             v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, object->rotation);
+                                             v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y,centerRot, object->rotation);
         }
         else
         {
           v2 pos = toV2(posMapper.map((object->position + accessor->offset) - position)) + spriteOffset;
+          v3 centerRot = v3(0,0,0);
+          centerRot = posMapper.map(toV2(object->position) - toV2(position));
           SpriteMapAccessor *ref = (SpriteMapAccessor *)accessor;
           kRenderer_drawStoredTexture_defaultShader(ref->spriteList->texIndex[ref->getMapIndex()],
-                                                    v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y, object->rotation);
+                                                    v3(pos.x, pos.y, object->position.z), spriteDimensions.x, spriteDimensions.y,centerRot, object->rotation);
         }
       }
 

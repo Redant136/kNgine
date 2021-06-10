@@ -106,7 +106,7 @@ namespace kNgine
     }
     return Sprite(width, height, 4, colorMap);
   }
-  static inline void freeSprite(Sprite sprite)
+  static inline void freeSprite(Sprite &sprite)
   {
     delete[] sprite.buffer;
   }
@@ -310,6 +310,8 @@ namespace kNgine
     {
       this->flags|=ObjectFlags::RENDERABLE;
     }
+    virtual void setSpriteDimensions(v2 size){}
+    virtual v2 getSpriteDimensions() = 0;
   };
   //[sprite]
   class SpriteAccessor : public Renderable
@@ -320,7 +322,6 @@ namespace kNgine
     SpriteAccessor(ComponentGameObject *base);
     virtual bool hasToSave() = 0;
     virtual Sprite *getSprite() = 0; //pointer for not having to call copy
-    virtual v2 getSpriteDimensions() = 0;
     virtual v2 getSpriteLocation()
     {
       switch (spriteLocation)
@@ -355,6 +356,7 @@ namespace kNgine
     bool hasToSave() { return true; }
     Sprite *getSprite();
     v2 getSpriteDimensions();
+    void setSpriteDimensions(v2 size){this->spriteDimension=size;}
   };
 
   class LayerRenderer : public GameObject

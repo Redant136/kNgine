@@ -35,7 +35,6 @@ namespace kNgine
       cpShapeFilter filter = cpShapeGetFilter(this->hitbox.shapes[i]);
       filter.group = (uintptr_t)base;
       filter.categories = GlobalCollisionCategory;
-      filter.mask ^= HitBoxCollisionCategory;
       cpShapeSetFilter(this->hitbox.shapes[i], filter);
     }
   }
@@ -51,6 +50,20 @@ namespace kNgine
   kPhysicsBodyComponent *kPhysicsBodyComponent::staticBody(ComponentGameObject *base, kHitBox hitbox)
   {
     return new kPhysicsBodyComponent(base, cpBodyNewStatic(), hitbox);
+  }
+  kPhysicsBodyComponent *kPhysicsBodyComponent::toIntangibleHitBox()
+  {
+    cpBodySetType(this->body, cpBodyType::CP_BODY_TYPE_KINEMATIC);
+    for (u32 i = 0; i < this->hitbox.shapes.size(); i++)
+    {
+      cpShapeFilter filter = cpShapeGetFilter(this->hitbox.shapes[i]);
+      filter.categories |= HitBoxCollisionCategory;
+      cpShapeSetFilter(this->hitbox.shapes[i], filter);
+      this->hitbox.shapes[i]->sensor = true;
+    }
+    this->dependentPosition=false;
+    
+    return this;
   }
 
   v2 kPhysicsBodyComponent::getVelocity()
@@ -90,21 +103,6 @@ namespace kNgine
   {
     cpBodySetForce(body, cpBodyGetForce(body) + toCPV(f));
   }
-  kPhysicsBodyComponent *kPhysicsBodyComponent::toIntangibleHitBox()
-  {
-    cpBodySetType(this->body, cpBodyType::CP_BODY_TYPE_KINEMATIC);
-    for (u32 i = 0; i < this->hitbox.shapes.size(); i++)
-    {
-      cpShapeFilter filter = cpShapeGetFilter(this->hitbox.shapes[i]);
-      filter.categories |= HitBoxCollisionCategory;
-      filter.mask ^= HitBoxCollisionCategory;
-      filter.mask ^= GlobalCollisionCategory;
-      cpShapeSetFilter(this->hitbox.shapes[i], filter);
-    }
-
-    
-    return this;
-  }
 
   void kPhysicsBodyComponent::enable()
   {
@@ -131,33 +129,17 @@ namespace kNgine
     cpBodySetPosition(body, toCPV(object->position));
     cpBodySetAngle(body, object->rotation.z);
   }
-  void kPhysicsBodyComponent::update(std::vector<msg> msgs)
-  {
-    if (dependentPosition)
-    {
-      object->position = toV2(body->p);
-      object->rotation.z = body->a;
-    }
-    else
-    {
-      body->p = toCPV(object->position);
-      body->a = object->rotation.z;
-    }
-  }
-  void kPhysicsBodyComponent::end(std::vector<EngineObject *> objects)
-  {
-  }
 
   cpPhysicsEngine::cpPhysicsEngine() : cpPhysicsEngine(v2(0, 0))
   {
   }
-  static cpBool findPreCollider(cpArbiter *arb, cpSpace *space, cpDataPointer data)
+  cpBool findPreCollider(cpArbiter *arb, cpSpace *space, cpDataPointer data)
   {
     ((kPhysicsBodyComponent *)arb->body_a->userData)->preCollision(((kPhysicsBodyComponent *)arb->body_b->userData)->object);
     ((kPhysicsBodyComponent *)arb->body_b->userData)->preCollision(((kPhysicsBodyComponent *)arb->body_a->userData)->object);
     return cpTrue;
   }
-  static void findPostCollider(cpArbiter *arb, cpSpace *space, cpDataPointer data)
+  void findPostCollider(cpArbiter *arb, cpSpace *space, cpDataPointer data)
   {
     ((kPhysicsBodyComponent *)arb->body_a->userData)->preCollision(((kPhysicsBodyComponent *)arb->body_b->userData)->object);
     ((kPhysicsBodyComponent *)arb->body_b->userData)->preCollision(((kPhysicsBodyComponent *)arb->body_a->userData)->object);
@@ -172,15 +154,19 @@ namespace kNgine
   }
   void cpPhysicsEngine::init(std::vector<EngineObject *> objects)
   {
-    // engineData=(Array<EngineObject*>*)callEvent("getEngineObjects");
     std::vector<ComponentGameObject *> list = findObject<ComponentGameObject>(objects, "[k_physics_body]");
     for (u32 i = 0; i < list.size(); i++)
     {
       kPhysicsBodyComponent *compn = list[i]->findComponent<kPhysicsBodyComponent>("[k_physics_body]");
-      compn->body = cpSpaceAddBody(space, compn->body);
-      for (u32 j = 0; j < compn->hitbox.shapes.size(); j++)
+      for (u32 j = 0; compn; j++, compn = list[i]->findComponent<kPhysicsBodyComponent>("[k_physics_body]", j))
       {
-        compn->hitbox.shapes[j] = cpSpaceAddShape(space, compn->hitbox.shapes[j]);
+        cpBodySetPosition(compn->body, toCPV(compn->object->position));
+        cpBodySetAngle(compn->body, compn->object->rotation.z);
+        compn->body = cpSpaceAddBody(space, compn->body);
+        for (u32 k = 0; k < compn->hitbox.shapes.size(); k++)
+        {
+          compn->hitbox.shapes[k] = cpSpaceAddShape(space, compn->hitbox.shapes[k]);
+        }
       }
     }
   }
@@ -195,6 +181,26 @@ namespace kNgine
       }
     }
     cpSpaceStep(space, timeStep);
+
+    std::vector<ComponentGameObject *> list = findObject<ComponentGameObject>(*(Array<EngineObject*>*)callEvent("getEngineObjects",NULL), "[k_physics_body]");
+    for (u32 i = 0; i < list.size(); i++)
+    {
+      kPhysicsBodyComponent *compn = list[i]->findComponent<kPhysicsBodyComponent>("[k_physics_body]");
+      for (u32 j = 0; compn; j++, compn = list[i]->findComponent<kPhysicsBodyComponent>("[k_physics_body]", j))
+      {
+        if (compn->dependentPosition)
+        {
+          list[i]->position = toV2(compn->body->p);
+          list[i]->rotation.z = compn->body->a;
+        }
+        else
+        {
+          cpBodySetPosition(compn->body,toCPV(list[i]->position));
+          cpBodySetAngle(compn->body,list[i]->rotation.z);
+        }
+        cpSpaceReindexShapesForBody(space, compn->body);
+      }
+    }
   }
   void cpPhysicsEngine::end(std::vector<EngineObject *> objects)
   {

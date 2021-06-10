@@ -101,8 +101,8 @@ int main()
     mcSprites->offsetPixelsInSprites(NORTH,1);
     kNgine::SpriteAnimation* walk_animation=new kNgine::SpriteAnimation(NULL,mcSprites,kNgine::importSpriteSheet("walking_animation.png",64,64),1.0/15);
 
-    animations->addSprite(adventurer,"adventurer");
-    animations->addSprite(walk_animation,"walk");
+    animations->addRenderable(adventurer,"adventurer");
+    animations->addRenderable(walk_animation,"walk");
     mc->addComponent(animations);
 
 

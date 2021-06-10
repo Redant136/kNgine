@@ -15,8 +15,8 @@ namespace kNgine
         cpPolyShape*poly=(cpPolyShape*)obj->hitbox.shapes[i];
         u32 numPoints=poly->count;
         v2*lineLoop=new v2[numPoints];
-        for(u32 i=0;i<numPoints;i++){
-          lineLoop[i] = cam->posMapper.map(toV2(poly->planes[i].v0) - toV2(cam->position));
+        for(u32 j=0;j<numPoints;j++){
+          lineLoop[j] = cam->posMapper.map(toV2(poly->planes[j].v0) - toV2(cam->position));
         }
         kRenderer_drawLineLoop(lineLoop,numPoints);
         delete[]lineLoop;

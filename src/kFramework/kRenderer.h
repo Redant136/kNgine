@@ -125,11 +125,11 @@ extern "C"
   void kRenderer_drawCircle(v2 startPoint, f32 radius);
 
   void kRenderer_drawBuffer_defaultShader(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
-                                          v3 position, f32 width, f32 height, v3 rotation);
+                                          v3 position, f32 width, f32 height,v3 centerOfRotation, v3 rotation);
   // void kRenderer_drawBuffer(u8 *buffer, u32 bufferWidth, u32 bufferHeight, u32 numChannels,
   //                           void *args[kRenderer_maxShaderPrograms][4]);
   void kRenderer_bindTexture(u32 *textureIndex, u8 *buffer, i32 bufferWidth, i32 bufferHeight, i32 numChannels);
-  void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f32 width, f32 height, v3 rotation);
+  void kRenderer_drawStoredTexture_defaultShader(u32 textureIndex, v3 position, f32 width, f32 height,v3 centerOfRotation, v3 rotation);
   void kRenderer_drawStoredTexture(u32 textureIndex, size_t numShaders, u32 *shaders, f32 **args);
   void kRenderer_unbindTexture(u32 textureIndex);
 
